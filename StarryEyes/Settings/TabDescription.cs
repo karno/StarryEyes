@@ -38,13 +38,13 @@ namespace StarryEyes.Settings
 
         public TabDescription(TabModel model)
         {
-            this.Name = model.Name;
-            this.ShowUnreadCounts = model.ShowUnreadCounts;
-            this.NotifyNewArrivals = model.NotifyNewArrivals;
-            this.BindingAccountIds = model.BindingAccounts.ToArray();
-            this.BindingHashtags = model.BindingHashtags.ToArray();
-            this.NotifySoundSource = model.NotifySoundSource;
-            this.Query = model.GetQueryString();
+            Name = model.Name;
+            ShowUnreadCounts = model.ShowUnreadCounts;
+            NotifyNewArrivals = model.NotifyNewArrivals;
+            BindingAccountIds = model.BindingAccounts.ToArray();
+            BindingHashtags = model.BindingHashtags.ToArray();
+            NotifySoundSource = model.NotifySoundSource;
+            Query = model.GetQueryString();
         }
 
         public TabModel ToTabModel()
@@ -60,16 +60,16 @@ namespace StarryEyes.Settings
                 filter = null;
             }
             var model = new TabModel
-             {
-                 Name = Name,
-                 FilterQuery = filter,
-                 RawQueryString = Query,
-                 BindingHashtags = this.BindingHashtags.Guard(),
-                 NotifyNewArrivals = this.NotifyNewArrivals,
-                 NotifySoundSource = this.NotifySoundSource,
-                 ShowUnreadCounts = this.ShowUnreadCounts
-             };
-            this.BindingAccountIds.ForEach(model.BindingAccounts.Add);
+            {
+                Name = Name,
+                FilterQuery = filter,
+                RawQueryString = Query,
+                BindingHashtags = BindingHashtags.Guard(),
+                NotifyNewArrivals = NotifyNewArrivals,
+                NotifySoundSource = NotifySoundSource,
+                ShowUnreadCounts = ShowUnreadCounts
+            };
+            BindingAccountIds.ForEach(model.BindingAccounts.Add);
             return model;
         }
     }

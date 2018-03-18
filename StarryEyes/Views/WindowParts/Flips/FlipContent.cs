@@ -11,12 +11,13 @@ namespace StarryEyes.Views.WindowParts.Flips
     {
         public bool IsOpen
         {
-            get { return (bool)GetValue(IsOpenProperty); }
-            set { SetValue(IsOpenProperty, value); }
+            get => (bool)GetValue(IsOpenProperty);
+            set => SetValue(IsOpenProperty, value);
         }
 
         public static readonly DependencyProperty IsOpenProperty =
-            DependencyProperty.Register("IsOpen", typeof(bool), typeof(FlipContent), new PropertyMetadata(false, OnOpenChanged));
+            DependencyProperty.Register("IsOpen", typeof(bool), typeof(FlipContent),
+                new PropertyMetadata(false, OnOpenChanged));
 
         private static void OnOpenChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
@@ -33,8 +34,10 @@ namespace StarryEyes.Views.WindowParts.Flips
             else
             {
                 VisualStateManager.GoToState(fc, "Close", true);
-                var timer = new DispatcherTimer(DispatcherPriority.Loaded, DispatcherHelper.UIDispatcher);
-                timer.Interval = TimeSpan.FromSeconds(0.2);
+                var timer = new DispatcherTimer(DispatcherPriority.Loaded, DispatcherHelper.UIDispatcher)
+                {
+                    Interval = TimeSpan.FromSeconds(0.2)
+                };
                 timer.Tick += (o, args) =>
                 {
                     timer.Stop();
@@ -46,19 +49,18 @@ namespace StarryEyes.Views.WindowParts.Flips
 
         public Visibility OwnerVisibility
         {
-            get { return (Visibility)GetValue(OwnerVisibilityProperty); }
-            set { SetValue(OwnerVisibilityProperty, value); }
+            get => (Visibility)GetValue(OwnerVisibilityProperty);
+            set => SetValue(OwnerVisibilityProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for OwnerVisibility.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty OwnerVisibilityProperty =
-            DependencyProperty.Register("OwnerVisibility", typeof(Visibility), typeof(FlipContent), new PropertyMetadata(Visibility.Visible));
+            DependencyProperty.Register("OwnerVisibility", typeof(Visibility), typeof(FlipContent),
+                new PropertyMetadata(Visibility.Visible));
 
         public FlipContent()
         {
-            dynamic dobj = new object();
-            var members = ((Type)dobj.GetType()).GetMembers();
-            this.Loaded += (sender, args) =>
+            Loaded += (sender, args) =>
             {
                 if (DesignTimeUtil.IsInDesignMode)
                 {

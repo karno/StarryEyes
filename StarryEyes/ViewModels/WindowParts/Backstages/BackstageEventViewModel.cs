@@ -6,46 +6,23 @@ namespace StarryEyes.ViewModels.WindowParts.Backstages
 {
     public class BackstageEventViewModel : ViewModel
     {
-        private readonly BackstageEventBase _sourceEvent;
-
         public BackstageEventViewModel(BackstageEventBase ev)
         {
-            this._sourceEvent = ev;
+            SourceEvent = ev;
         }
 
-        public BackstageEventBase SourceEvent
-        {
-            get { return this._sourceEvent; }
-        }
+        protected BackstageEventBase SourceEvent { get; }
 
-        public Color Background
-        {
-            get { return this.SourceEvent.Background; }
-        }
+        public Color Background => SourceEvent.Background;
 
-        public Color Foreground
-        {
-            get { return this.SourceEvent.Foreground; }
-        }
+        public Color Foreground => SourceEvent.Foreground;
 
-        public string Title
-        {
-            get { return this.SourceEvent.Title; }
-        }
+        public string Title => SourceEvent.Title;
 
-        public ImageSource TitleImage
-        {
-            get { return this.SourceEvent.TitleImage; }
-        }
+        public ImageSource TitleImage => SourceEvent.TitleImage;
 
-        public bool IsImageAvailable
-        {
-            get { return this.SourceEvent.TitleImage != null; }
-        }
+        public bool IsImageAvailable => SourceEvent.TitleImage != null;
 
-        public string Detail
-        {
-            get { return this.SourceEvent.Detail.Replace("\r", "").Replace("\n", " "); }
-        }
+        public string Detail => SourceEvent.Detail.Replace("\r", "").Replace("\n", " ");
     }
 }

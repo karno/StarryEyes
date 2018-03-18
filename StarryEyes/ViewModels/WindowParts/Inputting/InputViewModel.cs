@@ -11,21 +11,15 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 {
     public class InputViewModel : ViewModel
     {
-        private readonly InputCoreViewModel _inputCoreViewModel;
-
-        private readonly AccountSelectorViewModel _accountSelectorViewModel;
-
-        private readonly PostLimitPredictionViewModel _postLimitPredictionViewModel;
-
         private bool _isOpening;
 
         public InputViewModel()
         {
-            this.CompositeDisposable.Add(_inputCoreViewModel = new InputCoreViewModel(this));
-            this.CompositeDisposable.Add(_accountSelectorViewModel = new AccountSelectorViewModel(this));
-            this.CompositeDisposable.Add(_postLimitPredictionViewModel = new PostLimitPredictionViewModel());
+            CompositeDisposable.Add(InputCoreViewModel = new InputCoreViewModel(this));
+            CompositeDisposable.Add(AccountSelectorViewModel = new AccountSelectorViewModel(this));
+            CompositeDisposable.Add(PostLimitPredictionViewModel = new PostLimitPredictionViewModel());
 
-            this.CompositeDisposable.Add(
+            CompositeDisposable.Add(
                 new EventListener<Action>(
                     h => InputModel.FocusRequest += h,
                     h => InputModel.FocusRequest -= h,
@@ -34,60 +28,46 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                         OpenInput();
                         FocusToTextBox();
                     }));
-            this.CompositeDisposable.Add(
+            CompositeDisposable.Add(
                 new EventListener<Action>(
                     h => InputModel.CloseRequest += h,
                     h => InputModel.CloseRequest -= h,
                     CloseInput));
-            this.RegisterKeyAssigns();
+            RegisterKeyAssigns();
         }
 
-        public InputCoreViewModel InputCoreViewModel
-        {
-            get { return this._inputCoreViewModel; }
-        }
+        public InputCoreViewModel InputCoreViewModel { get; }
 
-        public AccountSelectorViewModel AccountSelectorViewModel
-        {
-            get { return this._accountSelectorViewModel; }
-        }
+        public AccountSelectorViewModel AccountSelectorViewModel { get; }
 
-        public PostLimitPredictionViewModel PostLimitPredictionViewModel
-        {
-            get { return this._postLimitPredictionViewModel; }
-        }
+        public PostLimitPredictionViewModel PostLimitPredictionViewModel { get; }
 
         private void RegisterKeyAssigns()
         {
             KeyAssignManager.RegisterActions(
-                KeyAssignAction.Create("CloseInput", this.CloseInput),
-                KeyAssignAction.Create("Post", this.InputCoreViewModel.Send),
+                KeyAssignAction.Create("CloseInput", CloseInput),
+                KeyAssignAction.Create("Post", InputCoreViewModel.Send),
                 KeyAssignAction.Create("LoadStash", () =>
                 {
-                    if (this.InputCoreViewModel.IsDraftsExisted)
+                    if (InputCoreViewModel.IsDraftsExisted)
                     {
-                        this.InputCoreViewModel.DraftedInputs[0].Writeback();
+                        InputCoreViewModel.DraftedInputs[0].Writeback();
                     }
                 }),
-                KeyAssignAction.Create("Amend", this.InputCoreViewModel.AmendLastPosted),
-                KeyAssignAction.Create("AttachImage", () =>
-                {
-                    this.InputCoreViewModel.AttachImage();
-                }),
-                KeyAssignAction.Create("ToggleEscape", () =>
-                {
-                    this.InputCoreViewModel.IsUrlAutoEsacpeEnabled = !this.InputCoreViewModel.IsUrlAutoEsacpeEnabled;
-                }),
-                KeyAssignAction.Create("SelectNextAccount", () => this.AccountSelectorViewModel.SelectNext()),
-                KeyAssignAction.Create("SelectPreviousAccount", () => this.AccountSelectorViewModel.SelectPrev()),
-                KeyAssignAction.Create("ClearSelectedAccounts", () => this.AccountSelectorViewModel.ClearAll()),
-                KeyAssignAction.Create("SelectAllAccounts", () => this.AccountSelectorViewModel.SelectAll())
-                );
+                KeyAssignAction.Create("Amend", InputCoreViewModel.AmendLastPosted),
+                KeyAssignAction.Create("AttachImage", () => { InputCoreViewModel.AttachImage(); }),
+                KeyAssignAction.Create("ToggleEscape",
+                    () => { InputCoreViewModel.IsUrlAutoEsacpeEnabled = !InputCoreViewModel.IsUrlAutoEsacpeEnabled; }),
+                KeyAssignAction.Create("SelectNextAccount", () => AccountSelectorViewModel.SelectNext()),
+                KeyAssignAction.Create("SelectPreviousAccount", () => AccountSelectorViewModel.SelectPrev()),
+                KeyAssignAction.Create("ClearSelectedAccounts", () => AccountSelectorViewModel.ClearAll()),
+                KeyAssignAction.Create("SelectAllAccounts", () => AccountSelectorViewModel.SelectAll())
+            );
         }
 
         public bool IsOpening
         {
-            get { return _isOpening; }
+            get => _isOpening;
             set
             {
                 if (_isOpening == value) return;
@@ -140,7 +120,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         public void FocusToTextBox()
         {
             DispatcherHelper.UIDispatcher.VerifyAccess();
-            this.Messenger.RaiseSafe(() => new InteractionMessage("FocusToTextBox"));
+            Messenger.RaiseSafe(() => new InteractionMessage("FocusToTextBox"));
         }
     }
 }

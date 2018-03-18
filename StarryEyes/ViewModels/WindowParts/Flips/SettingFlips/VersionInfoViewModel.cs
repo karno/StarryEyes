@@ -17,23 +17,20 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
         {
             // when update is available, callback this.
             if (DesignTimeUtil.IsInDesignMode) return;
-            AutoUpdateService.UpdateStateChanged += () => this._isUpdateAvailable = true;
+            AutoUpdateService.UpdateStateChanged += () => _isUpdateAvailable = true;
             _contributors = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                 ContributionService.Contributors, c => new ContributorViewModel(c),
                 DispatcherHelper.UIDispatcher);
-            this.CompositeDisposable.Add(_contributors.ListenCollectionChanged(
+            CompositeDisposable.Add(_contributors.ListenCollectionChanged(
                 _ => RaisePropertyChanged(() => IsDonated)));
         }
 
-        public string ApplicationName
-        {
-            get { return App.AppFullName; }
-        }
+        public string ApplicationName => App.AppFullName;
 
         [UsedImplicitly]
         public void CheckUpdate()
         {
-            Task.Run(() => this.CheckUpdates());
+            Task.Run(() => CheckUpdates());
         }
 
         #region Open links
@@ -53,15 +50,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
             BrowserHelper.Open(App.DonationUrl);
         }
 
-        #endregion
+        #endregion Open links
 
         #region Contributors
 
         private readonly ReadOnlyDispatcherCollectionRx<ContributorViewModel> _contributors;
-        public ReadOnlyDispatcherCollectionRx<ContributorViewModel> Contributors
-        {
-            get { return this._contributors; }
-        }
+        public ReadOnlyDispatcherCollectionRx<ContributorViewModel> Contributors => _contributors;
 
         public bool IsDonated
         {
@@ -72,47 +66,35 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
             }
         }
 
-        #endregion
+        #endregion Contributors
 
         #region Versioning
 
-        public string Version
-        {
-            get { return App.FormattedVersion; }
-        }
+        public string Version => App.FormattedVersion;
 
         private bool _isChecking;
         private bool _isUpdateAvailable;
 
-        public bool IsChecking
-        {
-            get { return this._isChecking; }
-        }
+        public bool IsChecking => _isChecking;
 
-        public bool IsUpdateIsNotExisted
-        {
-            get { return !this._isChecking && !this._isUpdateAvailable; }
-        }
+        public bool IsUpdateIsNotExisted => !_isChecking && !_isUpdateAvailable;
 
-        public bool IsUpdateExisted
-        {
-            get { return !this._isChecking && this._isUpdateAvailable; }
-        }
+        public bool IsUpdateExisted => !_isChecking && _isUpdateAvailable;
 
         public async void CheckUpdates()
         {
-            this._isChecking = true;
-            this.RefreshCheckState();
-            this._isUpdateAvailable = await AutoUpdateService.CheckPrepareUpdate(App.Version);
-            this._isChecking = false;
-            this.RefreshCheckState();
+            _isChecking = true;
+            RefreshCheckState();
+            _isUpdateAvailable = await AutoUpdateService.CheckPrepareUpdate(App.Version);
+            _isChecking = false;
+            RefreshCheckState();
         }
 
         private void RefreshCheckState()
         {
-            this.RaisePropertyChanged(() => this.IsChecking);
-            this.RaisePropertyChanged(() => this.IsUpdateExisted);
-            this.RaisePropertyChanged(() => this.IsUpdateIsNotExisted);
+            RaisePropertyChanged(() => IsChecking);
+            RaisePropertyChanged(() => IsUpdateExisted);
+            RaisePropertyChanged(() => IsUpdateIsNotExisted);
         }
 
         public void StartUpdate()
@@ -120,7 +102,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
             AutoUpdateService.StartUpdate(App.Version);
         }
 
-        #endregion
+        #endregion Versioning
     }
 
     public class ContributorViewModel : ViewModel
@@ -128,30 +110,21 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
         private readonly string _name;
         private readonly string _screenName;
 
-        public string Name
-        {
-            get { return this._name; }
-        }
+        public string Name => _name;
 
-        public string ScreenName
-        {
-            get { return this._screenName; }
-        }
+        public string ScreenName => _screenName;
 
-        public bool IsLinkOpenable
-        {
-            get { return this._screenName != null; }
-        }
+        public bool IsLinkOpenable => _screenName != null;
 
         public ContributorViewModel(Contributor contributor)
         {
-            this._name = contributor.Name;
-            this._screenName = contributor.ScreenName;
+            _name = contributor.Name;
+            _screenName = contributor.ScreenName;
         }
 
         public void OpenUserTwitter()
         {
-            BrowserHelper.Open(VersionInfoViewModel.Twitter + this._screenName);
+            BrowserHelper.Open(VersionInfoViewModel.Twitter + _screenName);
         }
     }
 }

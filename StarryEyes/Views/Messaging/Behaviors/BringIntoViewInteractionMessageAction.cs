@@ -9,7 +9,7 @@ namespace StarryEyes.Views.Messaging.Behaviors
         {
             if (message is BringIntoViewMessage)
             {
-                this.AssociatedObject.BringIntoView();
+                AssociatedObject.BringIntoView();
             }
         }
     }

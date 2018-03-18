@@ -29,8 +29,8 @@ namespace StarryEyes.Views.Behaviors
         /// </summary>
         public bool IsScrollLockEnabled
         {
-            get { return (bool)GetValue(IsScrollLockEnabledProperty); }
-            set { SetValue(IsScrollLockEnabledProperty, value); }
+            get => (bool)GetValue(IsScrollLockEnabledProperty);
+            set => SetValue(IsScrollLockEnabledProperty, value);
         }
 
         /// <summary>
@@ -46,8 +46,8 @@ namespace StarryEyes.Views.Behaviors
         /// </summary>
         public bool IsScrollLockOnlyScrolled
         {
-            get { return (bool)GetValue(IsScrollLockOnlyScrolledProperty); }
-            set { SetValue(IsScrollLockOnlyScrolledProperty, value); }
+            get => (bool)GetValue(IsScrollLockOnlyScrolledProperty);
+            set => SetValue(IsScrollLockOnlyScrolledProperty, value);
         }
 
         /// <summary>
@@ -62,8 +62,8 @@ namespace StarryEyes.Views.Behaviors
         /// </summary>
         public IList ItemsSource
         {
-            get { return (IList)GetValue(ItemsSourceProperty); }
-            set { SetValue(ItemsSourceProperty, value); }
+            get => (IList)GetValue(ItemsSourceProperty);
+            set => SetValue(ItemsSourceProperty, value);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace StarryEyes.Views.Behaviors
         {
             var behavior = source as TimelineScrollLockerBehavior;
             // sender is ScollLockerBehavior and that is attached.
-            if (behavior != null && behavior.AssociatedObject != null)
+            if (behavior?.AssociatedObject != null)
             {
                 // call ItemsSourceChanged on the instance.
                 behavior.ItemsSourceChanged();
@@ -89,8 +89,8 @@ namespace StarryEyes.Views.Behaviors
         /// </summary>
         public bool IsAnimationEnabled
         {
-            get { return (bool)GetValue(IsAnimationEnabledProperty); }
-            set { SetValue(IsAnimationEnabledProperty, value); }
+            get => (bool)GetValue(IsAnimationEnabledProperty);
+            set => SetValue(IsAnimationEnabledProperty, value);
         }
 
         /// <summary>
@@ -105,8 +105,8 @@ namespace StarryEyes.Views.Behaviors
         /// </summary>
         public ScrollUnit CurrentScrollUnit
         {
-            get { return (ScrollUnit)GetValue(CurrentScrollUnitProperty); }
-            set { SetValue(CurrentScrollUnitProperty, value); }
+            get => (ScrollUnit)GetValue(CurrentScrollUnitProperty);
+            set => SetValue(CurrentScrollUnitProperty, value);
         }
 
         /// <summary>
@@ -148,18 +148,15 @@ namespace StarryEyes.Views.Behaviors
             _disposables.Add(Disposable.Create(() =>
             {
                 var disposable = Interlocked.Exchange(ref _itemSourceCollectionChangeListener, null);
-                if (disposable != null)
-                {
-                    disposable.Dispose();
-                }
+                disposable?.Dispose();
             }));
 
             _disposables.Add(
                 Observable.FromEventPattern<ScrollChangedEventHandler, ScrollChangedEventArgs>(
-                              h => this.AssociatedObject.ScrollChanged += h,
-                              h => this.AssociatedObject.ScrollChanged -= h)
+                              h => AssociatedObject.ScrollChanged += h,
+                              h => AssociatedObject.ScrollChanged -= h)
                           .Select(p => p.EventArgs)
-                          .Subscribe(this.ScrollChanged));
+                          .Subscribe(ScrollChanged));
         }
 
         protected override void OnDetaching()
@@ -169,7 +166,7 @@ namespace StarryEyes.Views.Behaviors
             {
                 _scrollOffsetQueue.Clear();
             }
-            this.StopScrollTimer();
+            StopScrollTimer();
         }
 
         /// <summary>
@@ -193,7 +190,7 @@ namespace StarryEyes.Views.Behaviors
             var verticalOffset = e.VerticalOffset;
 
             var epsilon = ScrollEpsilonItem;
-            if (this.CurrentScrollUnit == ScrollUnit.Pixel)
+            if (CurrentScrollUnit == ScrollUnit.Pixel)
             {
                 epsilon = ScrollEpsilonPixel;
             }
@@ -219,7 +216,7 @@ namespace StarryEyes.Views.Behaviors
                 // var prevPosition = e.VerticalOffset + e.ExtentHeightChange;
 
                 var firstNode = _lastScrollOffsets.First;
-                var lastScrollOffset = firstNode != null ? firstNode.Value : 0;
+                var lastScrollOffset = firstNode?.Value ?? 0;
 
                 var prevPosition = lastScrollOffset + e.ExtentHeightChange;
                 if (prevPosition > e.ExtentHeight)
@@ -243,7 +240,7 @@ namespace StarryEyes.Views.Behaviors
                             {
                                 System.Diagnostics.Debug.WriteLine("* Currently scrolling -> update animation.");
                                 // start animation
-                                this.RunAnimation(prevPosition);
+                                RunAnimation(prevPosition);
                                 return;
                             }
                         }
@@ -257,7 +254,7 @@ namespace StarryEyes.Views.Behaviors
                 {
                     System.Diagnostics.Debug.WriteLine("* Run animation! offset: " + prevPosition);
                     // animate to new position
-                    this.RunAnimation(prevPosition);
+                    RunAnimation(prevPosition);
                 }
                 else
                 {
@@ -326,19 +323,16 @@ namespace StarryEyes.Views.Behaviors
             if (nc == null) return;
 
             // initialize count
-            this._previousItemCount = itemsSource.Count;
+            _previousItemCount = itemsSource.Count;
 
             // create listener of timeline changes
             var listener = ListenCollectionChange(itemsSource);
 
             // swap old listener
             var disposable = Interlocked.Exchange(
-                ref this._itemSourceCollectionChangeListener, listener);
+                ref _itemSourceCollectionChangeListener, listener);
 
-            if (disposable != null)
-            {
-                disposable.Dispose();
-            }
+            disposable?.Dispose();
         }
 
         /// <summary>
@@ -350,11 +344,11 @@ namespace StarryEyes.Views.Behaviors
         {
             return ((INotifyCollectionChanged)source).ListenCollectionChanged(ev =>
             {
-                if (this.AssociatedObject == null) return;
+                if (AssociatedObject == null) return;
                 if (ev.Action == NotifyCollectionChangedAction.Add)
                 {
                     // get virtualizing stack panel
-                    var vsp = this.AssociatedObject.FindVisualChild<VirtualizingStackPanel>();
+                    var vsp = AssociatedObject.FindVisualChild<VirtualizingStackPanel>();
                     if (vsp != null)
                     {
                         var index = vsp.ItemContainerGenerator
@@ -367,7 +361,7 @@ namespace StarryEyes.Views.Behaviors
                     }
                 }
                 // we should not scroll -> update items count.
-                this._previousItemCount = source.Count;
+                _previousItemCount = source.Count;
             });
         }
 
@@ -383,7 +377,7 @@ namespace StarryEyes.Views.Behaviors
                 _scrollOffsetQueue.Clear();
             }
 
-            this._isScrollAnimating = true;
+            _isScrollAnimating = true;
 
             // scroll to initial position (enforced)
             ScrollToVerticalOffset(offset);
@@ -440,7 +434,7 @@ namespace StarryEyes.Views.Behaviors
                     // disable magical ignore
                     return;
                 }
-                dequeuedOffset = this._scrollOffsetQueue.Dequeue();
+                dequeuedOffset = _scrollOffsetQueue.Dequeue();
                 if (_scrollOffsetQueue.Count == 0)
                 {
                     lastItemOfQueue = true;
@@ -456,7 +450,7 @@ namespace StarryEyes.Views.Behaviors
             _isDispatcherAffected = false;
 
             // set scroll offset
-            this.Dispatcher.InvokeAsync(() =>
+            Dispatcher.InvokeAsync(() =>
             {
                 ScrollToVerticalOffset(dequeuedOffset);
                 _isDispatcherAffected = true;
@@ -474,12 +468,12 @@ namespace StarryEyes.Views.Behaviors
             if (offset < 1)
             {
                 _lastScrollOffsets.AddFirst(0);
-                this.AssociatedObject.ScrollToTop();
+                AssociatedObject.ScrollToTop();
             }
             else
             {
                 _lastScrollOffsets.AddFirst(offset);
-                this.AssociatedObject.ScrollToVerticalOffset(offset);
+                AssociatedObject.ScrollToVerticalOffset(offset);
             }
         }
     }

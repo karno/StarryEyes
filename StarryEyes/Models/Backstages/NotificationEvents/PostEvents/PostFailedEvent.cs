@@ -11,24 +11,15 @@ namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
 
         public PostFailedEvent(InputData data, string reason)
         {
-            this._post = data.Text;
-            this._reason = reason;
+            _post = data.Text;
+            _reason = reason;
         }
 
 
-        public override string Title
-        {
-            get { return "FAILED"; }
-        }
+        public override string Title => "FAILED";
 
-        public override string Detail
-        {
-            get { return _reason + " - " + this._post; }
-        }
+        public override string Detail => _reason + " - " + _post;
 
-        public override System.Windows.Media.Color Background
-        {
-            get { return MetroColors.Red; }
-        }
+        public override System.Windows.Media.Color Background => MetroColors.Red;
     }
 }

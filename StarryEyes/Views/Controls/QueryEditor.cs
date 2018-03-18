@@ -21,13 +21,14 @@ namespace StarryEyes.Views.Controls
     {
         public string QueryText
         {
-            get { return (string)GetValue(QueryTextProperty); }
-            set { SetValue(QueryTextProperty, value); }
+            get => (string)GetValue(QueryTextProperty);
+            set => SetValue(QueryTextProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for QueryText.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty QueryTextProperty =
-            DependencyProperty.Register("QueryText", typeof(string), typeof(QueryEditor), new PropertyMetadata(null, QueryTextChangedStatic));
+            DependencyProperty.Register("QueryText", typeof(string), typeof(QueryEditor),
+                new PropertyMetadata(null, QueryTextChangedStatic));
 
         private static void QueryTextChangedStatic(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
@@ -38,21 +39,22 @@ namespace StarryEyes.Views.Controls
 
         public bool IsSourceFilterEditable
         {
-            get { return (bool)GetValue(IsSourceFilterEditableProperty); }
-            set { SetValue(IsSourceFilterEditableProperty, value); }
+            get => (bool)GetValue(IsSourceFilterEditableProperty);
+            set => SetValue(IsSourceFilterEditableProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for IsSourceFilterEditable.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsSourceFilterEditableProperty =
-            DependencyProperty.Register("IsSourceFilterEditable", typeof(bool), typeof(QueryEditor), new PropertyMetadata(true));
+            DependencyProperty.Register("IsSourceFilterEditable", typeof(bool), typeof(QueryEditor),
+                new PropertyMetadata(true));
 
         public QueryEditor()
         {
-            this.ShowLineNumbers = true;
-            this.LoadXshd();
-            this.TextArea.TextEntering += TextArea_TextEntering;
-            this.TextArea.TextEntered += TextArea_TextEntered;
-            this.ContextMenu = this.BuildContextMenu();
+            ShowLineNumbers = true;
+            LoadXshd();
+            TextArea.TextEntering += TextArea_TextEntering;
+            TextArea.TextEntered += TextArea_TextEntered;
+            ContextMenu = BuildContextMenu();
         }
 
 
@@ -79,13 +81,13 @@ namespace StarryEyes.Views.Controls
             using (var stream = asm.GetManifestResourceStream(ResourceName) ?? Stream.Null)
             using (var reader = XmlReader.Create(stream))
             {
-                this.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+                SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
             }
         }
 
         protected override void OnTextChanged(EventArgs e)
         {
-            QueryText = this.Text;
+            QueryText = Text;
             base.OnTextChanged(e);
         }
 
@@ -95,38 +97,38 @@ namespace StarryEyes.Views.Controls
 
         private void OpenCompletionWindow(IEnumerable<CompletionData> completions)
         {
-            if (this._completionWindow != null) return;
-            var wnd = new CompletionWindow(this.TextArea);
+            if (_completionWindow != null) return;
+            var wnd = new CompletionWindow(TextArea);
             wnd.Closed += (o, e) =>
             {
-                if (this._completionWindow.Equals(wnd))
+                if (_completionWindow.Equals(wnd))
                 {
-                    this._completionWindow = null;
+                    _completionWindow = null;
                 }
             };
             completions.ForEach(wnd.CompletionList.CompletionData.Add);
             // insert elements
-            this._completionWindow = wnd;
+            _completionWindow = wnd;
             wnd.Show();
         }
 
         void TextArea_TextEntered(object sender, TextCompositionEventArgs e)
         {
             var cidx = CaretOffset;
-            if (cidx < 0 || this._completionWindow != null) return;
-            var cd = this.QueryCompletionData(this.Text.Substring(0, cidx), e.Text);
+            if (cidx < 0 || _completionWindow != null) return;
+            var cd = QueryCompletionData(Text.Substring(0, cidx), e.Text);
             if (cd != null)
             {
-                this.OpenCompletionWindow(cd);
+                OpenCompletionWindow(cd);
             }
         }
 
         void TextArea_TextEntering(object sender, TextCompositionEventArgs e)
         {
-            if (e.Text.Length > 0 && this._completionWindow != null &&
+            if (e.Text.Length > 0 && _completionWindow != null &&
                 !char.IsLetterOrDigit(e.Text[0]))
             {
-                this._completionWindow.CompletionList.RequestInsertion(e);
+                _completionWindow.CompletionList.RequestInsertion(e);
             }
         }
 
@@ -135,19 +137,19 @@ namespace StarryEyes.Views.Controls
             var tokens = Tokenizer.Tokenize(beforeCursor, true).ToArray();
             if (!IsSourceFilterEditable)
             {
-                return this.QueryOnRight(tokens, inputted);
+                return QueryOnRight(tokens, inputted);
             }
             var wheres = tokens.SkipWhile(t => !t.IsMatchTokenLiteral("where"))
                                .ToArray();
             if (wheres.Length > 0)
             {
-                return this.QueryOnRight(wheres.Skip(1), inputted);
+                return QueryOnRight(wheres.Skip(1), inputted);
             }
             var froms = tokens.SkipWhile(t => !t.IsMatchTokenLiteral("from"))
                               .ToArray();
             if (froms.Length > 0)
             {
-                return this.QueryOnLeft(froms.Skip(1), inputted);
+                return QueryOnLeft(froms.Skip(1), inputted);
             }
             switch (inputted.ToLower())
             {
@@ -200,7 +202,7 @@ namespace StarryEyes.Views.Controls
             {
                 case 0:
                     // first token of this query
-                    return this.GetVariableCompletionData();
+                    return GetVariableCompletionData();
                 case 1:
                     first = second = third = lts[0];
                     break;
@@ -218,7 +220,7 @@ namespace StarryEyes.Views.Controls
             }
             if (lts.Length < 2 || third.Type != TokenType.Period)
             {
-                return this.CheckPreviousIsVariable(third) ? null : this.GetVariableCompletionData();
+                return CheckPreviousIsVariable(third) ? null : GetVariableCompletionData();
             }
             if (second.IsMatchTokenLiteral("list") || first.Type == TokenType.Period)
             {
@@ -227,9 +229,9 @@ namespace StarryEyes.Views.Controls
             }
             if (second.IsMatchTokenLiteral("user") || second.IsMatchTokenLiteral("retweeter"))
             {
-                return this.GetUserObjectFieldCompletionData();
+                return GetUserObjectFieldCompletionData();
             }
-            return this.GetAccountObjectFieldCompletionData();
+            return GetAccountObjectFieldCompletionData();
         }
 
         private bool CheckPreviousIsVariable(Token token)
@@ -242,7 +244,9 @@ namespace StarryEyes.Views.Controls
                 {
                     return true;
                 }
+
                 #region determine defined variables
+
                 switch (token.Value.ToLower())
                 {
                     case "we":
@@ -349,7 +353,9 @@ namespace StarryEyes.Views.Controls
                     case "client":
                         return true;
                 }
-                #endregion
+
+                #endregion determine defined variables
+
                 switch (token.Value[0])
                 {
                     case '@':
@@ -381,7 +387,7 @@ namespace StarryEyes.Views.Controls
                 new CompletionData("favs", QueryCompletionResources.VariableFavorites),
                 new CompletionData("rts", QueryCompletionResources.VariableRetweets),
                 new CompletionData("list", QueryCompletionResources.VariableList),
-                new CompletionData("has_media", QueryCompletionResources.VariableHasMedia),
+                new CompletionData("has_media", QueryCompletionResources.VariableHasMedia)
             };
         }
 
@@ -418,6 +424,6 @@ namespace StarryEyes.Views.Controls
             };
         }
 
-        #endregion
+        #endregion code completion
     }
 }

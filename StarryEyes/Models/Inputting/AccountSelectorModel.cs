@@ -18,7 +18,7 @@ namespace StarryEyes.Models.Inputting
 
         internal AccountSelectorModel([CanBeNull] InputCoreModel coreModel)
         {
-            this._coreModel = coreModel;
+            _coreModel = coreModel;
             IsSynchronizedWithTab = true;
             Accounts.CollectionChanged += HandleCollectionChanged;
         }
@@ -26,12 +26,8 @@ namespace StarryEyes.Models.Inputting
         private void HandleCollectionChanged(object o, NotifyCollectionChangedEventArgs e)
         {
             if (_currentFocusTab == null || !IsSynchronizedWithTab) return;
-            var newItems = e.NewItems != null
-                ? e.NewItems.OfType<TwitterAccount>().Select(i => i.Id)
-                : Enumerable.Empty<long>();
-            var oldItems = e.OldItems != null
-                ? e.OldItems.OfType<TwitterAccount>().Select(i => i.Id)
-                : Enumerable.Empty<long>();
+            var newItems = e.NewItems?.OfType<TwitterAccount>().Select(i => i.Id) ?? Enumerable.Empty<long>();
+            var oldItems = e.OldItems?.OfType<TwitterAccount>().Select(i => i.Id) ?? Enumerable.Empty<long>();
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -63,7 +59,7 @@ namespace StarryEyes.Models.Inputting
         [CanBeNull]
         public TabModel CurrentFocusTab
         {
-            get { return _currentFocusTab; }
+            get => _currentFocusTab;
             set
             {
                 if (_currentFocusTab == value) return;

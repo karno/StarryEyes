@@ -11,32 +11,32 @@ namespace StarryEyes.Models.Subsystems.Notifications.Audio
         private readonly ISampleProvider _provider;
         private readonly CompositeDisposable _disposables;
 
-        public WaveFormat WaveFormat { get; private set; }
+        public WaveFormat WaveFormat { get; }
 
         public AutoDisposeSampleProvider(ISampleProvider provider,
-             params IDisposable[] disposables)
+            params IDisposable[] disposables)
             : this(provider, (IEnumerable<IDisposable>)disposables)
         {
         }
 
         public AutoDisposeSampleProvider(ISampleProvider provider,
-             IEnumerable<IDisposable> disposables)
+            IEnumerable<IDisposable> disposables)
         {
-            this._provider = provider;
-            this._disposables = new CompositeDisposable(disposables);
-            this.WaveFormat = provider.WaveFormat;
+            _provider = provider;
+            _disposables = new CompositeDisposable(disposables);
+            WaveFormat = provider.WaveFormat;
         }
 
         public int Read(float[] buffer, int offset, int count)
         {
-            if (this._isDisposed)
+            if (_isDisposed)
             {
                 return 0;
             }
-            var read = this._provider.Read(buffer, offset, count);
+            var read = _provider.Read(buffer, offset, count);
             if (read == 0)
             {
-                this.Dispose();
+                Dispose();
             }
             return read;
         }

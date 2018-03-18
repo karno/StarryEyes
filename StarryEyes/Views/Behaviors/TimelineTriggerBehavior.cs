@@ -13,9 +13,10 @@ namespace StarryEyes.Views.Behaviors
         private readonly CompositeDisposable _disposables = new CompositeDisposable();
 
         private bool? _isScrollOnTop;
+
         public bool IsScrollOnTop
         {
-            get { return (_isScrollOnTop = (bool)GetValue(IsScrollOnTopProperty)).Value; }
+            get => (_isScrollOnTop = (bool)GetValue(IsScrollOnTopProperty)).Value;
             set
             {
                 if (_isScrollOnTop != value)
@@ -27,12 +28,14 @@ namespace StarryEyes.Views.Behaviors
         }
 
         public static readonly DependencyProperty IsScrollOnTopProperty =
-            DependencyProperty.Register("IsScrollOnTop", typeof(bool), typeof(TimelineTriggerBehavior), new PropertyMetadata(false));
+            DependencyProperty.Register("IsScrollOnTop", typeof(bool), typeof(TimelineTriggerBehavior),
+                new PropertyMetadata(false));
 
         private bool? _isScrollOnBottom;
+
         public bool IsScrollOnBottom
         {
-            get { return (_isScrollOnBottom = (bool)GetValue(IsScrollOnBottomProperty)).Value; }
+            get => (_isScrollOnBottom = (bool)GetValue(IsScrollOnBottomProperty)).Value;
             set
             {
                 if (_isScrollOnBottom != value)
@@ -44,12 +47,14 @@ namespace StarryEyes.Views.Behaviors
         }
 
         public static readonly DependencyProperty IsScrollOnBottomProperty =
-            DependencyProperty.Register("IsScrollOnBottom", typeof(bool), typeof(TimelineTriggerBehavior), new PropertyMetadata(false));
+            DependencyProperty.Register("IsScrollOnBottom", typeof(bool), typeof(TimelineTriggerBehavior),
+                new PropertyMetadata(false));
 
         private bool? _isMouseOver;
+
         public bool IsMouseOver
         {
-            get { return (_isMouseOver = (bool)GetValue(IsMouseOverProperty)).Value; }
+            get => (_isMouseOver = (bool)GetValue(IsMouseOverProperty)).Value;
             set
             {
                 if (_isMouseOver != value)
@@ -61,30 +66,31 @@ namespace StarryEyes.Views.Behaviors
         }
 
         public static readonly DependencyProperty IsMouseOverProperty =
-            DependencyProperty.Register("IsMouseOver", typeof(bool), typeof(TimelineTriggerBehavior), new PropertyMetadata(false));
+            DependencyProperty.Register("IsMouseOver", typeof(bool), typeof(TimelineTriggerBehavior),
+                new PropertyMetadata(false));
 
         protected override void OnAttached()
         {
             base.OnAttached();
-            this._disposables.Add(
+            _disposables.Add(
                 Observable.Merge(
-                    Observable.FromEventPattern<MouseEventHandler, MouseEventArgs>(
-                        h => this.AssociatedObject.MouseEnter += h,
-                        h => this.AssociatedObject.MouseEnter -= h),
-                    Observable.FromEventPattern<MouseEventHandler, MouseEventArgs>(
-                        h => this.AssociatedObject.MouseLeave += h,
-                        h => this.AssociatedObject.MouseLeave -= h))
-                          .Subscribe(_ => this.IsMouseOver = this.AssociatedObject.IsMouseOver));
-            this._disposables.Add(
+                              Observable.FromEventPattern<MouseEventHandler, MouseEventArgs>(
+                                  h => AssociatedObject.MouseEnter += h,
+                                  h => AssociatedObject.MouseEnter -= h),
+                              Observable.FromEventPattern<MouseEventHandler, MouseEventArgs>(
+                                  h => AssociatedObject.MouseLeave += h,
+                                  h => AssociatedObject.MouseLeave -= h))
+                          .Subscribe(_ => IsMouseOver = AssociatedObject.IsMouseOver));
+            _disposables.Add(
                 Observable.FromEventPattern<ScrollChangedEventHandler, ScrollChangedEventArgs>(
-                    h => this.AssociatedObject.ScrollChanged += h,
-                    h => this.AssociatedObject.ScrollChanged -= h)
-                    .Select(p => p.EventArgs)
+                              h => AssociatedObject.ScrollChanged += h,
+                              h => AssociatedObject.ScrollChanged -= h)
+                          .Select(p => p.EventArgs)
                           .Subscribe(e =>
                           {
                               var vo = e.VerticalOffset;
                               var top = vo < 1;
-                              var bottom = vo > this.AssociatedObject.ScrollableHeight - 1;
+                              var bottom = vo > AssociatedObject.ScrollableHeight - 1;
                               IsScrollOnTop = top;
                               IsScrollOnBottom = bottom;
                           }));
@@ -92,9 +98,8 @@ namespace StarryEyes.Views.Behaviors
 
         protected override void OnDetaching()
         {
-            this._disposables.Dispose();
+            _disposables.Dispose();
             base.OnDetaching();
         }
-
     }
 }

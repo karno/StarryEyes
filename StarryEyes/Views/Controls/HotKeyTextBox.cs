@@ -8,28 +8,28 @@ namespace StarryEyes.Views.Controls
     public sealed class HotKeyTextBox : TextBox
     {
         public static readonly DependencyProperty KeyProperty =
-        DependencyProperty.Register("Key", typeof(Key), typeof(HotKeyTextBox),
-        new PropertyMetadata(Key.None, (o, e) => UpdateContent((HotKeyTextBox)o)));
+            DependencyProperty.Register("Key", typeof(Key), typeof(HotKeyTextBox),
+                new PropertyMetadata(Key.None, (o, e) => UpdateContent((HotKeyTextBox)o)));
 
         public Key Key
         {
-            get { return (Key)GetValue(KeyProperty); }
-            set { SetValue(KeyProperty, value); }
+            get => (Key)GetValue(KeyProperty);
+            set => SetValue(KeyProperty, value);
         }
 
         public static readonly DependencyProperty ModifierKeysProperty =
             DependencyProperty.Register("ModifierKeys", typeof(ModifierKeys), typeof(HotKeyTextBox),
-            new PropertyMetadata(ModifierKeys.None, (o, e) => UpdateContent((HotKeyTextBox)o)));
+                new PropertyMetadata(ModifierKeys.None, (o, e) => UpdateContent((HotKeyTextBox)o)));
 
         public ModifierKeys ModifierKeys
         {
-            get { return (ModifierKeys)GetValue(ModifierKeysProperty); }
-            set { SetValue(ModifierKeysProperty, value); }
+            get => (ModifierKeys)GetValue(ModifierKeysProperty);
+            set => SetValue(ModifierKeysProperty, value);
         }
 
         public static readonly DependencyProperty SeparatorProperty =
-                    DependencyProperty.Register("Separator", typeof(string), typeof(HotKeyTextBox),
-                    new PropertyMetadata(" + ", (o, e) => UpdateContent((HotKeyTextBox)o)));
+            DependencyProperty.Register("Separator", typeof(string), typeof(HotKeyTextBox),
+                new PropertyMetadata(" + ", (o, e) => UpdateContent((HotKeyTextBox)o)));
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
@@ -48,8 +48,8 @@ namespace StarryEyes.Views.Controls
                 case Key.RightShift:
                     return;
             }
-            this.Key = e.Key;
-            this.ModifierKeys = Keyboard.Modifiers;
+            Key = e.Key;
+            ModifierKeys = Keyboard.Modifiers;
         }
 
         private static void UpdateContent(HotKeyTextBox textBox)

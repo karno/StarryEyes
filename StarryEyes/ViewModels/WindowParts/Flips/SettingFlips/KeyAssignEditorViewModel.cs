@@ -15,12 +15,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
     {
         private KeyAssignProfile _profile;
 
-        private readonly ObservableCollection<AssignViewModel> _assigns =
-            new ObservableCollection<AssignViewModel>();
-
-        private readonly ObservableCollection<AssignActionViewModel> _actions =
-            new ObservableCollection<AssignActionViewModel>();
-
         private AssignViewModel _currentAssignViewModel;
 
         public KeyAssignEditorViewModel()
@@ -30,19 +24,19 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
 
         public void RefreshRegisteredActions()
         {
-            this.Actions.Clear();
+            Actions.Clear();
             KeyAssignManager.RegisteredActions
-                            .ForEach(a => this.Actions.Add(new AssignActionViewModel(a)));
+                            .ForEach(a => Actions.Add(new AssignActionViewModel(a)));
         }
 
         public KeyAssignProfile Profile
         {
-            get { return _profile; }
+            get => _profile;
             set
             {
                 _profile = value;
                 RaisePropertyChanged();
-                this.Assigns.Clear();
+                Assigns.Clear();
                 var groups = new[]
                 {
                     KeyAssignGroup.Global,
@@ -51,14 +45,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
                     KeyAssignGroup.Timeline
                 };
                 groups.SelectMany(g =>
-                    value.GetDictionary(g).Values
-                         .SelectMany(a => a)
-                         .SelectMany(a =>
-                             a.Actions
-                              .Select(action => new AssignViewModel(this,
-                                  a.Key, a.Modifiers, g,
-                                  action.ActionName, action.Argument))))
-                      .ForEach(v => this.Assigns.Add(v));
+                          value.GetDictionary(g).Values
+                               .SelectMany(a => a)
+                               .SelectMany(a =>
+                                   a.Actions
+                                    .Select(action => new AssignViewModel(this,
+                                        a.Key, a.Modifiers, g,
+                                        action.ActionName, action.Argument))))
+                      .ForEach(v => Assigns.Add(v));
                 CurrentAssignViewModel = null;
             }
         }
@@ -68,22 +62,17 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
             _profile = null;
         }
 
-        public ObservableCollection<AssignViewModel> Assigns
-        {
-            get { return this._assigns; }
-        }
+        public ObservableCollection<AssignViewModel> Assigns { get; } = new ObservableCollection<AssignViewModel>();
 
-        public ObservableCollection<AssignActionViewModel> Actions
-        {
-            get { return this._actions; }
-        }
+        public ObservableCollection<AssignActionViewModel> Actions { get; } =
+            new ObservableCollection<AssignActionViewModel>();
 
         public AssignViewModel CurrentAssignViewModel
         {
-            get { return this._currentAssignViewModel; }
+            get => _currentAssignViewModel;
             set
             {
-                this._currentAssignViewModel = value;
+                _currentAssignViewModel = value;
                 RaisePropertyChanged();
             }
         }
@@ -92,17 +81,17 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
         {
             if (_profile == null) return;
             _profile.ClearAssigns();
-            this.Assigns.Where(a => !String.IsNullOrEmpty(a.Action))
-                .GroupBy(a => a.Group)
-                .ForEach(g =>
-                    g.GroupBy(a => Tuple.Create(a.Key, a.Modifier))
-                     .Select(a => new KeyAssign(a.Key.Item1, a.Key.Item2,
-                         a.Select(m => new KeyAssignActionDescription
-                         {
-                             ActionName = m.Action,
-                             Argument = String.IsNullOrEmpty(m.Argument) ? null : m.Argument
-                         })))
-                     .ForEach(a => this._profile.SetAssign(g.Key, a)));
+            Assigns.Where(a => !String.IsNullOrEmpty(a.Action))
+                   .GroupBy(a => a.Group)
+                   .ForEach(g =>
+                       g.GroupBy(a => Tuple.Create(a.Key, a.Modifier))
+                        .Select(a => new KeyAssign(a.Key.Item1, a.Key.Item2,
+                            a.Select(m => new KeyAssignActionDescription
+                            {
+                                ActionName = m.Action,
+                                Argument = String.IsNullOrEmpty(m.Argument) ? null : m.Argument
+                            })))
+                        .ForEach(a => _profile.SetAssign(g.Key, a)));
             _profile.Save(KeyAssignManager.KeyAssignsProfileDirectoryPath);
         }
 
@@ -112,14 +101,14 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
             var nvm = new AssignViewModel(this,
                 Key.Enter, ModifierKeys.None, KeyAssignGroup.Global,
                 null, null);
-            this.Assigns.Add(nvm);
+            Assigns.Add(nvm);
             CurrentAssignViewModel = nvm;
             Commit();
         }
 
         public void Remove(AssignViewModel assignViewModel)
         {
-            this.Assigns.Remove(assignViewModel);
+            Assigns.Remove(assignViewModel);
             Commit();
         }
     }
@@ -137,20 +126,20 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
             Key key, ModifierKeys modifier, KeyAssignGroup group,
             string action, string argument)
         {
-            this._parent = parent;
-            this._key = key;
-            this._modifier = modifier;
-            this._group = group;
-            this._action = action;
-            this._argument = argument;
+            _parent = parent;
+            _key = key;
+            _modifier = modifier;
+            _group = group;
+            _action = action;
+            _argument = argument;
         }
 
         public Key Key
         {
-            get { return this._key; }
+            get => _key;
             set
             {
-                this._key = value;
+                _key = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(() => KeyAndModifier);
                 _parent.Commit();
@@ -159,27 +148,24 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
 
         public ModifierKeys Modifier
         {
-            get { return this._modifier; }
+            get => _modifier;
             set
             {
-                this._modifier = value;
+                _modifier = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(() => KeyAndModifier);
                 _parent.Commit();
             }
         }
 
-        public string KeyAndModifier
-        {
-            get { return HotKeyTextBox.StringifyShortcutKeys(Key, Modifier); }
-        }
+        public string KeyAndModifier => HotKeyTextBox.StringifyShortcutKeys(Key, Modifier);
 
         public KeyAssignGroup Group
         {
-            get { return this._group; }
+            get => _group;
             set
             {
-                this._group = value;
+                _group = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(() => GroupString);
                 RaisePropertyChanged(() => GroupIndex);
@@ -187,33 +173,24 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
             }
         }
 
-        public string GroupString
-        {
-            get { return this._group.ToString(); }
-        }
+        public string GroupString => _group.ToString();
 
         public int GroupIndex
         {
-            get { return (int)Group; }
-            set { Group = (KeyAssignGroup)value; }
+            get => (int)Group;
+            set => Group = (KeyAssignGroup)value;
         }
 
-        public ObservableCollection<AssignActionViewModel> Actions
-        {
-            get { return this._parent.Actions; }
-        }
+        public ObservableCollection<AssignActionViewModel> Actions => _parent.Actions;
 
-        public string Action
-        {
-            get { return this._action; }
-        }
+        public string Action => _action;
 
         public AssignActionViewModel CurrentActionViewModel
         {
-            get { return _parent.Actions.FirstOrDefault(a => a.Name == this._action); }
+            get { return _parent.Actions.FirstOrDefault(a => a.Name == _action); }
             set
             {
-                this._action = value.Name;
+                _action = value.Name;
                 if (!value.IsArgumentRequired)
                 {
                     Argument = null;
@@ -236,10 +213,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
 
         public string Argument
         {
-            get { return this._argument; }
+            get => _argument;
             set
             {
-                this._argument = value;
+                _argument = value;
                 RaisePropertyChanged();
                 _parent.Commit();
             }
@@ -258,29 +235,17 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
 
         public AssignActionViewModel(KeyAssignAction action)
         {
-            this._action = action;
+            _action = action;
         }
 
-        public string Name
-        {
-            get { return _action.Name; }
-        }
+        public string Name => _action.Name;
 
-        public string ArgumentType
-        {
-            get
-            {
-                return this._action.ArgumentRequired == null
-                    ? SettingFlipResources.KeyAssignArgumentOptional
-                    : (this._action.ArgumentRequired.Value
-                        ? SettingFlipResources.KeyAssignArgumentRequired
-                        : SettingFlipResources.KeyAssignArgumentNone);
-            }
-        }
+        public string ArgumentType => _action.ArgumentRequired == null
+            ? SettingFlipResources.KeyAssignArgumentOptional
+            : (_action.ArgumentRequired.Value
+                ? SettingFlipResources.KeyAssignArgumentRequired
+                : SettingFlipResources.KeyAssignArgumentNone);
 
-        public bool IsArgumentRequired
-        {
-            get { return _action.ArgumentRequired.GetValueOrDefault(true); }
-        }
+        public bool IsArgumentRequired => _action.ArgumentRequired.GetValueOrDefault(true);
     }
 }

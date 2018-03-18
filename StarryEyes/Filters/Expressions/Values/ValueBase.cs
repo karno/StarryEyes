@@ -7,7 +7,7 @@ namespace StarryEyes.Filters.Expressions.Values
 {
     public abstract class ValueBase : FilterOperatorBase
     {
-        protected override string OperatorString => this.ToQuery();
+        protected override string OperatorString => ToQuery();
 
         public override StringComparison GetStringComparison()
         {

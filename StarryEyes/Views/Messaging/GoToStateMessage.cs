@@ -9,8 +9,8 @@ namespace StarryEyes.Views.Messaging
             : base(messageKey)
         {
             DispatcherHelper.UIDispatcher.VerifyAccess();
-            this.StateName = stateName;
-            this.UseTransitions = useTransitions;
+            StateName = stateName;
+            UseTransitions = useTransitions;
         }
 
         public GoToStateMessage(string stateName, bool useTransitions = true)
@@ -18,13 +18,13 @@ namespace StarryEyes.Views.Messaging
         {
         }
 
-        public string StateName { get; set; }
+        public string StateName { get; }
 
-        public bool UseTransitions { get; set; }
+        public bool UseTransitions { get; }
 
         protected override System.Windows.Freezable CreateInstanceCore()
         {
-            return new GoToStateMessage(this.MessageKey, this.StateName, this.UseTransitions);
+            return new GoToStateMessage(MessageKey, StateName, UseTransitions);
         }
     }
 }

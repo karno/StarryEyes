@@ -58,7 +58,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool IsConfigurationActive
         {
-            get { return _isConfigurationActive; }
+            get => _isConfigurationActive;
             set
             {
                 if (_isConfigurationActive == value) return;
@@ -131,7 +131,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool IsPowerUser
         {
-            get { return Setting.IsPowerUser.Value; }
+            get => Setting.IsPowerUser.Value;
             set
             {
                 Setting.IsPowerUser.Value = value;
@@ -268,7 +268,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public int TweetDisplayMode
         {
-            get { return _tweetDisplayMode; }
+            get => _tweetDisplayMode;
             set
             {
                 _tweetDisplayMode = value;
@@ -300,13 +300,13 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public int ScrollLockStrategy
         {
-            get { return (int)Setting.ScrollLockStrategy.Value; }
-            set { Setting.ScrollLockStrategy.Value = (ScrollLockStrategy)value; }
+            get => (int)Setting.ScrollLockStrategy.Value;
+            set => Setting.ScrollLockStrategy.Value = (ScrollLockStrategy)value;
         }
 
         public int ThumbnailStrategy
         {
-            get { return (int)Setting.ThumbnailMode.Value; }
+            get => (int)Setting.ThumbnailMode.Value;
             set
             {
                 Setting.ThumbnailMode.Value = (ThumbnailMode)value;
@@ -316,13 +316,13 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public int TimelineIconResolution
         {
-            get { return (int)Setting.IconResolution.Value; }
-            set { Setting.IconResolution.Value = (TimelineIconResolution)value; }
+            get => (int)Setting.IconResolution.Value;
+            set => Setting.IconResolution.Value = (TimelineIconResolution)value;
         }
 
         public bool IsScrollByPixel
         {
-            get { return Setting.IsScrollByPixel.Value; }
+            get => Setting.IsScrollByPixel.Value;
             set
             {
                 Setting.IsScrollByPixel.Value = value;
@@ -332,20 +332,20 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool IsAnimateNewTweet
         {
-            get { return Setting.IsAnimateScrollToNewTweet.Value; }
-            set { Setting.IsAnimateScrollToNewTweet.Value = value; }
+            get => Setting.IsAnimateScrollToNewTweet.Value;
+            set => Setting.IsAnimateScrollToNewTweet.Value = value;
         }
 
         public bool IsAllowFavoriteMyself
         {
-            get { return Setting.AllowFavoriteMyself.Value; }
-            set { Setting.AllowFavoriteMyself.Value = value; }
+            get => Setting.AllowFavoriteMyself.Value;
+            set => Setting.AllowFavoriteMyself.Value = value;
         }
 
         public bool OpenTwitterImageWithOriginalSize
         {
-            get { return Setting.OpenTwitterImageWithOriginalSize.Value; }
-            set { Setting.OpenTwitterImageWithOriginalSize.Value = value; }
+            get => Setting.OpenTwitterImageWithOriginalSize.Value;
+            set => Setting.OpenTwitterImageWithOriginalSize.Value = value;
         }
 
         [UsedImplicitly]
@@ -356,7 +356,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public string SearchLanguage
         {
-            get { return Setting.SearchLanguage.Value; }
+            get => Setting.SearchLanguage.Value;
             set
             {
                 Setting.SearchLanguage.Value = value;
@@ -365,35 +365,29 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        public IEnumerable<string> SupportedLanguages
+        public IEnumerable<string> SupportedLanguages => new[]
         {
-            get
-            {
-                return new[]
-                {
-                    "", "aa", "ab", "ae", "af", "ak", "am", "an", "ar", "as", "av", "ay", "az", "ba", "be", "bg", "bh",
-                    "bi", "bm", "bn", "bo", "br", "bs", "ca", "ce", "ch", "co", "cr", "cs", "cu", "cv", "cy", "da",
-                    "de",
-                    "dv", "dz", "ee", "el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi", "fj", "fo", "fr", "fy",
-                    "ga",
-                    "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho", "hr", "ht", "hu", "hy", "hz", "ia", "id",
-                    "ie",
-                    "ig", "ii", "ik", "io", "is", "it", "iu", "ja", "jv", "ka", "kg", "ki", "kj", "kk", "kl", "km",
-                    "kn",
-                    "ko", "kr", "ks", "ku", "kv", "kw", "ky", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv",
-                    "mg",
-                    "mh", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "na", "nb", "nd", "ne", "ng", "nl", "nn",
-                    "no",
-                    "nr", "nv", "ny", "oc", "oj", "om", "or", "os", "pa", "pi", "pl", "ps", "pt", "qu", "rm", "rn",
-                    "ro",
-                    "ru", "rw", "sa", "sc", "sd", "se", "sg", "si", "sk", "sl", "sm", "sn", "so", "sq", "sr", "ss",
-                    "st",
-                    "su", "sv", "sw", "ta", "te", "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw",
-                    "ty",
-                    "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "wo", "xh", "yi", "yo", "za", "zh", "zu"
-                };
-            }
-        }
+            "", "aa", "ab", "ae", "af", "ak", "am", "an", "ar", "as", "av", "ay", "az", "ba", "be", "bg", "bh",
+            "bi", "bm", "bn", "bo", "br", "bs", "ca", "ce", "ch", "co", "cr", "cs", "cu", "cv", "cy", "da",
+            "de",
+            "dv", "dz", "ee", "el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi", "fj", "fo", "fr", "fy",
+            "ga",
+            "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho", "hr", "ht", "hu", "hy", "hz", "ia", "id",
+            "ie",
+            "ig", "ii", "ik", "io", "is", "it", "iu", "ja", "jv", "ka", "kg", "ki", "kj", "kk", "kl", "km",
+            "kn",
+            "ko", "kr", "ks", "ku", "kv", "kw", "ky", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv",
+            "mg",
+            "mh", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "na", "nb", "nd", "ne", "ng", "nl", "nn",
+            "no",
+            "nr", "nv", "ny", "oc", "oj", "om", "or", "os", "pa", "pi", "pl", "ps", "pt", "qu", "rm", "rn",
+            "ro",
+            "ru", "rw", "sa", "sc", "sd", "se", "sg", "si", "sk", "sl", "sm", "sn", "so", "sq", "sr", "ss",
+            "st",
+            "su", "sv", "sw", "ta", "te", "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw",
+            "ty",
+            "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "wo", "xh", "yi", "yo", "za", "zh", "zu"
+        };
 
         public string SearchLanguageDescription
         {
@@ -417,7 +411,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool AutoCleanupStatuses
         {
-            get { return Setting.AutoCleanupTweets.Value; }
+            get => Setting.AutoCleanupTweets.Value;
             set
             {
                 Setting.AutoCleanupTweets.Value = value;
@@ -427,7 +421,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public int AutoCleanupThreshold
         {
-            get { return Math.Max(Setting.AutoCleanupThreshold.Value, 0); }
+            get => Math.Max(Setting.AutoCleanupThreshold.Value, 0);
             set
             {
                 Setting.AutoCleanupThreshold.Value = Math.Max(value, 0);
@@ -447,7 +441,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public string QueryString
         {
-            get { return _currentQueryString; }
+            get => _currentQueryString;
             set
             {
                 if (_currentQueryString == value) return;
@@ -464,7 +458,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool FoundError
         {
-            get { return _foundError; }
+            get => _foundError;
             set
             {
                 _foundError = value;
@@ -476,7 +470,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public string ExceptionMessage
         {
-            get { return _exceptionMessage; }
+            get => _exceptionMessage;
             set
             {
                 _exceptionMessage = value;
@@ -514,17 +508,9 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         private Livet.Commands.ViewModelCommand _openQueryReferenceCommand;
 
-        public Livet.Commands.ViewModelCommand OpenQueryReferenceCommand
-        {
-            get
-            {
-                if (_openQueryReferenceCommand == null)
-                {
-                    _openQueryReferenceCommand = new Livet.Commands.ViewModelCommand(OpenQueryReference);
-                }
-                return _openQueryReferenceCommand;
-            }
-        }
+        public Livet.Commands.ViewModelCommand OpenQueryReferenceCommand =>
+            _openQueryReferenceCommand ?? (_openQueryReferenceCommand =
+                new Livet.Commands.ViewModelCommand(OpenQueryReference));
 
         public void OpenQueryReference()
         {
@@ -535,26 +521,26 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool UseLightweightMute
         {
-            get { return Setting.UseLightweightMute.Value; }
-            set { Setting.UseLightweightMute.Value = value; }
+            get => Setting.UseLightweightMute.Value;
+            set => Setting.UseLightweightMute.Value = value;
         }
 
         public bool IsMuteBlockingUsers
         {
-            get { return Setting.MuteBlockingUsers.Value; }
-            set { Setting.MuteBlockingUsers.Value = value; }
+            get => Setting.MuteBlockingUsers.Value;
+            set => Setting.MuteBlockingUsers.Value = value;
         }
 
         public bool IsMuteNoRetweetUsersRetweet
         {
-            get { return Setting.MuteNoRetweets.Value; }
-            set { Setting.MuteNoRetweets.Value = value; }
+            get => Setting.MuteNoRetweets.Value;
+            set => Setting.MuteNoRetweets.Value = value;
         }
 
         public bool IsMuteOfficialMutes
         {
-            get { return Setting.MuteOfficialMutes.Value; }
-            set { Setting.MuteOfficialMutes.Value = value; }
+            get => Setting.MuteOfficialMutes.Value;
+            set => Setting.MuteOfficialMutes.Value = value;
         }
 
         #endregion Mute filter editor property
@@ -563,19 +549,19 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public int TweetBoxClosingActionIndex
         {
-            get { return (int)Setting.TweetBoxClosingAction.Value; }
-            set { Setting.TweetBoxClosingAction.Value = (TweetBoxClosingAction)value; }
+            get => (int)Setting.TweetBoxClosingAction.Value;
+            set => Setting.TweetBoxClosingAction.Value = (TweetBoxClosingAction)value;
         }
 
         public bool IsBacktrackFallback
         {
-            get { return Setting.IsBacktrackFallback.Value; }
-            set { Setting.IsBacktrackFallback.Value = value; }
+            get => Setting.IsBacktrackFallback.Value;
+            set => Setting.IsBacktrackFallback.Value = value;
         }
 
         public bool IsInputSuggestEnabled
         {
-            get { return Setting.IsInputSuggestEnabled.Value; }
+            get => Setting.IsInputSuggestEnabled.Value;
             set
             {
                 Setting.IsInputSuggestEnabled.Value = value;
@@ -585,7 +571,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public int InputUserSuggestActionIndex
         {
-            get { return (int)Setting.InputUserSuggestMode.Value; }
+            get => (int)Setting.InputUserSuggestMode.Value;
             set
             {
                 Setting.InputUserSuggestMode.Value = (InputUserSuggestMode)value;
@@ -595,19 +581,19 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool RestorePreviousStashed
         {
-            get { return Setting.RestorePreviousStashed.Value; }
-            set { Setting.RestorePreviousStashed.Value = value; }
+            get => Setting.RestorePreviousStashed.Value;
+            set => Setting.RestorePreviousStashed.Value = value;
         }
 
         public bool SuppressTagBindInReply
         {
-            get { return Setting.SuppressTagBindingInReply.Value; }
-            set { Setting.SuppressTagBindingInReply.Value = value; }
+            get => Setting.SuppressTagBindingInReply.Value;
+            set => Setting.SuppressTagBindingInReply.Value = value;
         }
 
         public bool NewTextCounting
         {
-            get { return Setting.NewTextCounting.Value; }
+            get => Setting.NewTextCounting.Value;
             set
             {
                 Setting.NewTextCounting.Value = value;
@@ -630,7 +616,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public int TargetDisplay
         {
-            get { return Setting.NotifyScreenIndex.Value + 1; }
+            get => Setting.NotifyScreenIndex.Value + 1;
             set
             {
                 var newValue = value - 1;
@@ -642,7 +628,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public int NotificationTypeIndex
         {
-            get { return (int)Setting.NotificationType.Value; }
+            get => (int)Setting.NotificationType.Value;
             set
             {
                 Setting.NotificationType.Value = (NotificationUIType)value;
@@ -652,68 +638,68 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool IsNotifyWhenWindowIsActive
         {
-            get { return Setting.NotifyWhenWindowIsActive.Value; }
-            set { Setting.NotifyWhenWindowIsActive.Value = value; }
+            get => Setting.NotifyWhenWindowIsActive.Value;
+            set => Setting.NotifyWhenWindowIsActive.Value = value;
         }
 
         public bool IsNotifyBackfilledTweets
         {
-            get { return Setting.NotifyBackfilledTweets.Value; }
-            set { Setting.NotifyBackfilledTweets.Value = value; }
+            get => Setting.NotifyBackfilledTweets.Value;
+            set => Setting.NotifyBackfilledTweets.Value = value;
         }
 
         public bool IsNotifyMentions
         {
-            get { return Setting.NotifyMention.Value; }
-            set { Setting.NotifyMention.Value = value; }
+            get => Setting.NotifyMention.Value;
+            set => Setting.NotifyMention.Value = value;
         }
 
         public bool IsNotifyMessages
         {
-            get { return Setting.NotifyMessage.Value; }
-            set { Setting.NotifyMessage.Value = value; }
+            get => Setting.NotifyMessage.Value;
+            set => Setting.NotifyMessage.Value = value;
         }
 
         public bool IsNotifyFollows
         {
-            get { return Setting.NotifyFollow.Value; }
-            set { Setting.NotifyFollow.Value = value; }
+            get => Setting.NotifyFollow.Value;
+            set => Setting.NotifyFollow.Value = value;
         }
 
         public bool IsNotifyFavorites
         {
-            get { return Setting.NotifyFavorite.Value; }
-            set { Setting.NotifyFavorite.Value = value; }
+            get => Setting.NotifyFavorite.Value;
+            set => Setting.NotifyFavorite.Value = value;
         }
 
         public bool IsNotifyRetweets
         {
-            get { return Setting.NotifyRetweet.Value; }
-            set { Setting.NotifyRetweet.Value = value; }
+            get => Setting.NotifyRetweet.Value;
+            set => Setting.NotifyRetweet.Value = value;
         }
 
         public bool ConfirmOnExitApp
         {
-            get { return Setting.ConfirmOnExitApp.Value; }
-            set { Setting.ConfirmOnExitApp.Value = value; }
+            get => Setting.ConfirmOnExitApp.Value;
+            set => Setting.ConfirmOnExitApp.Value = value;
         }
 
         public bool WarnAmendTweet
         {
-            get { return Setting.WarnAmending.Value; }
-            set { Setting.WarnAmending.Value = value; }
+            get => Setting.WarnAmending.Value;
+            set => Setting.WarnAmending.Value = value;
         }
 
         public bool WarnReplyFromThirdAccount
         {
-            get { return Setting.WarnReplyFromThirdAccount.Value; }
-            set { Setting.WarnReplyFromThirdAccount.Value = value; }
+            get => Setting.WarnReplyFromThirdAccount.Value;
+            set => Setting.WarnReplyFromThirdAccount.Value = value;
         }
 
         public bool ShowMessageOnTweetFailed
         {
-            get { return Setting.ShowMessageOnTweetFailed.Value; }
-            set { Setting.ShowMessageOnTweetFailed.Value = value; }
+            get => Setting.ShowMessageOnTweetFailed.Value;
+            set => Setting.ShowMessageOnTweetFailed.Value = value;
         }
 
         [UsedImplicitly]
@@ -726,7 +712,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                     Title = SettingFlipResources.NotifyAllTabDisabledTitle,
                     MainIcon = VistaTaskDialogIcon.Information,
                     MainInstruction = SettingFlipResources.NotifyAllTabDisabledInst,
-                    CommonButtons = TaskDialogCommonButtons.Close,
+                    CommonButtons = TaskDialogCommonButtons.Close
                 }));
         }
 
@@ -736,7 +722,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public string BackgroundImagePath
         {
-            get { return Setting.BackgroundImagePath.Value ?? String.Empty; }
+            get => Setting.BackgroundImagePath.Value ?? String.Empty;
             set
             {
                 Setting.BackgroundImagePath.Value = value;
@@ -747,7 +733,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public int BackgroundImageTransparency
         {
-            get { return Setting.BackgroundImageTransparency.Value; }
+            get => Setting.BackgroundImageTransparency.Value;
             set
             {
                 Setting.BackgroundImageTransparency.Value = value;
@@ -824,11 +810,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = "EXPLORER.EXE",
-                    Arguments = "/n, " + ThemeManager.ThemeProfileDirectoryPath,
+                    Arguments = "/n, " + ThemeManager.ThemeProfileDirectoryPath
                 });
             }
             catch
             {
+                // ignored
             }
         }
 
@@ -849,15 +836,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         #region for theme preview
 
-        private ThemeProfile CurrentConfiguringTheme
-        {
-            get
-            {
-                return (ThemeFileIndex >= 0 && ThemeFileIndex < _themeCandidateFiles.Count
-                           ? ThemeManager.GetTheme(_themeCandidateFiles[ThemeFileIndex])
-                           : null) ?? BuiltInThemeProvider.GetDefault();
-            }
-        }
+        private ThemeProfile CurrentConfiguringTheme => (ThemeFileIndex >= 0 &&
+                                                         ThemeFileIndex < _themeCandidateFiles.Count
+                                                            ? ThemeManager.GetTheme(
+                                                                _themeCandidateFiles[ThemeFileIndex])
+                                                            : null) ?? BuiltInThemeProvider.GetDefault();
 
         private void CurrentThemeChanged()
         {
@@ -873,50 +856,23 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             RaisePropertyChanged(() => TabUnreadCountForeground);
         }
 
-        public Brush GlobalForeground
-        {
-            get { return new SolidColorBrush(CurrentConfiguringTheme.BaseColor.Foreground); }
-        }
+        public Brush GlobalForeground => new SolidColorBrush(CurrentConfiguringTheme.BaseColor.Foreground);
 
-        public Brush GlobalBackground
-        {
-            get { return new SolidColorBrush(CurrentConfiguringTheme.BaseColor.Background); }
-        }
+        public Brush GlobalBackground => new SolidColorBrush(CurrentConfiguringTheme.BaseColor.Background);
 
-        public Brush GlobalKeyBrush
-        {
-            get { return new SolidColorBrush(CurrentConfiguringTheme.GlobalKeyColor); }
-        }
+        public Brush GlobalKeyBrush => new SolidColorBrush(CurrentConfiguringTheme.GlobalKeyColor);
 
-        public Brush CurrentThemeBorder
-        {
-            get { return new SolidColorBrush(CurrentConfiguringTheme.GlobalKeyColor); }
-        }
+        public Brush CurrentThemeBorder => new SolidColorBrush(CurrentConfiguringTheme.GlobalKeyColor);
 
-        public Brush TitleBackground
-        {
-            get { return new SolidColorBrush(CurrentConfiguringTheme.TitleBarColor.Background); }
-        }
+        public Brush TitleBackground => new SolidColorBrush(CurrentConfiguringTheme.TitleBarColor.Background);
 
-        public Brush TitleForeground
-        {
-            get { return new SolidColorBrush(CurrentConfiguringTheme.TitleBarColor.Foreground); }
-        }
+        public Brush TitleForeground => new SolidColorBrush(CurrentConfiguringTheme.TitleBarColor.Foreground);
 
-        public Brush ActiveTabForeground
-        {
-            get { return new SolidColorBrush(CurrentConfiguringTheme.TabColor.Focused); }
-        }
+        public Brush ActiveTabForeground => new SolidColorBrush(CurrentConfiguringTheme.TabColor.Focused);
 
-        public Brush InactiveTabForeground
-        {
-            get { return new SolidColorBrush(CurrentConfiguringTheme.TabColor.Default); }
-        }
+        public Brush InactiveTabForeground => new SolidColorBrush(CurrentConfiguringTheme.TabColor.Default);
 
-        public Brush TabUnreadCountForeground
-        {
-            get { return new SolidColorBrush(CurrentConfiguringTheme.TabColor.UnreadCount); }
-        }
+        public Brush TabUnreadCountForeground => new SolidColorBrush(CurrentConfiguringTheme.TabColor.UnreadCount);
 
         public BitmapImage WallpaperImage
         {
@@ -943,10 +899,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        public double WallpaperOpacity
-        {
-            get { return (255 - Math.Min(255, Setting.BackgroundImageTransparency.Value)) / 255.0; }
-        }
+        public double WallpaperOpacity => (255 - Math.Min(255, Setting.BackgroundImageTransparency.Value)) / 255.0;
 
         #endregion for theme preview
 
@@ -956,18 +909,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         private readonly KeyAssignEditorViewModel _keyAssignEditorViewModel = new KeyAssignEditorViewModel();
 
-        public KeyAssignEditorViewModel KeyAssignEditorViewModel
-        {
-            get { return _keyAssignEditorViewModel; }
-        }
+        public KeyAssignEditorViewModel KeyAssignEditorViewModel => _keyAssignEditorViewModel;
 
         private readonly ObservableCollection<string> _keyAssignCandidateFiles =
             new ObservableCollection<string>();
 
-        public ObservableCollection<string> KeyAssignCandidateFiles
-        {
-            get { return _keyAssignCandidateFiles; }
-        }
+        public ObservableCollection<string> KeyAssignCandidateFiles => _keyAssignCandidateFiles;
 
         public int KeyAssignFile
         {
@@ -1072,8 +1019,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public string ExternalBrowserPath
         {
-            get { return Setting.ExternalBrowserPath.Value; }
-            set { Setting.ExternalBrowserPath.Value = value; }
+            get => Setting.ExternalBrowserPath.Value;
+            set => Setting.ExternalBrowserPath.Value = value;
         }
 
         #endregion Outer and third party property
@@ -1084,7 +1031,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public int UseWebProxy
         {
-            get { return (int)Setting.WebProxyType.Value; }
+            get => (int)Setting.WebProxyType.Value;
             set
             {
                 Setting.WebProxyType.Value = (WebProxyConfiguration)value;
@@ -1093,46 +1040,40 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        public bool ExplicitSetProxy
-        {
-            get { return Setting.WebProxyType.Value == WebProxyConfiguration.Custom; }
-        }
+        public bool ExplicitSetProxy => Setting.WebProxyType.Value == WebProxyConfiguration.Custom;
 
         public string WebProxyHost
         {
-            get { return Setting.WebProxyHost.Value; }
-            set { Setting.WebProxyHost.Value = value; }
+            get => Setting.WebProxyHost.Value;
+            set => Setting.WebProxyHost.Value = value;
         }
 
         public int WebProxyPort
         {
-            get { return Setting.WebProxyPort.Value; }
-            set { Setting.WebProxyPort.Value = value; }
+            get => Setting.WebProxyPort.Value;
+            set => Setting.WebProxyPort.Value = value;
         }
 
         public bool BypassProxyInLocal
         {
-            get { return Setting.BypassWebProxyInLocal.Value; }
-            set { Setting.BypassWebProxyInLocal.Value = value; }
+            get => Setting.BypassWebProxyInLocal.Value;
+            set => Setting.BypassWebProxyInLocal.Value = value;
         }
 
         public string BypassList
         {
-            get { return Setting.WebProxyBypassList.Value.Guard().JoinString(Environment.NewLine); }
-            set
-            {
-                Setting.WebProxyBypassList.Value =
-                    (value ?? String.Empty).Split(new[] { Environment.NewLine },
-                        StringSplitOptions.RemoveEmptyEntries);
-            }
+            get => Setting.WebProxyBypassList.Value.Guard().JoinString(Environment.NewLine);
+            set => Setting.WebProxyBypassList.Value =
+                (value ?? String.Empty).Split(new[] { Environment.NewLine },
+                    StringSplitOptions.RemoveEmptyEntries);
         }
 
         #endregion Web proxy
 
         public string ApiProxy
         {
-            get { return Setting.ApiProxy.Value; }
-            set { Setting.ApiProxy.Value = value; }
+            get => Setting.ApiProxy.Value;
+            set => Setting.ApiProxy.Value = value;
         }
 
         #endregion proxy configuration
@@ -1141,92 +1082,92 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool ApplyUnstablePatch
         {
-            get { return Setting.AcceptUnstableVersion.Value; }
-            set { Setting.AcceptUnstableVersion.Value = value; }
+            get => Setting.AcceptUnstableVersion.Value;
+            set => Setting.AcceptUnstableVersion.Value = value;
         }
 
         public bool UseInMemoryDatabase
         {
-            get { return Setting.UseInMemoryDatabase.Value; }
-            set { Setting.UseInMemoryDatabase.Value = value; }
+            get => Setting.UseInMemoryDatabase.Value;
+            set => Setting.UseInMemoryDatabase.Value = value;
         }
 
         public int EventDisplayMinimumMillisec
         {
-            get { return Setting.EventDisplayMinimumMSec.Value; }
-            set { Setting.EventDisplayMinimumMSec.Value = value; }
+            get => Setting.EventDisplayMinimumMSec.Value;
+            set => Setting.EventDisplayMinimumMSec.Value = value;
         }
 
         public int EventDisplayMaximumMillisec
         {
-            get { return Setting.EventDisplayMaximumMSec.Value; }
-            set { Setting.EventDisplayMaximumMSec.Value = value; }
+            get => Setting.EventDisplayMaximumMSec.Value;
+            set => Setting.EventDisplayMaximumMSec.Value = value;
         }
 
         public int UserInfoReceivePeriod
         {
-            get { return Setting.UserInfoReceivePeriod.Value; }
-            set { Setting.UserInfoReceivePeriod.Value = value; }
+            get => Setting.UserInfoReceivePeriod.Value;
+            set => Setting.UserInfoReceivePeriod.Value = value;
         }
 
         public int UserRelationReceivePeriod
         {
-            get { return Setting.UserRelationReceivePeriod.Value; }
-            set { Setting.UserRelationReceivePeriod.Value = value; }
+            get => Setting.UserRelationReceivePeriod.Value;
+            set => Setting.UserRelationReceivePeriod.Value = value;
         }
 
         public int RESTReceivePeriod
         {
-            get { return Setting.RESTReceivePeriod.Value; }
-            set { Setting.RESTReceivePeriod.Value = value; }
+            get => Setting.RESTReceivePeriod.Value;
+            set => Setting.RESTReceivePeriod.Value = value;
         }
 
         public int RESTSearchReceivePeriod
         {
-            get { return Setting.RESTSearchReceivePeriod.Value; }
-            set { Setting.RESTSearchReceivePeriod.Value = value; }
+            get => Setting.RESTSearchReceivePeriod.Value;
+            set => Setting.RESTSearchReceivePeriod.Value = value;
         }
 
         public int ListReceivePeriod
         {
-            get { return Setting.ListReceivePeriod.Value; }
-            set { Setting.ListReceivePeriod.Value = value; }
+            get => Setting.ListReceivePeriod.Value;
+            set => Setting.ListReceivePeriod.Value = value;
         }
 
         public int PostWindowTimeSec
         {
-            get { return Setting.PostWindowTimeSec.Value; }
-            set { Setting.PostWindowTimeSec.Value = value; }
+            get => Setting.PostWindowTimeSec.Value;
+            set => Setting.PostWindowTimeSec.Value = value;
         }
 
         public int PostLimitPerWindow
         {
-            get { return Setting.PostLimitPerWindow.Value; }
-            set { Setting.PostLimitPerWindow.Value = value; }
+            get => Setting.PostLimitPerWindow.Value;
+            set => Setting.PostLimitPerWindow.Value = value;
         }
 
         public string SearchLocale
         {
-            get { return Setting.SearchLocale.Value; }
-            set { Setting.SearchLocale.Value = value; }
+            get => Setting.SearchLocale.Value;
+            set => Setting.SearchLocale.Value = value;
         }
 
         public bool LoadPluginFromDevFolder
         {
-            get { return Setting.LoadPluginFromDevFolder.Value; }
-            set { Setting.LoadPluginFromDevFolder.Value = value; }
+            get => Setting.LoadPluginFromDevFolder.Value;
+            set => Setting.LoadPluginFromDevFolder.Value = value;
         }
 
         public bool DisableGeoLocationService
         {
-            get { return Setting.DisableGeoLocationService.Value; }
-            set { Setting.DisableGeoLocationService.Value = value; }
+            get => Setting.DisableGeoLocationService.Value;
+            set => Setting.DisableGeoLocationService.Value = value;
         }
 
         public bool IsBehaviorLogEnabled
         {
-            get { return Setting.IsBehaviorLogEnabled.Value; }
-            set { Setting.IsBehaviorLogEnabled.Value = value; }
+            get => Setting.IsBehaviorLogEnabled.Value;
+            set => Setting.IsBehaviorLogEnabled.Value = value;
         }
 
         [UsedImplicitly]
@@ -1246,6 +1187,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
             catch
             {
+                // ignored
             }
         }
 
@@ -1267,6 +1209,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 }
                 catch
                 {
+                    // ignored
                 }
             }
             if (_lastCommit != null)
@@ -1385,6 +1328,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                         }
                         catch
                         {
+                            // ignored
                         }
                     });
                 }
@@ -1392,26 +1336,23 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        public string ScreenName
-        {
-            get { return Account.UnreliableScreenName; }
-        }
+        public string ScreenName => Account.UnreliableScreenName;
 
         public long? FallbackAccountId
         {
-            get { return Account.FallbackAccountId; }
-            set { Account.FallbackAccountId = value; }
+            get => Account.FallbackAccountId;
+            set => Account.FallbackAccountId = value;
         }
 
         public bool FallbackFavorites
         {
-            get { return Account.IsFallbackFavorite; }
-            set { Account.IsFallbackFavorite = value; }
+            get => Account.IsFallbackFavorite;
+            set => Account.IsFallbackFavorite = value;
         }
 
         public bool IsUserStreamsEnabled
         {
-            get { return Account.IsUserStreamsEnabled; }
+            get => Account.IsUserStreamsEnabled;
             set
             {
                 if (IsUserStreamsEnabled == value) return;
@@ -1423,7 +1364,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool ReceiveRepliesAll
         {
-            get { return Account.ReceiveRepliesAll; }
+            get => Account.ReceiveRepliesAll;
             set
             {
                 if (ReceiveRepliesAll == value) return;
@@ -1435,7 +1376,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool ReceiveFollowingsActivity
         {
-            get { return Account.ReceiveFollowingsActivity; }
+            get => Account.ReceiveFollowingsActivity;
             set
             {
                 if (ReceiveFollowingsActivity == value) return;
@@ -1447,8 +1388,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool IsMarkMediaAsPossiblySensitive
         {
-            get { return Account.MarkMediaAsPossiblySensitive; }
-            set { Account.MarkMediaAsPossiblySensitive = value; }
+            get => Account.MarkMediaAsPossiblySensitive;
+            set => Account.MarkMediaAsPossiblySensitive = value;
         }
 
         [UsedImplicitly]

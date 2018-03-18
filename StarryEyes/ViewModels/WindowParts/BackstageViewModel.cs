@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,35 +33,26 @@ namespace StarryEyes.ViewModels.WindowParts
 
         private bool _isDisposed;
 
-        public ReadOnlyDispatcherCollectionRx<BackstageAccountViewModel> Accounts
-        {
-            get { return this._accounts; }
-        }
+        public ReadOnlyDispatcherCollectionRx<BackstageAccountViewModel> Accounts => _accounts;
 
-        public ReadOnlyDispatcherCollectionRx<TwitterEventViewModel> TwitterEvents
-        {
-            get { return this._twitterEvents; }
-        }
+        public ReadOnlyDispatcherCollectionRx<TwitterEventViewModel> TwitterEvents => _twitterEvents;
 
         public BackstageViewItem ViewItem
         {
-            get { return _viewItem; }
+            get => _viewItem;
             set
             {
                 if (_viewItem == value) return;
                 _viewItem = value;
-                this.RaisePropertyChanged();
+                RaisePropertyChanged();
             }
         }
 
-        public string CurrentVersion
-        {
-            get { return App.FormattedVersion; }
-        }
+        public string CurrentVersion => App.FormattedVersion;
 
         public bool ShowCurrentEvent
         {
-            get { return _showCurrentEvent; }
+            get => _showCurrentEvent;
             set
             {
                 _showCurrentEvent = value;
@@ -70,14 +60,11 @@ namespace StarryEyes.ViewModels.WindowParts
             }
         }
 
-        public bool IsCurrentEventAvailable
-        {
-            get { return _currentEvent != null; }
-        }
+        public bool IsCurrentEventAvailable => _currentEvent != null;
 
         public BackstageEventViewModel CurrentEvent
         {
-            get { return _currentEvent; }
+            get => _currentEvent;
             set
             {
                 _currentEvent = value;
@@ -105,13 +92,13 @@ namespace StarryEyes.ViewModels.WindowParts
             CompositeDisposable.Add(_accounts);
             CompositeDisposable.Add(
                 Observable.FromEvent(
-                    h => BackstageModel.CloseBackstage += h,
-                    h => BackstageModel.CloseBackstage -= h)
-                          .Subscribe(_ => this.Close()));
+                              h => BackstageModel.CloseBackstage += h,
+                              h => BackstageModel.CloseBackstage -= h)
+                          .Subscribe(_ => Close()));
             CompositeDisposable.Add(
                 Observable.FromEvent<BackstageEventBase>(
-                    h => BackstageModel.EventRegistered += h,
-                    h => BackstageModel.EventRegistered -= h)
+                              h => BackstageModel.EventRegistered += h,
+                              h => BackstageModel.EventRegistered -= h)
                           .Subscribe(ev =>
                           {
                               lock (_syncLock)
@@ -133,7 +120,7 @@ namespace StarryEyes.ViewModels.WindowParts
         public void Initialize()
         {
             Task.Factory.StartNew(EventDispatchWorker,
-                                  TaskCreationOptions.LongRunning);
+                TaskCreationOptions.LongRunning);
         }
 
         private void EventDispatchWorker()
@@ -162,7 +149,7 @@ namespace StarryEyes.ViewModels.WindowParts
                 {
                     if (_waitingEvents.Count == 0)
                         Monitor.Wait(_syncLock,
-                                     Setting.EventDisplayMaximumMSec.Value - Setting.EventDisplayMinimumMSec.Value);
+                            Setting.EventDisplayMaximumMSec.Value - Setting.EventDisplayMinimumMSec.Value);
                     ShowCurrentEvent = false;
                     Thread.Sleep(100);
                 }

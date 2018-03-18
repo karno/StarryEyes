@@ -7,13 +7,15 @@ namespace StarryEyes.Models.Timelines.Tabs
     /// </summary>
     public class ColumnInfo
     {
-        public ColumnInfo() { }
+        public ColumnInfo()
+        {
+        }
 
         public ColumnInfo(IEnumerable<TabModel> tabs)
         {
-            this.Tabs = new List<TabModel>(tabs);
+            Tabs = new List<TabModel>(tabs);
         }
 
-        public List<TabModel> Tabs { get; set; }
+        public List<TabModel> Tabs { get; }
     }
 }

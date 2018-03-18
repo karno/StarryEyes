@@ -12,28 +12,15 @@ namespace StarryEyes.Models.Backstages.NotificationEvents
 
         public TrackLimitEvent(TwitterAccount relatedInfo, int drop)
         {
-            this._info = relatedInfo;
-            this._drop = drop;
+            _info = relatedInfo;
+            _drop = drop;
         }
 
-        public override string Title
-        {
-            get { return "TRACK LIMIT"; }
-        }
+        public override string Title => "TRACK LIMIT";
 
-        public override string Detail
-        {
-            get
-            {
-                return
-                    BackstageResources.TrackLimitFormat.SafeFormat(
-                        _drop, "@" + _info.UnreliableScreenName);
-            }
-        }
+        public override string Detail => BackstageResources.TrackLimitFormat.SafeFormat(
+            _drop, "@" + _info.UnreliableScreenName);
 
-        public override Color Background
-        {
-            get { return MetroColors.Mauve; }
-        }
+        public override Color Background => MetroColors.Mauve;
     }
 }

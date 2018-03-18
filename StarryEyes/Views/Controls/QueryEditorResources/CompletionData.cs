@@ -19,8 +19,8 @@ namespace StarryEyes.Views.Controls.QueryEditorResources
         public CompletionData(string text, string completion, string desc)
         {
             _completion = completion;
-            this.Text = text;
-            this.Description = desc;
+            Text = text;
+            Description = desc;
         }
 
         public void Complete(TextArea textArea, ISegment completionSegment, EventArgs insertionRequestEventArgs)
@@ -28,10 +28,10 @@ namespace StarryEyes.Views.Controls.QueryEditorResources
             textArea.Document.Replace(completionSegment, _completion);
         }
 
-        public ImageSource Image { get { return null; } }
-        public string Text { get; private set; }
-        public object Content { get { return Text; } }
-        public object Description { get; private set; }
-        public double Priority { get { return 0; } }
+        public ImageSource Image => null;
+        public string Text { get; }
+        public object Content => Text;
+        public object Description { get; }
+        public double Priority => 0;
     }
 }

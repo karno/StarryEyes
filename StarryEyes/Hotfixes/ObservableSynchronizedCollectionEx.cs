@@ -11,19 +11,23 @@ using System.Threading;
 
 // ReSharper disable CheckNamespace
 namespace Livet
-// ReSharper restore CheckNamespace
+    // ReSharper restore CheckNamespace
 {
     /// <summary>
     /// スレッドセーフな変更通知コレクションです。
     /// </summary>
     /// <typeparam name="T">コレクションアイテムの型</typeparam>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
+        "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     [Serializable]
-    public class ObservableSynchronizedCollectionEx<T> : IList<T>, ICollection, INotifyCollectionChanged, INotifyPropertyChanged
+    public class ObservableSynchronizedCollectionEx<T> : IList<T>, ICollection, INotifyCollectionChanged,
+        INotifyPropertyChanged
     {
         private readonly IList<T> _list;
+
         [NonSerialized]
         private readonly object _syncRoot = new object();
+
         [NonSerialized]
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
@@ -41,7 +45,7 @@ namespace Livet
         /// <param name="source">初期値となるソース</param>
         public ObservableSynchronizedCollectionEx(IEnumerable<T> source)
         {
-            if (source == null) throw new ArgumentNullException("source");
+            if (source == null) throw new ArgumentNullException(nameof(source));
             _list = new List<T>(source);
         }
 
@@ -67,7 +71,8 @@ namespace Livet
                 {
                     OnPropertyChanged("Count");
                     OnPropertyChanged("Item[]");
-                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
+                    OnCollectionChanged(
+                        new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
                 });
         }
 
@@ -79,7 +84,7 @@ namespace Livet
         public void Insert(Func<IEnumerable<T>, int> indexProvider, T item)
         {
             ReadAndWriteWithLockAction(() =>
-                indexProvider(_list),
+                    indexProvider(_list),
                 i => _list.Insert(i, item),
                 i =>
                 {
@@ -102,27 +107,23 @@ namespace Livet
                 {
                     OnPropertyChanged("Count");
                     OnPropertyChanged("Item[]");
-                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removeItem, index));
+                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove,
+                        removeItem, index));
                 });
         }
 
         public T this[int index]
         {
-            get
-            {
-                return ReadWithLockAction(() => _list[index]);
-            }
+            get { return ReadWithLockAction(() => _list[index]); }
             set
             {
                 ReadAndWriteWithLockAction(() => _list[index],
-                    oldItem =>
-                    {
-                        _list[index] = value;
-                    },
+                    oldItem => { _list[index] = value; },
                     oldItem =>
                     {
                         OnPropertyChanged("Item[]");
-                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, _list[index], oldItem, index));
+                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace,
+                            _list[index], oldItem, index));
                     });
             }
         }
@@ -154,7 +155,8 @@ namespace Livet
                 {
                     OnPropertyChanged("Count");
                     OnPropertyChanged("Item[]");
-                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, _list.Count - 1));
+                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item,
+                        _list.Count - 1));
                 });
         }
 
@@ -164,13 +166,13 @@ namespace Livet
         public void Clear()
         {
             ReadAndWriteWithLockAction(
-            () => this._list.Clear(),
-            () =>
-            {
-                this.OnPropertyChanged("Count");
-                this.OnPropertyChanged("Item[]");
-                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-            });
+                () => _list.Clear(),
+                () =>
+                {
+                    OnPropertyChanged("Count");
+                    OnPropertyChanged("Item[]");
+                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                });
         }
 
         /// <summary>
@@ -210,7 +212,7 @@ namespace Livet
 
         public void SynchronizedToArray(Action<T[]> resultHandler)
         {
-            ReadWithLockAction(() => resultHandler(this._list.ToArray()));
+            ReadWithLockAction(() => resultHandler(_list.ToArray()));
         }
 
         /// <summary>
@@ -218,19 +220,13 @@ namespace Livet
         /// </summary>
         public int Count
         {
-            get
-            {
-                return ReadWithLockAction(() => _list.Count);
-            }
+            get { return ReadWithLockAction(() => _list.Count); }
         }
 
         /// <summary>
         /// このコレクションが読み取り専用かどうかを取得します。
         /// </summary>
-        public bool IsReadOnly
-        {
-            get { return _list.IsReadOnly; }
-        }
+        public bool IsReadOnly => _list.IsReadOnly;
 
         /// <summary>
         /// 最初に見つかった特定のオブジェクトを削除します。
@@ -242,16 +238,14 @@ namespace Livet
             var result = false;
 
             ReadAndWriteWithLockAction(() => _list.IndexOf(item),
-                index =>
-                {
-                    result = _list.Remove(item);
-                },
+                index => { result = _list.Remove(item); },
                 index =>
                 {
                     if (!result) return;
-                    this.OnPropertyChanged("Count");
-                    this.OnPropertyChanged("Item[]");
-                    this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
+                    OnPropertyChanged("Count");
+                    OnPropertyChanged("Item[]");
+                    OnCollectionChanged(
+                        new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
                 });
 
             return result;
@@ -264,23 +258,23 @@ namespace Livet
         public void RemoveWhere(Func<T, bool> predicate)
         {
             ReadAndWriteWithLockAction(() =>
-            {
-                var indexAndItems = new Dictionary<int, T>();
-                _list
-                    .Select((item, i) => new { i, item })
-                    .Where(i => predicate(i.item))
-                    .ForEach(i => indexAndItems.Add(i.i, i.item));
-                return indexAndItems.Reverse();
-            },
-            indexAndItems => indexAndItems.ForEach(i => _list.RemoveAt(i.Key)),
-            indexAndItems =>
-            {
-                OnPropertyChanged("Count");
-                OnPropertyChanged("Item[]");
-                indexAndItems.ForEach(kvp =>
-                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(
-                        NotifyCollectionChangedAction.Remove, kvp.Value, kvp.Key)));
-            });
+                {
+                    var indexAndItems = new Dictionary<int, T>();
+                    _list
+                        .Select((item, i) => new { i, item })
+                        .Where(i => predicate(i.item))
+                        .ForEach(i => indexAndItems.Add(i.i, i.item));
+                    return indexAndItems.Reverse();
+                },
+                indexAndItems => indexAndItems.ForEach(i => _list.RemoveAt(i.Key)),
+                indexAndItems =>
+                {
+                    OnPropertyChanged("Count");
+                    OnPropertyChanged("Item[]");
+                    indexAndItems.ForEach(kvp =>
+                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(
+                            NotifyCollectionChangedAction.Remove, kvp.Value, kvp.Key)));
+                });
         }
 
         /// <summary>
@@ -299,7 +293,8 @@ namespace Livet
                 item =>
                 {
                     OnPropertyChanged("Item[]");
-                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, item, newIndex, oldIndex));
+                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, item,
+                        newIndex, oldIndex));
                 });
         }
 
@@ -334,18 +329,12 @@ namespace Livet
         /// <summary>
         /// このコレクションがスレッドセーフであるかどうかを取得します。(常にtrueを返します)
         /// </summary>
-        public bool IsSynchronized
-        {
-            get { return true; }
-        }
+        public bool IsSynchronized => true;
 
         /// <summary>
         /// このコレクションへのスレッドセーフなアクセスに使用できる同期オブジェクトを返します。
         /// </summary>
-        public object SyncRoot
-        {
-            get { return _syncRoot; }
-        }
+        public object SyncRoot => _syncRoot;
 
         /// <summary>
         /// CollectionChangedイベントを発生させます。
@@ -355,10 +344,7 @@ namespace Livet
         {
             var threadSafeHandler = Interlocked.CompareExchange(ref CollectionChanged, null, null);
 
-            if (threadSafeHandler != null)
-            {
-                threadSafeHandler(this, args);
-            }
+            threadSafeHandler?.Invoke(this, args);
         }
 
         /// <summary>
@@ -369,10 +355,7 @@ namespace Livet
         {
             var threadSafeHandler = Interlocked.CompareExchange(ref PropertyChanged, null, null);
 
-            if (threadSafeHandler != null)
-            {
-                threadSafeHandler(this, new PropertyChangedEventArgs(propertyName));
-            }
+            threadSafeHandler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         protected void ReadWithLockAction(Action readAction)
@@ -445,7 +428,8 @@ namespace Livet
             }
         }
 
-        protected void ReadAndWriteWithLockAction<TResult>(Func<TResult> readBeforeWriteAction, Action<TResult> writeAction, Action<TResult> readAfterWriteAction)
+        protected void ReadAndWriteWithLockAction<TResult>(Func<TResult> readBeforeWriteAction,
+            Action<TResult> writeAction, Action<TResult> readAfterWriteAction)
         {
             _lock.EnterUpgradeableReadLock();
             try

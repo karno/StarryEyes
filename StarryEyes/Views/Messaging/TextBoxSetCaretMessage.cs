@@ -5,28 +5,31 @@ namespace StarryEyes.Views.Messaging
 {
     public class TextBoxSetCaretMessage : InteractionMessage
     {
-        public int CaretIndex { get; set; }
+        public int CaretIndex { get; }
 
-        public int SelectionLength { get; set; }
+        public int SelectionLength { get; }
 
-        public TextBoxSetCaretMessage(string messageKey) : base(messageKey) { }
+        public TextBoxSetCaretMessage(string messageKey) : base(messageKey)
+        {
+        }
+
         public TextBoxSetCaretMessage(int caretIndex, int selectionLength)
         {
             DispatcherHelper.UIDispatcher.VerifyAccess();
-            this.CaretIndex = caretIndex;
+            CaretIndex = caretIndex;
             SelectionLength = selectionLength;
         }
 
         public TextBoxSetCaretMessage(string messageKey, int caretIndex, int selectionLength)
             : base(messageKey)
         {
-            this.CaretIndex = caretIndex;
+            CaretIndex = caretIndex;
             SelectionLength = selectionLength;
         }
 
         protected override System.Windows.Freezable CreateInstanceCore()
         {
-            return new TextBoxSetCaretMessage(this.MessageKey, CaretIndex, SelectionLength);
+            return new TextBoxSetCaretMessage(MessageKey, CaretIndex, SelectionLength);
         }
     }
 }

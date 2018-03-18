@@ -15,7 +15,7 @@ namespace StarryEyes.Views.Messaging.Behaviors
             try
             {
                 var options = tdm.Options;
-                options.Owner = Window.GetWindow(this.AssociatedObject);
+                options.Owner = Window.GetWindow(AssociatedObject);
                 tdm.Response = TaskDialog.Show(options);
             }
             catch (Exception)

@@ -11,9 +11,9 @@ namespace StarryEyes.Models.Timelines.Statuses
 
         private UserModel(TwitterUser user)
         {
-            this.User = user;
+            User = user;
         }
 
-        public TwitterUser User { get; private set; }
+        public TwitterUser User { get; }
     }
 }

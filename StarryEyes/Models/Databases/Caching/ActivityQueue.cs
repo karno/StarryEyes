@@ -22,10 +22,10 @@ namespace StarryEyes.Models.Databases.Caching
             Action<IEnumerable<Tuple<long, long>>> addWriteback,
             Action<IEnumerable<Tuple<long, long>>> removeWriteback)
         {
-            this._threshold = threshold;
-            this._minInterval = minInterval;
-            this._addWriteback = addWriteback;
-            this._removeWriteback = removeWriteback;
+            _threshold = threshold;
+            _minInterval = minInterval;
+            _addWriteback = addWriteback;
+            _removeWriteback = removeWriteback;
             _lastWritebackStamp = DateTime.Now;
         }
 
@@ -34,7 +34,7 @@ namespace StarryEyes.Models.Databases.Caching
         {
             var adds = new List<long>();
             var removes = new List<long>();
-            foreach (var tuple in this._queue)
+            foreach (var tuple in _queue)
             {
                 if (tuple.Item1 != statusId) continue;
                 var item = tuple.Item2;
@@ -63,26 +63,26 @@ namespace StarryEyes.Models.Databases.Caching
 
         public void Add(long statusId, long userId)
         {
-            this._queue.Enqueue(Tuple.Create(statusId, userId, true));
+            _queue.Enqueue(Tuple.Create(statusId, userId, true));
             CheckNeedWriteback();
         }
 
         public void Remove(long statusId, long userId)
         {
-            this._queue.Enqueue(Tuple.Create(statusId, userId, false));
+            _queue.Enqueue(Tuple.Create(statusId, userId, false));
             CheckNeedWriteback();
         }
 
         private void CheckNeedWriteback()
         {
-            if (this._queue.Count <= this._threshold) return;
-            lock (this._intvlock)
+            if (_queue.Count <= _threshold) return;
+            lock (_intvlock)
             {
-                var span = DateTime.Now - this._lastWritebackStamp;
-                if (span < this._minInterval) return;
-                this._lastWritebackStamp = DateTime.Now;
+                var span = DateTime.Now - _lastWritebackStamp;
+                if (span < _minInterval) return;
+                _lastWritebackStamp = DateTime.Now;
             }
-            Task.Run(() => this.Writeback());
+            Task.Run(() => Writeback());
         }
 
         public void Writeback()
@@ -90,7 +90,7 @@ namespace StarryEyes.Models.Databases.Caching
             var adds = new List<Tuple<long, long>>();
             var removes = new List<Tuple<long, long>>();
             Tuple<long, long, bool> tuple;
-            while (this._queue.TryDequeue(out tuple))
+            while (_queue.TryDequeue(out tuple))
             {
                 var item = Tuple.Create(tuple.Item1, tuple.Item2);
                 if (tuple.Item3)
@@ -112,8 +112,8 @@ namespace StarryEyes.Models.Databases.Caching
                     adds.Remove(item);
                 }
             }
-            this._addWriteback(adds);
-            this._removeWriteback(removes);
+            _addWriteback(adds);
+            _removeWriteback(removes);
         }
     }
 }

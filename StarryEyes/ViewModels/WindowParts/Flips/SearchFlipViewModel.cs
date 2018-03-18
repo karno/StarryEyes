@@ -22,12 +22,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 {
     public class SearchFlipViewModel : PartialFlipViewModelBase
     {
-        protected override bool IsWindowCommandsRelated
-        {
-            get { return false; }
-        }
+        protected override bool IsWindowCommandsRelated => false;
 
-        private readonly SearchCandidateViewModel _candidateViewModel;
         private SearchResultViewModel _resultViewModel;
         private UserResultViewModel _userViewModel;
         private UserInfoViewModel _userInfoViewModel;
@@ -35,11 +31,11 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         public SearchFlipViewModel()
         {
             if (DesignTimeUtil.IsInDesignMode) return;
-            _candidateViewModel = new SearchCandidateViewModel(this);
+            SearchCandidate = new SearchCandidateViewModel(this);
             CompositeDisposable.Add(
                 Observable.FromEvent(
-                    h => KeyAssignManager.KeyAssignChanged += h,
-                    h => KeyAssignManager.KeyAssignChanged -= h)
+                              h => KeyAssignManager.KeyAssignChanged += h,
+                              h => KeyAssignManager.KeyAssignChanged -= h)
                           .Subscribe(_ => RaisePropertyChanged(() => SearchHintLabel)));
             CompositeDisposable.Add(
                 new EventListener<Action<string, SearchMode>>(
@@ -68,9 +64,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         private bool _isSearchResultAvailable;
+
         public bool IsSearchResultAvailable
         {
-            get { return _isSearchResultAvailable; }
+            get => _isSearchResultAvailable;
             set
             {
                 _isSearchResultAvailable = value;
@@ -78,54 +75,46 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        public SearchCandidateViewModel SearchCandidate
-        {
-            get { return _candidateViewModel; }
-        }
+        public SearchCandidateViewModel SearchCandidate { get; }
+
         public SearchResultViewModel SearchResult
         {
-            get { return _resultViewModel; }
+            get => _resultViewModel;
             private set
             {
                 var previous = Interlocked.Exchange(ref _resultViewModel, value);
                 RaisePropertyChanged();
-                if (previous != null)
-                {
-                    previous.Dispose();
-                }
+                previous?.Dispose();
             }
         }
+
         public UserResultViewModel UserResult
         {
-            get { return _userViewModel; }
+            get => _userViewModel;
             private set
             {
                 var previous = Interlocked.Exchange(ref _userViewModel, value);
                 RaisePropertyChanged();
-                if (previous != null)
-                {
-                    previous.Dispose();
-                }
+                previous?.Dispose();
             }
         }
+
         public UserInfoViewModel UserInfo
         {
-            get { return _userInfoViewModel; }
+            get => _userInfoViewModel;
             private set
             {
                 var previous = Interlocked.Exchange(ref _userInfoViewModel, value);
                 RaisePropertyChanged();
-                if (previous != null)
-                {
-                    previous.Dispose();
-                }
+                previous?.Dispose();
             }
         }
 
         private bool _isQueryMode;
+
         public bool IsQueryMode
         {
-            get { return _isQueryMode; }
+            get => _isQueryMode;
             set
             {
                 _isQueryMode = value;
@@ -134,9 +123,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         private bool _canBeUserScreenName;
+
         public bool CanBeUserScreenName
         {
-            get { return _canBeUserScreenName; }
+            get => _canBeUserScreenName;
             set
             {
                 _canBeUserScreenName = value;
@@ -145,9 +135,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         private bool _isSearchOptionAvailable;
+
         public bool IsSearchOptionAvailable
         {
-            get { return _isSearchOptionAvailable; }
+            get => _isSearchOptionAvailable;
             set
             {
                 _isSearchOptionAvailable = value;
@@ -156,9 +147,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         private bool _displaySlimView;
+
         public bool DisplaySlimView
         {
-            get { return _displaySlimView; }
+            get => _displaySlimView;
             set
             {
                 if (_displaySlimView == value) return;
@@ -222,9 +214,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         #endregion Search options
 
         private string _text;
+
         public string Text
         {
-            get { return _text; }
+            get => _text;
             set
             {
                 if (_text != value)
@@ -237,9 +230,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         private string _errorText;
+
         public string ErrorText
         {
-            get { return _errorText; }
+            get => _errorText;
             set
             {
                 _errorText = value;
@@ -248,15 +242,13 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             }
         }
 
-        public bool HasError
-        {
-            get { return !String.IsNullOrEmpty(_errorText); }
-        }
+        public bool HasError => !String.IsNullOrEmpty(_errorText);
 
         private SearchMode _searchMode = SearchMode.CurrentTab;
+
         public SearchMode SearchMode
         {
-            get { return _searchMode; }
+            get => _searchMode;
             set
             {
                 if (_searchMode == value) return;
@@ -267,6 +259,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         private string _searchHintKeyAssign;
+
         public string SearchHintLabel
         {
             get
@@ -289,6 +282,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         private readonly Regex _userScreenNameRegex = new Regex("^@?[A-Za-z0-9_]+$", RegexOptions.Compiled);
+
         private async void OnTextChanged(string value)
         {
             if (value != null && value.StartsWith("?"))
@@ -386,20 +380,19 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
                 // commit search query
                 CommitSearch();
             }
-            if (SearchResult != null)
-            {
-                SearchResult.SetFocus();
-            }
+            SearchResult?.SetFocus();
         }
 
         #endregion Text box control
 
         private readonly Stack<Tuple<string, SearchMode>> _backStack = new Stack<Tuple<string, SearchMode>>();
         private string _previousCommit;
+
         private void CommitSearch()
         {
             _previousCommit = Text;
-            if (_backStack.Count > 0 && (_backStack.Peek().Item1 == Text || _backStack.Peek().Item2 == SearchMode.CurrentTab))
+            if (_backStack.Count > 0 && (_backStack.Peek().Item1 == Text ||
+                                         _backStack.Peek().Item2 == SearchMode.CurrentTab))
             {
                 _backStack.Pop();
             }

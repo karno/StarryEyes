@@ -15,18 +15,9 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
     {
         private CompositeDisposable _disposables = new CompositeDisposable();
 
-        public override long UserId
-        {
-            get { return -1; } // an representive user is not existed.
-        }
+        public override long UserId => -1;
 
-        public override IReadOnlyCollection<long> Users
-        {
-            get
-            {
-                return new AVLTree<long>(Setting.Accounts.Ids);
-            }
-        }
+        public override IReadOnlyCollection<long> Users => new AVLTree<long>(Setting.Accounts.Ids);
 
         public override IReadOnlyCollection<long> Followings
         {
@@ -76,38 +67,17 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             }
         }
 
-        public override string UserIdSql
-        {
-            get { return "-1"; }
-        }
+        public override string UserIdSql => "-1";
 
-        public override string UsersSql
-        {
-            get
-            {
-                return "(select Id from Accounts)";
-            }
-        }
+        public override string UsersSql => "(select Id from Accounts)";
 
-        public override string FollowingsSql
-        {
-            get { return "(select Targetid from Followings)"; }
-        }
+        public override string FollowingsSql => "(select TargetId from Followings)";
 
-        public override string FollowersSql
-        {
-            get { return "(select Targetid from Followers)"; }
-        }
+        public override string FollowersSql => "(select TargetId from Followers)";
 
-        public override string BlockingsSql
-        {
-            get { return "(select TargetId from Blockings)"; }
-        }
+        public override string BlockingsSql => "(select TargetId from Blockings)";
 
-        public override string MutesSql
-        {
-            get { return "(select TargetId from Mutes)"; }
-        }
+        public override string MutesSql => "(select TargetId from Mutes)";
 
         public override string ToQuery()
         {
@@ -117,12 +87,12 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         public override void BeginLifecycle()
         {
             _disposables.Add(Setting.Accounts.Collection.ListenCollectionChanged(
-                _ => this.RaiseReapplyFilter(null)));
+                _ => RaiseReapplyFilter(null)));
             _disposables.Add(
                 Observable.FromEvent<RelationDataChangedInfo>(
-                    h => AccountRelationData.AccountDataUpdatedStatic += h,
-                    h => AccountRelationData.AccountDataUpdatedStatic -= h)
-                          .Subscribe(this.RaiseReapplyFilter));
+                              h => AccountRelationData.AccountDataUpdatedStatic += h,
+                              h => AccountRelationData.AccountDataUpdatedStatic -= h)
+                          .Subscribe(RaiseReapplyFilter));
         }
 
         public override void EndLifecycle()

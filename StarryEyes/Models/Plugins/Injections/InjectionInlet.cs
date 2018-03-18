@@ -27,7 +27,7 @@ namespace StarryEyes.Models.Plugins.Injections
             return new InjectionInlet<TIn>(target);
         }
 
-        private class InjectionInlet<TIn> : IInjectionInlet<TIn>
+        private sealed class InjectionInlet<TIn> : IInjectionInlet<TIn>
         {
             private readonly Action<TIn> _baseMethod;
 
@@ -36,7 +36,7 @@ namespace StarryEyes.Models.Plugins.Injections
 
             public InjectionInlet(Action<TIn> baseMethod)
             {
-                this._baseMethod = baseMethod;
+                _baseMethod = baseMethod;
                 // initialize dictionaries
                 _injectors[InjectionPriority.High] = new List<Func<TIn, IInjectionResult<TIn>>>();
                 _injectors[InjectionPriority.Middle] = new List<Func<TIn, IInjectionResult<TIn>>>();
@@ -72,7 +72,7 @@ namespace StarryEyes.Models.Plugins.Injections
             }
         }
 
-        private class InjectionInlet<TIn, TOut> : IInjectionInlet<TIn, TOut>
+        private sealed class InjectionInlet<TIn, TOut> : IInjectionInlet<TIn, TOut>
         {
             private readonly Func<TIn, TOut> _baseMethod;
 
@@ -81,7 +81,7 @@ namespace StarryEyes.Models.Plugins.Injections
 
             public InjectionInlet(Func<TIn, TOut> baseMethod)
             {
-                this._baseMethod = baseMethod;
+                _baseMethod = baseMethod;
                 // initialize dictionaries
                 _injectors[InjectionPriority.High] = new List<Func<TIn, IInjectionResult<TIn, TOut>>>();
                 _injectors[InjectionPriority.Middle] = new List<Func<TIn, IInjectionResult<TIn, TOut>>>();

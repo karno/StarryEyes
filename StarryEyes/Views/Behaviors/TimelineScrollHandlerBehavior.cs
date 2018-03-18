@@ -8,7 +8,7 @@ namespace StarryEyes.Views.Behaviors
     {
         protected override void OnAttached()
         {
-            this.AssociatedObject.PreviewMouseWheel += AssociatedObject_PreviewMouseWheel;
+            AssociatedObject.PreviewMouseWheel += AssociatedObject_PreviewMouseWheel;
             base.OnAttached();
         }
 
@@ -17,18 +17,18 @@ namespace StarryEyes.Views.Behaviors
             // this bugfix is available only on scroll by pixel setting.
             if (!Setting.IsScrollByPixel.Value) return;
 
-            var newOffset = this.AssociatedObject.VerticalOffset - e.Delta;
+            var newOffset = AssociatedObject.VerticalOffset - e.Delta;
             if (newOffset >= 1) return;
 
             // capture scroll event (for preventing freeze)
-            this.AssociatedObject.ScrollToTop();
+            AssociatedObject.ScrollToTop();
             e.Handled = true;
         }
 
         protected override void OnDetaching()
         {
             base.OnDetaching();
-            this.AssociatedObject.PreviewMouseWheel -= AssociatedObject_PreviewMouseWheel;
+            AssociatedObject.PreviewMouseWheel -= AssociatedObject_PreviewMouseWheel;
         }
     }
 }

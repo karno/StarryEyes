@@ -21,11 +21,11 @@ namespace StarryEyes.Settings.Themes
         [DataMember(Name = "GlobalKeyColor", Order = 3)]
         private string GlobalKeyColorString
         {
-            get { return this.GlobalKeyColor.ToColorString(); }
-            set { this.GlobalKeyColor = value.ToColor(); }
+            get => GlobalKeyColor.ToColorString();
+            set => GlobalKeyColor = value.ToColor();
         }
 
-        #endregion
+        #endregion Serialization properties
 
         private FontTheme _globalFont;
         private UserFlipTheme _userFlipColor;
@@ -34,7 +34,9 @@ namespace StarryEyes.Settings.Themes
         /// <summary>
         /// Internal constructor
         /// </summary>
-        private ThemeProfile() { }
+        private ThemeProfile()
+        {
+        }
 
         /// <summary>
         /// Construct class with name
@@ -42,7 +44,7 @@ namespace StarryEyes.Settings.Themes
         /// <param name="name"></param>
         public ThemeProfile(string name)
         {
-            this.Name = name;
+            Name = name;
         }
 
         /// <summary>
@@ -98,8 +100,8 @@ namespace StarryEyes.Settings.Themes
         [DataMember(Order = 1), CanBeNull]
         public FontTheme GlobalFont
         {
-            get { return _globalFont ?? (_globalFont = FontTheme.Default); }
-            set { _globalFont = value; }
+            get => _globalFont ?? (_globalFont = FontTheme.Default);
+            set => _globalFont = value;
         }
 
         /// <summary>
@@ -144,8 +146,8 @@ namespace StarryEyes.Settings.Themes
         [DataMember(Order = 8), CanBeNull]
         public UserFlipTheme UserFlipColor
         {
-            get { return _userFlipColor ?? (_userFlipColor = new UserFlipTheme()); }
-            set { _userFlipColor = value; }
+            get => _userFlipColor ?? (_userFlipColor = new UserFlipTheme());
+            set => _userFlipColor = value;
         }
 
         /// <summary>
@@ -154,8 +156,8 @@ namespace StarryEyes.Settings.Themes
         [DataMember(Order = 9), CanBeNull]
         public TabTheme TabColor
         {
-            get { return _tabColor ?? (_tabColor = new TabTheme()); }
-            set { _tabColor = value; }
+            get => _tabColor ?? (_tabColor = new TabTheme());
+            set => _tabColor = value;
         }
 
         /// <summary>
@@ -223,7 +225,7 @@ namespace StarryEyes.Settings.Themes
             return new ThemeProfile
             {
                 Name = Name,
-                GlobalFont = this.GlobalFont.Clone(),
+                GlobalFont = GlobalFont.Clone(),
                 BaseColor = BaseColor.Clone(),
                 GlobalKeyColor = GlobalKeyColor,
                 TitleBarColor = TitleBarColor.Clone(),
@@ -231,12 +233,12 @@ namespace StarryEyes.Settings.Themes
                 AccountSelectionFlipColor = AccountSelectionFlipColor.Clone(),
                 SearchFlipColor = SearchFlipColor.Clone(),
                 UserFlipColor = UserFlipColor.Clone(),
-                TabColor = this.TabColor.Clone(),
-                TweetDefaultColor = this.TweetDefaultColor.Clone(),
-                TweetMyselfColor = this.TweetMyselfColor.Clone(),
-                TweetMentionColor = this.TweetMentionColor.Clone(),
-                TweetRetweetColor = this.TweetRetweetColor.Clone(),
-                TweetDirectMessageColor = this.TweetDirectMessageColor.Clone()
+                TabColor = TabColor.Clone(),
+                TweetDefaultColor = TweetDefaultColor.Clone(),
+                TweetMyselfColor = TweetMyselfColor.Clone(),
+                TweetMentionColor = TweetMentionColor.Clone(),
+                TweetRetweetColor = TweetRetweetColor.Clone(),
+                TweetDirectMessageColor = TweetDirectMessageColor.Clone()
             };
         }
 

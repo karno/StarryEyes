@@ -24,12 +24,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 {
     public class UserInfoViewModel : ViewModel
     {
-        private readonly SearchFlipViewModel _parent;
-        private string _screenName;
-        private UserTimelineViewModel _statuses;
-        private UserTimelineViewModel _favorites;
-        private UserFollowingViewModel _following;
-        private UserFollowersViewModel _followers;
         private bool _communicating = true;
         private UserViewModel _user;
 
@@ -37,7 +31,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         public UserDisplayKind DisplayKind
         {
-            get { return _displayKind; }
+            get => _displayKind;
             set
             {
                 if (_displayKind == value) return;
@@ -50,28 +44,16 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             }
         }
 
-        private ObservableCollection<RelationControlViewModel> _relationControls =
+        public ObservableCollection<RelationControlViewModel> RelationControls { get; set; } =
             new ObservableCollection<RelationControlViewModel>();
 
-        public ObservableCollection<RelationControlViewModel> RelationControls
-        {
-            get { return _relationControls; }
-            set { _relationControls = value; }
-        }
+        public SearchFlipViewModel Parent { get; }
 
-        public SearchFlipViewModel Parent
-        {
-            get { return _parent; }
-        }
-
-        public string ScreenName
-        {
-            get { return _screenName; }
-        }
+        public string ScreenName { get; private set; }
 
         public bool Communicating
         {
-            get { return _communicating; }
+            get => _communicating;
             set
             {
                 _communicating = value;
@@ -81,7 +63,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         public UserViewModel User
         {
-            get { return _user; }
+            get => _user;
             set
             {
                 _user = value;
@@ -90,60 +72,30 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             }
         }
 
-        public bool IsUserAvailable
-        {
-            get { return User != null; }
-        }
+        public bool IsUserAvailable => User != null;
 
-        public UserTimelineViewModel Statuses
-        {
-            get { return _statuses; }
-        }
+        public UserTimelineViewModel Statuses { get; private set; }
 
-        public UserTimelineViewModel Favorites
-        {
-            get { return _favorites; }
-        }
+        public UserTimelineViewModel Favorites { get; private set; }
 
-        public UserFollowingViewModel Following
-        {
-            get { return _following; }
-        }
+        public UserFollowingViewModel Following { get; private set; }
 
-        public UserFollowersViewModel Followers
-        {
-            get { return _followers; }
-        }
+        public UserFollowersViewModel Followers { get; private set; }
 
-        public bool IsVisibleStatuses
-        {
-            get { return DisplayKind == UserDisplayKind.Statuses; }
-        }
+        public bool IsVisibleStatuses => DisplayKind == UserDisplayKind.Statuses;
 
-        public bool IsVisibleFavorites
-        {
-            get { return DisplayKind == UserDisplayKind.Favorites; }
-        }
+        public bool IsVisibleFavorites => DisplayKind == UserDisplayKind.Favorites;
 
-        public bool IsVisibleFollowing
-        {
-            get { return DisplayKind == UserDisplayKind.Following; }
-        }
+        public bool IsVisibleFollowing => DisplayKind == UserDisplayKind.Following;
 
-        public bool IsVisibleFollowers
-        {
-            get { return DisplayKind == UserDisplayKind.Followers; }
-        }
+        public bool IsVisibleFollowers => DisplayKind == UserDisplayKind.Followers;
 
-        public bool DisplaySlimView
-        {
-            get { return _parent.DisplaySlimView; }
-        }
+        public bool DisplaySlimView => Parent.DisplaySlimView;
 
         public UserInfoViewModel(SearchFlipViewModel parent, string screenName)
         {
-            _parent = parent;
-            _screenName = screenName;
+            Parent = parent;
+            ScreenName = screenName;
             CompositeDisposable.Add(
                 parent.ListenPropertyChanged(() => parent.DisplaySlimView,
                     _ => RaisePropertyChanged(() => DisplaySlimView)));
@@ -156,7 +108,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             {
                 var user = await StoreHelper.GetUserAsync(screenName, true);
                 // overwrite by oficially-provided screen name
-                _screenName = user.ScreenName;
+                ScreenName = user.ScreenName;
                 RaisePropertyChanged(() => ScreenName);
 
                 User = new UserViewModel(user);
@@ -167,23 +119,23 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                        .Select(a => new RelationControlViewModel(this, a, user))
                        .ForEach(RelationControls.Add);
 
-                CompositeDisposable.Add(_statuses = new UserTimelineViewModel(this,
+                CompositeDisposable.Add(Statuses = new UserTimelineViewModel(this,
                     new UserTimelineModel(user.Id, TimelineType.User)));
                 RaisePropertyChanged(() => Statuses);
 
-                CompositeDisposable.Add(_favorites = new UserTimelineViewModel(this,
+                CompositeDisposable.Add(Favorites = new UserTimelineViewModel(this,
                     new UserTimelineModel(user.Id, TimelineType.Favorites)));
                 RaisePropertyChanged(() => Favorites);
 
-                CompositeDisposable.Add(_following = new UserFollowingViewModel(this));
+                CompositeDisposable.Add(Following = new UserFollowingViewModel(this));
                 RaisePropertyChanged(() => Following);
 
-                CompositeDisposable.Add(_followers = new UserFollowersViewModel(this));
+                CompositeDisposable.Add(Followers = new UserFollowersViewModel(this));
                 RaisePropertyChanged(() => Followers);
             }
             catch (Exception ex)
             {
-                _parent.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
+                Parent.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = SearchFlipResources.MsgUserInfoLoadErrorTitle,
                     MainIcon = VistaTaskDialogIcon.Error,
@@ -194,7 +146,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                     CommonButtons = TaskDialogCommonButtons.Close
                 }));
                 User = null;
-                _parent.CloseResults();
+                Parent.CloseResults();
             }
             finally
             {
@@ -233,7 +185,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         public string SelectedText
         {
-            get { return _selectedText ?? String.Empty; }
+            get => _selectedText ?? String.Empty;
             set
             {
                 _selectedText = value;
@@ -289,10 +241,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         private ListenerCommand<string> _openLinkCommand;
 
-        public ListenerCommand<string> OpenLinkCommand
-        {
-            get { return _openLinkCommand ?? (_openLinkCommand = new ListenerCommand<string>(OpenLink)); }
-        }
+        public ListenerCommand<string> OpenLinkCommand => _openLinkCommand ??
+                                                          (_openLinkCommand = new ListenerCommand<string>(OpenLink));
 
         public void OpenLink(string parameter)
         {

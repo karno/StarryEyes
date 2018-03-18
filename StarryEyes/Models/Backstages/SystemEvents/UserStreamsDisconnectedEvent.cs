@@ -10,23 +10,13 @@ namespace StarryEyes.Models.Backstages.SystemEvents
 
         public UserStreamsDisconnectedEvent(TwitterAccount account, string reason)
         {
-            this._account = account;
+            _account = account;
             _reason = reason;
         }
 
-        public override SystemEventKind Kind
-        {
-            get { return SystemEventKind.Error; }
-        }
+        public override SystemEventKind Kind => SystemEventKind.Error;
 
-        public override string Detail
-        {
-            get
-            {
-                return BackstageResources.UserStreamDisconnectedFormat.SafeFormat(
-                    "@" + this._account.UnreliableScreenName,
-                    _reason);
-            }
-        }
+        public override string Detail => BackstageResources.UserStreamDisconnectedFormat.SafeFormat(
+            "@" + _account.UnreliableScreenName, _reason);
     }
 }

@@ -10,10 +10,7 @@ namespace StarryEyes.ViewModels.WindowParts.Backstages
         {
         }
 
-        public TwitterEventBase TwitterEvent
-        {
-            get { return this.SourceEvent as TwitterEventBase; }
-        }
+        public TwitterEventBase TwitterEvent => SourceEvent as TwitterEventBase;
 
         public void OpenEventSourceUserProfile()
         {

@@ -15,77 +15,83 @@ namespace StarryEyes.Views.Behaviors
 
         public bool IsOverrideMouseEvent
         {
-            get { return (bool)GetValue(IsOverrideMouseEventProperty); }
-            set { SetValue(IsOverrideMouseEventProperty, value); }
+            get => (bool)GetValue(IsOverrideMouseEventProperty);
+            set => SetValue(IsOverrideMouseEventProperty, value);
         }
 
         public static readonly DependencyProperty IsOverrideMouseEventProperty =
-            DependencyProperty.Register("IsOverrideMouseEvent", typeof(bool), typeof(DragStartBehavior), new PropertyMetadata(false));
+            DependencyProperty.Register("IsOverrideMouseEvent", typeof(bool), typeof(DragStartBehavior),
+                new PropertyMetadata(false));
 
         public DragDropEffects AllowedEffects
         {
-            get { return (DragDropEffects)GetValue(AllowedEffectsProperty); }
-            set { SetValue(AllowedEffectsProperty, value); }
+            get => (DragDropEffects)GetValue(AllowedEffectsProperty);
+            set => SetValue(AllowedEffectsProperty, value);
         }
 
         public static readonly DependencyProperty AllowedEffectsProperty =
-            DependencyProperty.Register("AllowedEffects", typeof(DragDropEffects), typeof(DragStartBehavior), new UIPropertyMetadata(DragDropEffects.All));
+            DependencyProperty.Register("AllowedEffects", typeof(DragDropEffects), typeof(DragStartBehavior),
+                new UIPropertyMetadata(DragDropEffects.All));
 
         public object DragDropData
         {
-            get { return GetValue(DragDropDataProperty); }
-            set { SetValue(DragDropDataProperty, value); }
+            get => GetValue(DragDropDataProperty);
+            set => SetValue(DragDropDataProperty, value);
         }
 
         public static readonly DependencyProperty DragDropDataProperty =
-            DependencyProperty.Register("DragDropData", typeof(object), typeof(DragStartBehavior), new PropertyMetadata(null));
+            DependencyProperty.Register("DragDropData", typeof(object), typeof(DragStartBehavior),
+                new PropertyMetadata(null));
 
 
         public ICommand BeforeDragDropCommand
         {
-            get { return (ICommand)GetValue(BeforeDragDropCommandProperty); }
-            set { SetValue(BeforeDragDropCommandProperty, value); }
+            get => (ICommand)GetValue(BeforeDragDropCommandProperty);
+            set => SetValue(BeforeDragDropCommandProperty, value);
         }
 
         public static readonly DependencyProperty BeforeDragDropCommandProperty =
-            DependencyProperty.Register("BeforeDragDropCommand", typeof(ICommand), typeof(DragStartBehavior), new PropertyMetadata(null));
+            DependencyProperty.Register("BeforeDragDropCommand", typeof(ICommand), typeof(DragStartBehavior),
+                new PropertyMetadata(null));
 
         public ICommand AfterDragDropCommand
         {
-            get { return (ICommand)GetValue(AfterDragDropCommandProperty); }
-            set { SetValue(AfterDragDropCommandProperty, value); }
+            get => (ICommand)GetValue(AfterDragDropCommandProperty);
+            set => SetValue(AfterDragDropCommandProperty, value);
         }
 
         public static readonly DependencyProperty AfterDragDropCommandProperty =
-            DependencyProperty.Register("AfterDragDropCommand", typeof(ICommand), typeof(DragStartBehavior), new PropertyMetadata(null));
+            DependencyProperty.Register("AfterDragDropCommand", typeof(ICommand), typeof(DragStartBehavior),
+                new PropertyMetadata(null));
 
         public ICommand OnClickCommand
         {
-            get { return (ICommand)GetValue(OnClickCommandProperty); }
-            set { SetValue(OnClickCommandProperty, value); }
+            get => (ICommand)GetValue(OnClickCommandProperty);
+            set => SetValue(OnClickCommandProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for OnClickCommand.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty OnClickCommandProperty =
-            DependencyProperty.Register("OnClickCommand", typeof(ICommand), typeof(DragStartBehavior), new PropertyMetadata(null));
+            DependencyProperty.Register("OnClickCommand", typeof(ICommand), typeof(DragStartBehavior),
+                new PropertyMetadata(null));
 
         protected override void OnAttached()
         {
-            this.AssociatedObject.PreviewMouseDown += AssociatedObject_PreviewMouseDown;
-            this.AssociatedObject.PreviewMouseMove += AssociatedObject_PreviewMouseMove;
-            this.AssociatedObject.PreviewMouseUp += AssociatedObject_PreviewMouseUp;
+            AssociatedObject.PreviewMouseDown += AssociatedObject_PreviewMouseDown;
+            AssociatedObject.PreviewMouseMove += AssociatedObject_PreviewMouseMove;
+            AssociatedObject.PreviewMouseUp += AssociatedObject_PreviewMouseUp;
         }
 
         protected override void OnDetaching()
         {
-            this.AssociatedObject.PreviewMouseDown -= AssociatedObject_PreviewMouseDown;
-            this.AssociatedObject.PreviewMouseMove -= AssociatedObject_PreviewMouseMove;
-            this.AssociatedObject.PreviewMouseUp -= AssociatedObject_PreviewMouseUp;
+            AssociatedObject.PreviewMouseDown -= AssociatedObject_PreviewMouseDown;
+            AssociatedObject.PreviewMouseMove -= AssociatedObject_PreviewMouseMove;
+            AssociatedObject.PreviewMouseUp -= AssociatedObject_PreviewMouseUp;
         }
 
         void AssociatedObject_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            _origin = e.GetPosition(this.AssociatedObject);
+            _origin = e.GetPosition(AssociatedObject);
             _isButtonDown = true;
             if (IsOverrideMouseEvent)
             {
@@ -99,22 +105,18 @@ namespace StarryEyes.Views.Behaviors
             {
                 return;
             }
-            var point = e.GetPosition(this.AssociatedObject);
+            var point = e.GetPosition(AssociatedObject);
             if (CheckDistance(point, _origin))
             {
-                if (this.BeforeDragDropCommand != null)
-                {
-                    this.BeforeDragDropCommand.Execute(null);
-                }
+                BeforeDragDropCommand?.Execute(null);
                 try
                 {
-                    DragDrop.DoDragDrop(this.AssociatedObject, this.DragDropData, this.AllowedEffects);
+                    DragDrop.DoDragDrop(AssociatedObject, DragDropData, AllowedEffects);
                 }
-                catch (COMException) { } // avoid exception of "drag operation is already in progress"
-                if (this.AfterDragDropCommand != null)
+                catch (COMException)
                 {
-                    this.AfterDragDropCommand.Execute(null);
-                }
+                } // avoid exception of "drag operation is already in progress"
+                AfterDragDropCommand?.Execute(null);
                 _isButtonDown = false;
                 e.Handled = true;
             }
@@ -129,7 +131,7 @@ namespace StarryEyes.Views.Behaviors
             _isButtonDown = false;
             if (OnClickCommand != null)
             {
-                var point = e.GetPosition(this.AssociatedObject);
+                var point = e.GetPosition(AssociatedObject);
                 if (CheckDistance(point, _origin))
                 {
                     OnClickCommand.Execute(null);

@@ -21,11 +21,11 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
         {
             _parent = parent;
             _model = model;
-            this.CompositeDisposable.Add(
+            CompositeDisposable.Add(
                 new EventListener<Action>(
                     h => _model.FocusRequired += h,
                     h => _model.FocusRequired -= h,
-                    this.SetFocus));
+                    SetFocus));
         }
 
         protected override IEnumerable<long> CurrentAccounts
@@ -44,7 +44,7 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
 
         public void SetFocus()
         {
-            this.Messenger.RaiseSafe(() => new InteractionMessage("SetFocus"));
+            Messenger.RaiseSafe(() => new InteractionMessage("SetFocus"));
         }
 
         [UsedImplicitly]

@@ -29,9 +29,8 @@ namespace StarryEyes.Settings.Themes
         /// <param name="fontSize">font size</param>
         public FontTheme([CanBeNull] FontFamily fontFamily, double fontSize)
         {
-            if (fontFamily == null) throw new ArgumentNullException("fontFamily");
-            this._fontFamily = fontFamily;
-            this.FontSize = fontSize;
+            _fontFamily = fontFamily ?? throw new ArgumentNullException(nameof(fontFamily));
+            FontSize = fontSize;
         }
 
         private FontFamily _fontFamily;
@@ -40,17 +39,11 @@ namespace StarryEyes.Settings.Themes
         /// The default font theme.
         /// </summary>
         [IgnoreDataMember]
-        public static FontTheme Default
+        public static FontTheme Default => new FontTheme
         {
-            get
-            {
-                return new FontTheme
-                {
-                    FontFamily = SystemFonts.MessageFontFamily,
-                    FontSize = SystemFonts.MessageFontSize,
-                };
-            }
-        }
+            FontFamily = SystemFonts.MessageFontFamily,
+            FontSize = SystemFonts.MessageFontSize
+        };
 
         public static FontTheme CreateDefaultWithSize(double size)
         {
@@ -88,8 +81,8 @@ namespace StarryEyes.Settings.Themes
         [IgnoreDataMember, CanBeNull]
         public FontFamily FontFamily
         {
-            get { return _fontFamily; }
-            set { _fontFamily = value; }
+            get => _fontFamily;
+            set => _fontFamily = value;
         }
 
         /// <summary>
@@ -117,9 +110,6 @@ namespace StarryEyes.Settings.Themes
             };
         }
 
-        object ICloneable.Clone()
-        {
-            return Clone();
-        }
+        object ICloneable.Clone() => Clone();
     }
 }

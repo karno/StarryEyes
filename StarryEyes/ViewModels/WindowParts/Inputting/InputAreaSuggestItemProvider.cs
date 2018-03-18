@@ -15,13 +15,14 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
     public class InputAreaSuggestItemProvider : SuggestItemProviderBase
     {
         public override int CandidateSelectionIndex { get; set; }
+
         public override string FindNearestToken(string text, int caretIndex, out int tokenStart, out int tokenLength)
         {
             tokenStart = caretIndex - 1;
             tokenLength = 1;
             while (tokenStart >= 0)
             {
-                if (this.CheckTriggerCharInputted(text[tokenStart]))
+                if (CheckTriggerCharInputted(text[tokenStart]))
                 {
                     return text.Substring(tokenStart, tokenLength);
                 }
@@ -35,7 +36,7 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
         {
             if (String.IsNullOrEmpty(token) || (token[0] != '@' && token[0] != '#'))
             {
-                this._items.Clear();
+                _items.Clear();
             }
             else
             {
@@ -45,22 +46,22 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                     if (token.Length == 1)
                     {
                         // pre-clear
-                        this._items.Clear();
+                        _items.Clear();
                     }
-                    Task.Run(() => this.AddUserItems(sn));
+                    Task.Run(() => AddUserItems(sn));
                 }
                 else
                 {
-                    this._items.Clear();
-                    this.AddHashItems(token.Substring(1));
-                    this.SelectSuitableItem(token);
+                    _items.Clear();
+                    AddHashItems(token.Substring(1));
+                    SelectSuitableItem(token);
                 }
             }
         }
 
         private void SelectSuitableItem(string token)
         {
-            var array = this._items.Select(s => s.Body.Substring(1))
+            var array = _items.Select(s => s.Body.Substring(1))
                               .ToArray();
             while (token.Length > 1)
             {
@@ -72,8 +73,8 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                                .First();
                 if (idx >= 0)
                 {
-                    this.CandidateSelectionIndex = idx;
-                    this.RaisePropertyChanged("CandidateSelectionIndex");
+                    CandidateSelectionIndex = idx;
+                    RaisePropertyChanged(nameof(CandidateSelectionIndex));
                     break;
                 }
                 token = token.Substring(0, token.Length - 1);
@@ -101,20 +102,20 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             Debug.WriteLine("current screen name: " + key);
             if (String.IsNullOrEmpty(key))
             {
-                await DispatcherHelper.UIDispatcher.InvokeAsync(() => this._items.Clear());
+                await DispatcherHelper.UIDispatcher.InvokeAsync(() => _items.Clear());
                 return;
             }
             string[] items;
             if (Setting.InputUserSuggestMode.Value == InputUserSuggestMode.All)
             {
                 items = (await UserProxy.GetUsersFastAsync(key, 1000))
-                   .Select(t => t.Item2)
-                   .ToArray();
+                    .Select(t => t.Item2)
+                    .ToArray();
             }
             else
             {
                 items = (await UserProxy.GetRelatedUsersFastAsync(key,
-                    Setting.InputUserSuggestMode.Value == InputUserSuggestMode.FollowingsOnly, 1000))
+                        Setting.InputUserSuggestMode.Value == InputUserSuggestMode.FollowingsOnly, 1000))
                     .Select(t => t.Item2)
                     .ToArray();
             }
@@ -128,9 +129,9 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
             await DispatcherHelper.UIDispatcher.InvokeAsync(
                 () =>
                 {
-                    this._items.Clear();
-                    ordered.ForEach(s => this._items.Add(s));
-                    this.SelectSuitableItem("@" + key);
+                    _items.Clear();
+                    ordered.ForEach(s => _items.Add(s));
+                    SelectSuitableItem("@" + key);
                 });
         }
 
@@ -141,24 +142,23 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                                   s.IndexOf(key, StringComparison.CurrentCultureIgnoreCase) >= 0)
                       .OrderBy(_ => _)
                       .Select(s => new SuggestItemViewModel("#" + s))
-                      .ForEach(s => this._items.Add(s));
+                      .ForEach(s => _items.Add(s));
         }
 
-        private readonly ObservableCollection<SuggestItemViewModel> _items = new ObservableCollection<SuggestItemViewModel>();
-        public override IList CandidateCollection
-        {
-            get { return this._items; }
-        }
+        private readonly ObservableCollection<SuggestItemViewModel> _items =
+            new ObservableCollection<SuggestItemViewModel>();
+
+        public override IList CandidateCollection => _items;
     }
 
     public class SuggestItemViewModel : ViewModel
     {
         public SuggestItemViewModel(string body)
         {
-            this.Body = body;
+            Body = body;
         }
 
-        public string Body { get; set; }
+        public string Body { get; }
 
         public override string ToString()
         {

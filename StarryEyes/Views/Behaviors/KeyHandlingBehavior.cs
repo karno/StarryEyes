@@ -11,13 +11,14 @@ namespace StarryEyes.Views.Behaviors
     {
         public ICommand PreviewKeyDownCommand
         {
-            get { return (ICommand)GetValue(PreviewKeyDownCommandProperty); }
-            set { SetValue(PreviewKeyDownCommandProperty, value); }
+            get => (ICommand)GetValue(PreviewKeyDownCommandProperty);
+            set => SetValue(PreviewKeyDownCommandProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for PreviewKeyDownCommand.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty PreviewKeyDownCommandProperty =
-            DependencyProperty.Register("PreviewKeyDownCommand", typeof(ICommand), typeof(KeyHandlingBehavior), new PropertyMetadata(null));
+            DependencyProperty.Register("PreviewKeyDownCommand", typeof(ICommand), typeof(KeyHandlingBehavior),
+                new PropertyMetadata(null));
 
         private readonly CompositeDisposable _disposables = new CompositeDisposable();
 
@@ -25,7 +26,8 @@ namespace StarryEyes.Views.Behaviors
         {
             base.OnAttached();
             _disposables.Add(Observable.FromEvent<KeyEventHandler, KeyEventArgs>(
-                h => this.AssociatedObject.PreviewKeyDown += h, h => this.AssociatedObject.PreviewKeyDown -= h)
+                                           h => AssociatedObject.PreviewKeyDown += h,
+                                           h => AssociatedObject.PreviewKeyDown -= h)
                                        .Subscribe(e =>
                                        {
                                            var commando = PreviewKeyDownCommand;

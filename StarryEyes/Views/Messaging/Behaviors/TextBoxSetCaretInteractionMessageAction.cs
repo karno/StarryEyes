@@ -9,8 +9,8 @@ namespace StarryEyes.Views.Messaging.Behaviors
         {
             var tcm = message as TextBoxSetCaretMessage;
             if (tcm == null) return;
-            this.AssociatedObject.CaretIndex = tcm.CaretIndex;
-            this.AssociatedObject.SelectionLength = tcm.SelectionLength;
+            AssociatedObject.CaretIndex = tcm.CaretIndex;
+            AssociatedObject.SelectionLength = tcm.SelectionLength;
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿
-using StarryEyes.Globalization.Filters;
+﻿using StarryEyes.Globalization.Filters;
 
 namespace StarryEyes.Filters.Parsing
 {
@@ -26,17 +25,17 @@ namespace StarryEyes.Filters.Parsing
         public Token(TokenType type, int debugIndex)
             : this()
         {
-            this.Type = type;
-            this.Value = null;
-            this.DebugIndex = debugIndex;
+            Type = type;
+            Value = null;
+            DebugIndex = debugIndex;
         }
 
         public Token(TokenType type, string value, int debugIndex)
             : this()
         {
-            this.Type = type;
-            this.Value = value;
-            this.DebugIndex = debugIndex;
+            Type = type;
+            Value = value;
+            DebugIndex = debugIndex;
         }
 
         public override string ToString()
@@ -90,10 +89,10 @@ namespace StarryEyes.Filters.Parsing
                 case TokenType.Exclamation:
                     return "! [" + QueryCompilerResources.TokenExclamation + "]";
                 case TokenType.String:
-                    return "[" + QueryCompilerResources.TokenString + " (" + (Value == null ? "[null]" : Value.Quote()) + ")]";
+                    return "[" + QueryCompilerResources.TokenString + " (" +
+                           (Value == null ? "[null]" : Value.Quote()) + ")]";
                 default:
                     return "[" + QueryCompilerResources.TokenUnknown + " (" + Value + ")]";
-
             }
         }
     }
@@ -116,94 +115,117 @@ namespace StarryEyes.Filters.Parsing
         /// Period
         /// </summary>
         Period,
+
         /// <summary>
         /// Comma
         /// </summary>
         Comma,
+
         /// <summary>
         /// Collon
         /// </summary>
         Collon,
+
         /// <summary>
         /// Exclamation
         /// </summary>
         Exclamation,
+
         /// <summary>
         /// Token Literal
         /// </summary>
         Literal,
+
         /// <summary>
         /// Operator plus, +
         /// </summary>
         OperatorPlus,
+
         /// <summary>
         /// Operator minus, -
         /// </summary>
         OperatorMinus,
+
         /// <summary>
         /// Operator multiple, *(Asterisk)
         /// </summary>
         OperatorMultiple,
+
         /// <summary>
         /// Operator divide, /
         /// </summary>
         OperatorDivide,
+
         /// <summary>
         /// Operator logical and, &amp;&amp;
         /// </summary>
         OperatorAnd,
+
         /// <summary>
         /// Operator logical or, ||
         /// </summary>
         OperatorOr,
+
         /// <summary>
         /// Set contains, -&gt;
         /// </summary>
         OperatorContains,
+
         /// <summary>
         /// Set contained in, &lt;-
         /// </summary>
         OperatorIn,
+
         /// <summary>
         /// Equals, ==
         /// </summary>
         OperatorEquals,
+
         /// <summary>
         /// Not equals, !=
         /// </summary>
         OperatorNotEquals,
+
         /// <summary>
         /// Less than, &lt; 
         /// </summary>
         OperatorLessThan,
+
         /// <summary>
         /// Less than or equal, &lt;=
         /// </summary>
         OperatorLessThanOrEqual,
+
         /// <summary>
         /// Greater than, &gt;
         /// </summary>
         OperatorGreaterThan,
+
         /// <summary>
         /// Greater than or equal, &gt;= 
         /// </summary>
         OperatorGreaterThanOrEqual,
+
         /// <summary>
         /// Open bracket, (
         /// </summary>
         OpenParenthesis,
+
         /// <summary>
         /// Close bracket, )
         /// </summary>
         CloseParenthesis,
+
         /// <summary>
         /// Open square bracket, (
         /// </summary>
         OpenSquareBracket,
+
         /// <summary>
         /// Close square bracket, ]
         /// </summary>
         CloseSquareBracket,
+
         /// <summary>
         /// Quoted string
         /// </summary>

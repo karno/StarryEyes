@@ -14,7 +14,7 @@ namespace StarryEyes.Views.Messaging.Behaviors
             try
             {
                 gtsm.Response = VisualStateUtilities.GoToState(
-                    this.AssociatedObject, gtsm.StateName, gtsm.UseTransitions);
+                    AssociatedObject, gtsm.StateName, gtsm.UseTransitions);
             }
             catch (Exception ex)
             {

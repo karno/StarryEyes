@@ -16,18 +16,13 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 {
     public class SearchCandidateViewModel : ViewModel
     {
-        private readonly SearchFlipViewModel _parent;
-
-        public SearchFlipViewModel Parent
-        {
-            get { return _parent; }
-        }
+        public SearchFlipViewModel Parent { get; }
 
         private bool _isSearchCandidateAvailable;
 
         public bool IsSearchCandidateAvailable
         {
-            get { return _isSearchCandidateAvailable; }
+            get => _isSearchCandidateAvailable;
             set
             {
                 _isSearchCandidateAvailable = value;
@@ -37,7 +32,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         public SearchCandidateViewModel(SearchFlipViewModel parent)
         {
-            _parent = parent;
+            Parent = parent;
         }
 
         private long _currentId;
@@ -46,7 +41,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         public Uri CurrentUserProfileImage
         {
-            get { return _currentUserProfileImage; }
+            get => _currentUserProfileImage;
             set
             {
                 _currentUserProfileImage = value;
@@ -58,7 +53,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         public string CurrentUserScreenName
         {
-            get { return _currentUserScreenName; }
+            get => _currentUserScreenName;
             set
             {
                 _currentUserScreenName = value;
@@ -66,13 +61,8 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             }
         }
 
-        private readonly ObservableCollection<SearchCandidateItemViewModel> _searchCandidates
-            = new ObservableCollection<SearchCandidateItemViewModel>();
-
-        public ObservableCollection<SearchCandidateItemViewModel> SearchCandidates
-        {
-            get { return _searchCandidates; }
-        }
+        public ObservableCollection<SearchCandidateItemViewModel> SearchCandidates { get; } =
+            new ObservableCollection<SearchCandidateItemViewModel>();
 
         public async void UpdateInfo()
         {
@@ -85,7 +75,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             }
             if (_currentId == cid) return;
             _currentId = cid;
-            _searchCandidates.Clear();
+            SearchCandidates.Clear();
             var aid = Setting.Accounts.Get(_currentId);
             if (aid == null)
             {
@@ -98,7 +88,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
             try
             {
                 var searches = await aid.CreateAccessor().GetSavedSearchesAsync(CancellationToken.None);
-                searches.Result.ForEach(s => _searchCandidates.Add(
+                searches.Result.ForEach(s => SearchCandidates.Add(
                     new SearchCandidateItemViewModel(this, aid, s.Id, s.Query)));
             }
             catch (Exception ex)
@@ -114,33 +104,21 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
     public class SearchCandidateItemViewModel : ViewModel
     {
         private readonly SearchCandidateViewModel _parent;
-        private readonly TwitterAccount _account;
-        private readonly long _id;
-        private readonly string _query;
 
         public SearchCandidateItemViewModel(SearchCandidateViewModel parent,
             TwitterAccount account, long id, string query)
         {
             _parent = parent;
-            _account = account;
-            _id = id;
-            _query = query;
+            TwitterAccount = account;
+            Id = id;
+            Query = query;
         }
 
-        public TwitterAccount TwitterAccount
-        {
-            get { return _account; }
-        }
+        public TwitterAccount TwitterAccount { get; }
 
-        public long Id
-        {
-            get { return _id; }
-        }
+        public long Id { get; }
 
-        public string Query
-        {
-            get { return _query; }
-        }
+        public string Query { get; }
 
         public void SelectThis()
         {
@@ -153,16 +131,15 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         private Livet.Commands.ViewModelCommand _removeCommand;
 
-        public Livet.Commands.ViewModelCommand RemoveCommand
-        {
-            get { return _removeCommand ?? (_removeCommand = new Livet.Commands.ViewModelCommand(Remove)); }
-        }
+        public Livet.Commands.ViewModelCommand RemoveCommand => _removeCommand ??
+                                                                (_removeCommand =
+                                                                    new Livet.Commands.ViewModelCommand(Remove));
 
         public async void Remove()
         {
             try
             {
-                await _account.CreateAccessor().DestroySavedSearchAsync(_id, CancellationToken.None);
+                await TwitterAccount.CreateAccessor().DestroySavedSearchAsync(Id, CancellationToken.None);
             }
             catch (Exception ex)
             {

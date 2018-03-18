@@ -7,22 +7,23 @@ namespace StarryEyes.Views.Messaging
 {
     public class TaskDialogMessage : ResponsiveInteractionMessage<TaskDialogResult>
     {
-        public TaskDialogOptions Options { get; private set; }
+        public TaskDialogOptions Options { get; }
 
         public TaskDialogMessage(TaskDialogOptions options)
         {
             DispatcherHelper.UIDispatcher.VerifyAccess();
-            this.Options = options;
+            Options = options;
         }
+
         public TaskDialogMessage(string messageKey, TaskDialogOptions options)
             : base(messageKey)
         {
-            this.Options = options;
+            Options = options;
         }
 
         protected override Freezable CreateInstanceCore()
         {
-            return new TaskDialogMessage(this.MessageKey, this.Options);
+            return new TaskDialogMessage(MessageKey, Options);
         }
     }
 }

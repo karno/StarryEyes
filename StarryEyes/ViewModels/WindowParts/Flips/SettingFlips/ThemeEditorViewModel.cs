@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using Livet;
-using ThemeManager = StarryEyes.Settings.ThemeManager;
+using StarryEyes.Settings;
 
 namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
 {
@@ -11,11 +11,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
             RefreshCandidates();
         }
 
-        private readonly ObservableCollection<string> _themeCandidateFiles = new ObservableCollection<string>();
-        public ObservableCollection<string> ThemeCandidateFiles
-        {
-            get { return this._themeCandidateFiles; }
-        }
+        public ObservableCollection<string> ThemeCandidateFiles { get; } = new ObservableCollection<string>();
 
         public void RefreshThemes()
         {
@@ -33,7 +29,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
         {
             if (_isChanged)
             {
-
             }
         }
 
@@ -44,7 +39,6 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SettingFlips
 
         private void SaveCore(string fileName)
         {
-
         }
     }
 }

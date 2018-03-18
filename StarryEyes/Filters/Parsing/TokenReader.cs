@@ -8,6 +8,7 @@ namespace StarryEyes.Filters.Parsing
     {
         readonly List<Token> _tokenQueueList;
         int _queueCursor;
+
         public TokenReader(IEnumerable<Token> tokens)
         {
             _tokenQueueList = new List<Token>(tokens);
@@ -35,10 +36,7 @@ namespace StarryEyes.Filters.Parsing
         /// <summary>
         /// Check token remains in queue.
         /// </summary>
-        public bool IsRemainToken
-        {
-            get { return _queueCursor < _tokenQueueList.Count; }
-        }
+        public bool IsRemainToken => _queueCursor < _tokenQueueList.Count;
 
         public string RemainQuery
         {
@@ -58,7 +56,7 @@ namespace StarryEyes.Filters.Parsing
         /// <returns>token</returns>
         public Token AssertGet(TokenType type)
         {
-            if (!this.IsRemainToken)
+            if (!IsRemainToken)
                 RaiseQueryInvalidTerminatedError(type, RemainQuery);
             var token = Get();
             if (token.Type != type)

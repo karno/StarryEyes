@@ -23,14 +23,11 @@ namespace StarryEyes.ViewModels.Dialogs
         public const string AccessTokenEndpoint = "https://api.twitter.com/oauth/access_token";
 
         private readonly Subject<TwitterAccount> _returnSubject = new Subject<TwitterAccount>();
-        public IObservable<TwitterAccount> AuthorizeObservable
-        {
-            get { return _returnSubject; }
-        }
+        public IObservable<TwitterAccount> AuthorizeObservable => _returnSubject;
 
         public AuthorizationViewModel()
         {
-            this.CompositeDisposable.Add(() => _returnSubject.OnCompleted());
+            CompositeDisposable.Add(() => _returnSubject.OnCompleted());
         }
 
         private OAuthAuthorizer _authorizer;
@@ -51,7 +48,7 @@ namespace StarryEyes.ViewModels.Dialogs
                               CurrentAuthenticationStep = AuthenticationStep.WaitingPinInput;
                               BrowserHelper.Open(_authorizer.BuildAuthorizeUrl(AuthorizationEndpoint, t.Token));
                           },
-                          ex => this.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
+                          ex => Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
                           {
                               Title = AuthorizationWindowResources.OAuthErrorTitle,
                               MainIcon = VistaTaskDialogIcon.Error,
@@ -59,14 +56,14 @@ namespace StarryEyes.ViewModels.Dialogs
                               Content = AuthorizationWindowResources.OAuthErrorContent,
                               CommonButtons = TaskDialogCommonButtons.Close,
                               FooterIcon = VistaTaskDialogIcon.Information,
-                              FooterText = AuthorizationWindowResources.OAuthErrorFooter,
+                              FooterText = AuthorizationWindowResources.OAuthErrorFooter
                           })));
         }
 
         private AuthenticationStep _currentAuthenticationStep = AuthenticationStep.RequestingToken;
         public AuthenticationStep CurrentAuthenticationStep
         {
-            get { return _currentAuthenticationStep; }
+            get => _currentAuthenticationStep;
             set
             {
                 _currentAuthenticationStep = value;
@@ -76,19 +73,13 @@ namespace StarryEyes.ViewModels.Dialogs
             }
         }
 
-        public bool IsNegotiating
-        {
-            get
-            {
-                return CurrentAuthenticationStep == AuthenticationStep.RequestingToken ||
-                    CurrentAuthenticationStep == AuthenticationStep.AuthorizingUser;
-            }
-        }
+        public bool IsNegotiating => CurrentAuthenticationStep == AuthenticationStep.RequestingToken ||
+                                     CurrentAuthenticationStep == AuthenticationStep.AuthorizingUser;
 
         private string _pin = String.Empty;
         public string Pin
         {
-            get { return _pin; }
+            get => _pin;
             set
             {
                 _pin = value;
@@ -99,10 +90,7 @@ namespace StarryEyes.ViewModels.Dialogs
         #region VerifyPinCommand
         private ViewModelCommand _verifyPinCommand;
 
-        public ViewModelCommand VerifyPinCommand
-        {
-            get { return _verifyPinCommand ?? (_verifyPinCommand = new ViewModelCommand(VerifyPin, CanVerifyPin)); }
-        }
+        public ViewModelCommand VerifyPinCommand => _verifyPinCommand ?? (_verifyPinCommand = new ViewModelCommand(VerifyPin, CanVerifyPin));
 
         public bool CanVerifyPin()
         {
@@ -120,12 +108,12 @@ namespace StarryEyes.ViewModels.Dialogs
                     var sn = r.ExtraData["screen_name"].First();
                     _returnSubject.OnNext(new TwitterAccount(id, sn, r.Token));
                     CurrentAuthenticationStep = AuthenticationStep.AuthorizationCompleted;
-                    this.Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
+                    Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
                 },
                 ex =>
                 {
                     CurrentAuthenticationStep = AuthenticationStep.WaitingPinInput;
-                    this.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
+                    Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
                     {
                         Title = AuthorizationWindowResources.OAuthFailedTitle,
                         MainIcon = VistaTaskDialogIcon.Error,
@@ -137,7 +125,7 @@ namespace StarryEyes.ViewModels.Dialogs
                     }));
                 });
         }
-        #endregion
+        #endregion VerifyPinCommand
 
         #region Text box control
 
@@ -150,7 +138,7 @@ namespace StarryEyes.ViewModels.Dialogs
             }
         }
 
-        #endregion
+        #endregion Text box control
 
         #region Help control
 
@@ -160,7 +148,7 @@ namespace StarryEyes.ViewModels.Dialogs
             BrowserHelper.Open(App.AuthorizeHelpUrl);
         }
 
-        #endregion
+        #endregion Help control
     }
 
     public enum AuthenticationStep
@@ -168,6 +156,6 @@ namespace StarryEyes.ViewModels.Dialogs
         RequestingToken,
         WaitingPinInput,
         AuthorizingUser,
-        AuthorizationCompleted,
+        AuthorizationCompleted
     }
 }

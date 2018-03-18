@@ -8,7 +8,8 @@ namespace StarryEyes.Models.Subsystems
     public static class SpecialImageResolvers
     {
         private static readonly Regex PixivRegex = new Regex("(http://[^\"]+?\\.pixiv\\.net/[^\"]+?_m\\.jpg)",
-                                                             RegexOptions.Compiled | RegexOptions.Singleline);
+            RegexOptions.Compiled | RegexOptions.Singleline);
+
         public static void Initialize()
         {
             ImageLoader.RegisterSpecialResolverTable("pixiv", uri =>
@@ -32,12 +33,14 @@ namespace StarryEyes.Models.Subsystems
                 }
                 catch (Exception)
                 {
+                    // ignored
                 }
                 return new byte[0];
             });
         }
 
         #region Extended WebClient
+
         private sealed class WebClientEx : WebClient
         {
             public CookieContainer CookieContainer { get; set; }
@@ -51,13 +54,14 @@ namespace StarryEyes.Models.Subsystems
                 var hwr = req as HttpWebRequest;
                 if (hwr != null)
                 {
-                    hwr.CookieContainer = this.CookieContainer;
+                    hwr.CookieContainer = CookieContainer;
                     hwr.UserAgent = "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0)";
-                    hwr.Referer = this.Referer;
+                    hwr.Referer = Referer;
                 }
                 return req;
             }
         }
-        #endregion
+
+        #endregion Extended WebClient
     }
 }

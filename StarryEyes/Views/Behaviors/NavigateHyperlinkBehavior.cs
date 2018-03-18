@@ -9,13 +9,13 @@ namespace StarryEyes.Views.Behaviors
         protected override void OnAttached()
         {
             base.OnAttached();
-            this.AssociatedObject.RequestNavigate += this.RequestNavigate;
+            AssociatedObject.RequestNavigate += RequestNavigate;
         }
 
         protected override void OnDetaching()
         {
             base.OnDetaching();
-            this.AssociatedObject.RequestNavigate -= this.RequestNavigate;
+            AssociatedObject.RequestNavigate -= RequestNavigate;
         }
 
         void RequestNavigate(object sender, RequestNavigateEventArgs e)

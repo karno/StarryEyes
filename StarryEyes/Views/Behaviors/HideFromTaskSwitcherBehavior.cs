@@ -10,30 +10,30 @@ namespace StarryEyes.Views.Behaviors
 
         protected override void OnAttached()
         {
-            if (this.AssociatedObject.IsLoaded)
+            if (AssociatedObject.IsLoaded)
             {
-                HideWindow(this.AssociatedObject);
+                HideWindow(AssociatedObject);
                 _isHide = true;
             }
             else
             {
-                this.AssociatedObject.Loaded += AssociatedObjectOnLoaded;
+                AssociatedObject.Loaded += AssociatedObjectOnLoaded;
             }
         }
 
         private void AssociatedObjectOnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
-            this.AssociatedObject.Loaded -= AssociatedObjectOnLoaded;
-            HideWindow(this.AssociatedObject);
+            AssociatedObject.Loaded -= AssociatedObjectOnLoaded;
+            HideWindow(AssociatedObject);
             _isHide = true;
         }
 
         protected override void OnDetaching()
         {
-            this.AssociatedObject.Loaded -= AssociatedObjectOnLoaded;
+            AssociatedObject.Loaded -= AssociatedObjectOnLoaded;
             if (_isHide)
             {
-                UnhideWindow(this.AssociatedObject);
+                UnhideWindow(AssociatedObject);
                 _isHide = false;
             }
         }

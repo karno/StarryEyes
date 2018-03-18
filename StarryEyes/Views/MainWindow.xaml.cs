@@ -4,7 +4,6 @@ using StarryEyes.Nightmare.Windows;
 using StarryEyes.Settings;
 using StarryEyes.ViewModels;
 using Application = System.Windows.Application;
-using ThemeManager = StarryEyes.Settings.ThemeManager;
 
 namespace StarryEyes.Views
 {
@@ -16,7 +15,7 @@ namespace StarryEyes.Views
         public MainWindow()
         {
             InitializeComponent();
-            this.Loaded += MainWindow_Loaded;
+            Loaded += MainWindow_Loaded;
         }
 
         void MainWindow_Loaded(object sender, System.Windows.RoutedEventArgs e)
@@ -26,19 +25,19 @@ namespace StarryEyes.Views
             var state = Setting.LastWindowState.Value;
             if (rect.IsEmpty) return;
             this.SetWindowPlacement(rect);
-            this.WindowState = state;
+            WindowState = state;
             UpdateTheme();
         }
 
         public void UpdateTheme()
         {
-            this.FontFamily = ThemeManager.CurrentTheme.GlobalFont.FontFamily;
-            this.FontSize = ThemeManager.CurrentTheme.GlobalFont.FontSize;
+            FontFamily = ThemeManager.CurrentTheme.GlobalFont.FontFamily;
+            FontSize = ThemeManager.CurrentTheme.GlobalFont.FontSize;
         }
 
         private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            var viewModel = this.DataContext as MainWindowViewModel;
+            var viewModel = DataContext as MainWindowViewModel;
             if (viewModel != null && !viewModel.OnClosing())
             {
                 e.Cancel = true;
@@ -46,7 +45,7 @@ namespace StarryEyes.Views
             else
             {
                 Setting.LastWindowPosition.Value = this.GetWindowPlacement();
-                Setting.LastWindowState.Value = this.WindowState;
+                Setting.LastWindowState.Value = WindowState;
             }
         }
 

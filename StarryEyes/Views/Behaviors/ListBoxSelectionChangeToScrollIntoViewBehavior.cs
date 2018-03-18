@@ -8,19 +8,19 @@ namespace StarryEyes.Views.Behaviors
         protected override void OnAttached()
         {
             base.OnAttached();
-            this.AssociatedObject.SelectionChanged += AssociatedObject_SelectionChanged;
+            AssociatedObject.SelectionChanged += AssociatedObject_SelectionChanged;
         }
 
         protected override void OnDetaching()
         {
-            this.AssociatedObject.SelectionChanged -= AssociatedObject_SelectionChanged;
+            AssociatedObject.SelectionChanged -= AssociatedObject_SelectionChanged;
             base.OnDetaching();
         }
 
         void AssociatedObject_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var listBox = sender as ListBox;
-            if (listBox == null || listBox.SelectedItem == null) return;
+            if (listBox?.SelectedItem == null) return;
             listBox.Dispatcher.InvokeAsync(() =>
             {
                 listBox.UpdateLayout();
@@ -30,6 +30,5 @@ namespace StarryEyes.Views.Behaviors
                 }
             });
         }
-
     }
 }

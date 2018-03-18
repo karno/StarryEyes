@@ -31,105 +31,56 @@ namespace StarryEyes.ViewModels
     {
         #region Included viewmodels
 
-        private readonly BackstageViewModel _backstageViewModel;
+        public BackstageViewModel BackstageViewModel { get; }
 
-        private readonly AccountSelectionFlipViewModel _globalAccountSelectionFlipViewModel;
+        public InputViewModel InputViewModel { get; }
 
-        private readonly InputViewModel _inputViewModel;
+        public MainAreaViewModel MainAreaViewModel { get; }
 
-        private readonly MainAreaViewModel _mainAreaViewModel;
+        public AccountSelectionFlipViewModel InputAreaAccountSelectionFlipViewModel => InputViewModel
+            .AccountSelectorViewModel.AccountSelectionFlip;
 
-        private readonly SettingFlipViewModel _settingFlipViewModel;
+        public AccountSelectionFlipViewModel GlobalAccountSelectionFlipViewModel { get; }
 
-        private readonly TabConfigurationFlipViewModel _tabConfigurationFlipViewModel;
+        public SettingFlipViewModel SettingFlipViewModel { get; }
 
-        private readonly SearchFlipViewModel _searchFlipViewModel;
+        public TabConfigurationFlipViewModel TabConfigurationFlipViewModel { get; }
 
-        public BackstageViewModel BackstageViewModel
-        {
-            get { return this._backstageViewModel; }
-        }
+        public SearchFlipViewModel SearchFlipViewModel { get; }
 
-        public InputViewModel InputViewModel
-        {
-            get { return this._inputViewModel; }
-        }
-
-        public MainAreaViewModel MainAreaViewModel
-        {
-            get { return _mainAreaViewModel; }
-        }
-
-        public AccountSelectionFlipViewModel InputAreaAccountSelectionFlipViewModel
-        {
-            get { return this._inputViewModel.AccountSelectorViewModel.AccountSelectionFlip; }
-        }
-
-        public AccountSelectionFlipViewModel GlobalAccountSelectionFlipViewModel
-        {
-            get { return _globalAccountSelectionFlipViewModel; }
-        }
-
-        public SettingFlipViewModel SettingFlipViewModel
-        {
-            get { return _settingFlipViewModel; }
-        }
-
-        public TabConfigurationFlipViewModel TabConfigurationFlipViewModel
-        {
-            get { return _tabConfigurationFlipViewModel; }
-        }
-
-        public SearchFlipViewModel SearchFlipViewModel
-        {
-            get { return _searchFlipViewModel; }
-        }
-
-        #endregion
+        #endregion Included viewmodels
 
         #region Properties
 
-        public string WindowTitle
-        {
-            get
-            {
-                return !App.IsUnstableVersion ? App.AppFullName : App.AppFullName + " " + App.FormattedVersion;
-            }
-        }
-
-        private bool _showWindowCommands = true;
+        public string WindowTitle => !App.IsUnstableVersion
+            ? App.AppFullName
+            : App.AppFullName + " " + App.FormattedVersion;
 
         public bool ShowWindowCommands
         {
-            get { return _showWindowCommands; }
+            get => ShowSearchBox;
             set
             {
-                _showWindowCommands = value;
+                ShowSearchBox = value;
                 RaisePropertyChanged(() => ShowWindowCommands);
             }
         }
 
-        public bool ShowSettingLabel
-        {
-            get { return _showWindowCommands && SearchFlipViewModel.IsVisible; }
-        }
+        public bool ShowSettingLabel => ShowSearchBox && SearchFlipViewModel.IsVisible;
 
-        public bool ShowSearchBox
-        {
-            get { return _showWindowCommands; }
-        }
+        public bool ShowSearchBox { get; private set; } = true;
 
-        #endregion
+        #endregion Properties
 
         public MainWindowViewModel()
         {
-            CompositeDisposable.Add(_backstageViewModel = new BackstageViewModel());
-            CompositeDisposable.Add(this._inputViewModel = new InputViewModel());
-            CompositeDisposable.Add(_mainAreaViewModel = new MainAreaViewModel());
-            CompositeDisposable.Add(_globalAccountSelectionFlipViewModel = new AccountSelectionFlipViewModel());
-            CompositeDisposable.Add(_settingFlipViewModel = new SettingFlipViewModel(this));
-            CompositeDisposable.Add(_tabConfigurationFlipViewModel = new TabConfigurationFlipViewModel());
-            CompositeDisposable.Add(_searchFlipViewModel = new SearchFlipViewModel());
+            CompositeDisposable.Add(BackstageViewModel = new BackstageViewModel());
+            CompositeDisposable.Add(InputViewModel = new InputViewModel());
+            CompositeDisposable.Add(MainAreaViewModel = new MainAreaViewModel());
+            CompositeDisposable.Add(GlobalAccountSelectionFlipViewModel = new AccountSelectionFlipViewModel());
+            CompositeDisposable.Add(SettingFlipViewModel = new SettingFlipViewModel(this));
+            CompositeDisposable.Add(TabConfigurationFlipViewModel = new TabConfigurationFlipViewModel());
+            CompositeDisposable.Add(SearchFlipViewModel = new SearchFlipViewModel());
             CompositeDisposable.Add(Observable
                 .FromEvent<FocusRequest>(
                     h => MainWindowModel.FocusRequested += h,
@@ -139,7 +90,7 @@ namespace StarryEyes.ViewModels
                 .FromEvent<bool>(
                     h => MainWindowModel.BackstageTransitionRequested += h,
                     h => MainWindowModel.BackstageTransitionRequested -= h)
-                .Subscribe(this.TransitionBackstage));
+                .Subscribe(TransitionBackstage));
             CompositeDisposable.Add(Setting.BackgroundImagePath.ListenValueChanged(
                 _ =>
                 {
@@ -148,7 +99,7 @@ namespace StarryEyes.ViewModels
                 }));
             CompositeDisposable.Add(Setting.BackgroundImageTransparency.ListenValueChanged(
                 _ => RaisePropertyChanged(() => BackgroundImageOpacity)));
-            this._backstageViewModel.Initialize();
+            BackstageViewModel.Initialize();
         }
 
         private void SetFocus(FocusRequest req)
@@ -161,15 +112,12 @@ namespace StarryEyes.ViewModels
                 case FocusRequest.Timeline:
                     SearchFlipViewModel.Close();
                     var ctab = TabManager.CurrentFocusTab;
-                    if (ctab != null)
-                    {
-                        ctab.RequestFocus();
-                    }
+                    ctab?.RequestFocus();
                     break;
                 case FocusRequest.Input:
                     SearchFlipViewModel.Close();
-                    this.InputViewModel.OpenInput();
-                    this.InputViewModel.FocusToTextBox();
+                    InputViewModel.OpenInput();
+                    InputViewModel.FocusToTextBox();
                     break;
             }
         }
@@ -180,79 +128,81 @@ namespace StarryEyes.ViewModels
         public void Initialize()
         {
             #region bind events
+
             CompositeDisposable.Add(
                 Observable.FromEvent<bool>(
-                    h => MainWindowModel.WindowCommandsDisplayChanged += h,
-                    h => MainWindowModel.WindowCommandsDisplayChanged -= h)
+                              h => MainWindowModel.WindowCommandsDisplayChanged += h,
+                              h => MainWindowModel.WindowCommandsDisplayChanged -= h)
                           .Subscribe(visible =>
                           {
                               var offset = visible
-                                               ? Interlocked.Increment(ref _visibleCount)
-                                               : Interlocked.Decrement(ref _visibleCount);
+                                  ? Interlocked.Increment(ref _visibleCount)
+                                  : Interlocked.Decrement(ref _visibleCount);
                               ShowWindowCommands = offset >= 0;
                           }));
             CompositeDisposable.Add(
                 Observable.FromEvent<TaskDialogOptions>(
-                    h => MainWindowModel.TaskDialogRequested += h,
-                    h => MainWindowModel.TaskDialogRequested -= h)
-                          .Subscribe(options => this.Messenger.RaiseSafe(() =>
+                              h => MainWindowModel.TaskDialogRequested += h,
+                              h => MainWindowModel.TaskDialogRequested -= h)
+                          .Subscribe(options => Messenger.RaiseSafe(() =>
                               new TaskDialogMessage(options))));
             CompositeDisposable.Add(
                 Observable.FromEvent(
-                    h => MainWindowModel.StateStringChanged += h,
-                    h => MainWindowModel.StateStringChanged -= h)
+                              h => MainWindowModel.StateStringChanged += h,
+                              h => MainWindowModel.StateStringChanged -= h)
                           .Subscribe(_ => RaisePropertyChanged(() => StateString)));
             CompositeDisposable.Add(
                 Observable.Interval(TimeSpan.FromSeconds(0.5))
                           .Subscribe(_ => UpdateStatistics()));
             CompositeDisposable.Add(
                 Observable.FromEvent<AccountSelectDescription>(
-                    h => MainWindowModel.AccountSelectActionRequested += h,
-                    h => MainWindowModel.AccountSelectActionRequested -= h)
+                              h => MainWindowModel.AccountSelectActionRequested += h,
+                              h => MainWindowModel.AccountSelectActionRequested -= h)
                           .Subscribe(
                               desc =>
                               {
                                   // ensure close before opening.
-                                  _globalAccountSelectionFlipViewModel.Close();
+                                  GlobalAccountSelectionFlipViewModel.Close();
 
-                                  _globalAccountSelectionFlipViewModel.SelectedAccounts =
+                                  GlobalAccountSelectionFlipViewModel.SelectedAccounts =
                                       desc.SelectionAccounts;
-                                  _globalAccountSelectionFlipViewModel.SelectionReason = "";
+                                  GlobalAccountSelectionFlipViewModel.SelectionReason = "";
                                   switch (desc.AccountSelectionAction)
                                   {
                                       case AccountSelectionAction.Favorite:
-                                          _globalAccountSelectionFlipViewModel.SelectionReason =
+                                          GlobalAccountSelectionFlipViewModel.SelectionReason =
                                               "favorite";
                                           break;
                                       case AccountSelectionAction.Retweet:
-                                          _globalAccountSelectionFlipViewModel.SelectionReason =
+                                          GlobalAccountSelectionFlipViewModel.SelectionReason =
                                               "retweet";
                                           break;
                                   }
                                   IDisposable disposable = null;
                                   disposable = Observable.FromEvent(
-                                      h => _globalAccountSelectionFlipViewModel.Closed += h,
-                                      h => _globalAccountSelectionFlipViewModel.Closed -= h)
+                                                             h => GlobalAccountSelectionFlipViewModel.Closed += h,
+                                                             h => GlobalAccountSelectionFlipViewModel.Closed -= h)
                                                          .Subscribe(_ =>
                                                          {
                                                              if (disposable == null) return;
                                                              disposable.Dispose();
                                                              disposable = null;
                                                              desc.Callback(
-                                                                 this._globalAccountSelectionFlipViewModel
+                                                                 GlobalAccountSelectionFlipViewModel
                                                                      .SelectedAccounts);
                                                          });
-                                  _globalAccountSelectionFlipViewModel.Open();
+                                  GlobalAccountSelectionFlipViewModel.Open();
                               }));
             CompositeDisposable.Add(
                 Observable.FromEvent(
                     h => ThemeManager.ThemeChanged += h,
                     h => ThemeManager.ThemeChanged -= h
-                    ).Subscribe(_ => this.Messenger.RaiseAsync(new InteractionMessage("InvalidateTheme"))));
+                ).Subscribe(_ => Messenger?.RaiseAsync(new InteractionMessage("InvalidateTheme"))));
 
-            #endregion
+            #endregion bind events
 
             #region special navigations
+
             // check first boot
             if (Setting.IsFirstGenerated)
             {
@@ -272,7 +222,8 @@ namespace StarryEyes.ViewModels
                     typeof(AuthorizationWindow),
                     auth, TransitionMode.Modal, null));
             }
-            #endregion
+
+            #endregion special navigations
 
             TabManager.Load();
             TabManager.Save();
@@ -280,14 +231,14 @@ namespace StarryEyes.ViewModels
             if (TabManager.Columns.Count == 1 && TabManager.Columns[0].Tabs.Count == 0)
             {
                 // lost tab info
-                this.ReInitTabs();
+                ReInitTabs();
             }
 
             // check cleanup parameter
             if (Setting.AutoCleanupTweets.Value &&
                 Setting.AutoCleanupThreshold.Value < 0)
             {
-                var msg = this.Messenger.GetResponseSafe(() =>
+                var msg = Messenger.GetResponseSafe(() =>
                     new TaskDialogMessage(new TaskDialogOptions
                     {
                         Title = AppInitResources.MsgCleanupConfigTitle,
@@ -306,7 +257,7 @@ namespace StarryEyes.ViewModels
             {
                 if (App.ExecutionMode == ExecutionMode.Standalone)
                 {
-                    var msg = this.Messenger.GetResponseSafe(() =>
+                    var msg = Messenger.GetResponseSafe(() =>
                         new TaskDialogMessage(new TaskDialogOptions
                         {
                             Title = AppInitResources.MsgExecModeWarningTitle,
@@ -318,11 +269,12 @@ namespace StarryEyes.ViewModels
                             CommonButtons = TaskDialogCommonButtons.Close,
                             VerificationText = Resources.MsgDoNotShowAgain
                         }));
-                    Setting.ShowStartupConfigurationWarning.Value = !msg.Response.VerificationChecked.GetValueOrDefault();
+                    Setting.ShowStartupConfigurationWarning.Value =
+                        !msg.Response.VerificationChecked.GetValueOrDefault();
                 }
                 else if (App.DatabaseDirectoryUserSpecified)
                 {
-                    var msg = this.Messenger.GetResponseSafe(() =>
+                    var msg = Messenger.GetResponseSafe(() =>
                         new TaskDialogMessage(new TaskDialogOptions
                         {
                             Title = AppInitResources.MsgDatabasePathWarningTitle,
@@ -334,7 +286,8 @@ namespace StarryEyes.ViewModels
                             CommonButtons = TaskDialogCommonButtons.Close,
                             VerificationText = Resources.MsgDoNotShowAgain
                         }));
-                    Setting.ShowStartupConfigurationWarning.Value = !msg.Response.VerificationChecked.GetValueOrDefault();
+                    Setting.ShowStartupConfigurationWarning.Value =
+                        !msg.Response.VerificationChecked.GetValueOrDefault();
                 }
             }
 
@@ -356,7 +309,7 @@ namespace StarryEyes.ViewModels
                     var rh = App.LeastDesktopHeapSize;
                     if (dh < rh)
                     {
-                        var msg = this.Messenger.GetResponseSafe(() =>
+                        var msg = Messenger.GetResponseSafe(() =>
                             new TaskDialogMessage(new TaskDialogOptions
                             {
                                 Title = Resources.AppName,
@@ -364,8 +317,9 @@ namespace StarryEyes.ViewModels
                                 MainInstruction = AppInitResources.MsgDesktopHeapInst,
                                 Content = AppInitResources.MsgDesktopHeapContent,
                                 ExpandedInfo = AppInitResources.MsgDesktopHeapInfoFormat.SafeFormat(dh, rh),
-                                CommandButtons = new[] { AppInitResources.MsgButtonBrowseMsKb, Resources.MsgButtonCancel },
-                                VerificationText = Resources.MsgDoNotShowAgain,
+                                CommandButtons = new[]
+                                    { AppInitResources.MsgButtonBrowseMsKb, Resources.MsgButtonCancel },
+                                VerificationText = Resources.MsgDoNotShowAgain
                             }));
                         Setting.CheckDesktopHeap.Value = !msg.Response.VerificationChecked.GetValueOrDefault();
                         if (msg.Response.CommandButtonResult == 0)
@@ -383,14 +337,14 @@ namespace StarryEyes.ViewModels
 
         private void ReInitTabs()
         {
-            var response = this.Messenger.GetResponseSafe(() =>
+            var response = Messenger.GetResponseSafe(() =>
                 new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = AppInitResources.MsgTabWarningTitle,
                     MainIcon = VistaTaskDialogIcon.Warning,
                     MainInstruction = AppInitResources.MsgTabWarningInst,
                     Content = AppInitResources.MsgTabWarningContent,
-                    CommonButtons = TaskDialogCommonButtons.YesNo,
+                    CommonButtons = TaskDialogCommonButtons.YesNo
                 }));
             if (response.Response.Result != TaskDialogSimpleResult.Yes) return;
             Setting.ResetTabInfo();
@@ -411,7 +365,7 @@ namespace StarryEyes.ViewModels
                         MainIcon = VistaTaskDialogIcon.Warning,
                         MainInstruction = AppInitResources.MsgExitInst,
                         CommonButtons = TaskDialogCommonButtons.OKCancel,
-                        VerificationText = Resources.MsgDoNotShowAgain,
+                        VerificationText = Resources.MsgDoNotShowAgain
                     }));
                 if (ret.Response == null) return true;
                 Setting.ConfirmOnExitApp.Value = !ret.Response.VerificationChecked.GetValueOrDefault();
@@ -425,10 +379,7 @@ namespace StarryEyes.ViewModels
 
         #region Status control
 
-        public bool IsMuted
-        {
-            get { return !Setting.PlaySounds.Value; }
-        }
+        public bool IsMuted => !Setting.PlaySounds.Value;
 
         public void ToggleMute()
         {
@@ -436,20 +387,11 @@ namespace StarryEyes.ViewModels
             RaisePropertyChanged(() => IsMuted);
         }
 
-        public string StateString
-        {
-            get { return MainWindowModel.StateString; }
-        }
+        public string StateString => MainWindowModel.StateString;
 
-        public string TweetsPerMinutes
-        {
-            get { return StatisticsService.TweetsPerMinutes.ToString(CultureInfo.InvariantCulture); }
-        }
+        public string TweetsPerMinutes => StatisticsService.TweetsPerMinutes.ToString(CultureInfo.InvariantCulture);
 
-        public int GrossTweetCount
-        {
-            get { return StatisticsService.EstimatedGrossTweetCount; }
-        }
+        public int GrossTweetCount => StatisticsService.EstimatedGrossTweetCount;
 
         public string StartupTime
         {
@@ -476,7 +418,7 @@ namespace StarryEyes.ViewModels
             GC.Collect();
         }
 
-        #endregion
+        #endregion Status control
 
         #region Theme control
 
@@ -530,28 +472,26 @@ namespace StarryEyes.ViewModels
             }
         }
 
-        public double BackgroundImageOpacity
-        {
-            get { return (255 - Math.Min(255, Setting.BackgroundImageTransparency.Value)) / 255.0; }
-        }
+        public double BackgroundImageOpacity => (255 - Math.Min(255, Setting.BackgroundImageTransparency.Value)) /
+                                                255.0;
 
-        #endregion
+        #endregion Theme control
 
         #region Toggle Backstage display
 
         private void TransitionBackstage(bool show)
         {
             if (IsBackstageVisible == show) return;
-            this.ToggleShowBackstage();
+            ToggleShowBackstage();
         }
 
         public bool IsBackstageVisible
         {
-            get { return this._isBackstageVisible; }
+            get => _isBackstageVisible;
             set
             {
-                this._isBackstageVisible = value;
-                this.RaisePropertyChanged();
+                _isBackstageVisible = value;
+                RaisePropertyChanged();
             }
         }
 
@@ -561,20 +501,17 @@ namespace StarryEyes.ViewModels
             ShowWindowCommands = !IsBackstageVisible;
         }
 
-        #endregion
+        #endregion Toggle Backstage display
 
         #region ShowSettingCommand
+
         private Livet.Commands.ViewModelCommand _showSettingCommand;
         private bool _isBackstageVisible;
 
-        public Livet.Commands.ViewModelCommand ShowSettingCommand
-        {
-            get
-            {
-                return _showSettingCommand ??
-                       (_showSettingCommand = new Livet.Commands.ViewModelCommand(ShowSetting));
-            }
-        }
+        public Livet.Commands.ViewModelCommand ShowSettingCommand => _showSettingCommand ??
+                                                                     (_showSettingCommand =
+                                                                         new Livet.Commands.ViewModelCommand(
+                                                                             ShowSetting));
 
         public async void ShowSetting()
         {
@@ -585,6 +522,6 @@ namespace StarryEyes.ViewModels
             MainWindowModel.SuppressKeyAssigns = false;
         }
 
-        #endregion
+        #endregion ShowSettingCommand
     }
 }

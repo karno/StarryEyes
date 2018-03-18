@@ -27,10 +27,7 @@ namespace StarryEyes.ViewModels.WindowParts.Backstages
             }
         }
 
-        public UserStreamsConnectionState ConnectionState
-        {
-            get { return _model.ConnectionState; }
-        }
+        public UserStreamsConnectionState ConnectionState => _model.ConnectionState;
 
         public bool IsFallbacked { get; set; }
 
@@ -40,46 +37,43 @@ namespace StarryEyes.ViewModels.WindowParts.Backstages
 
         public int MaxUpdate { get; set; }
 
-        public bool IsWarningPostLimit
-        {
-            get { return RemainUpdate < 5; }
-        }
+        public bool IsWarningPostLimit => RemainUpdate < 5;
 
         public BackstageAccountViewModel(BackstageViewModel parent, BackstageAccountModel model)
         {
             _parent = parent;
             _model = model;
-            this.CompositeDisposable.Add(
+            CompositeDisposable.Add(
                 Observable.FromEvent(
-                    h => _model.ConnectionStateChanged += h,
-                    h => _model.ConnectionStateChanged -= h)
+                              h => _model.ConnectionStateChanged += h,
+                              h => _model.ConnectionStateChanged -= h)
                           .Subscribe(_ => ConnectionStateChanged()));
-            this.CompositeDisposable.Add(
+            CompositeDisposable.Add(
                 Observable.FromEvent(
-                    h => _model.TwitterUserChanged += h,
-                    h => _model.TwitterUserChanged -= h)
+                              h => _model.TwitterUserChanged += h,
+                              h => _model.TwitterUserChanged -= h)
                           .Subscribe(_ => UserChanged()));
-            this.CompositeDisposable.Add(
+            CompositeDisposable.Add(
                 Observable.FromEvent(
-                    h => _model.FallbackStateUpdated += h,
-                    h => _model.FallbackStateUpdated -= h)
-                          .Subscribe(_ => this.FallbackStateUpdated()));
-            this.CompositeDisposable.Add(
+                              h => _model.FallbackStateUpdated += h,
+                              h => _model.FallbackStateUpdated -= h)
+                          .Subscribe(_ => FallbackStateUpdated()));
+            CompositeDisposable.Add(
                 Observable.Interval(TimeSpan.FromSeconds(5))
                           .Subscribe(_ =>
                           {
                               var count = PostLimitPredictionService.GetCurrentWindowCount(model.Account.Id);
                               MaxUpdate = Setting.PostLimitPerWindow.Value;
                               RemainUpdate = MaxUpdate - count;
-                              this.RaisePropertyChanged(() => RemainUpdate);
-                              this.RaisePropertyChanged(() => MaxUpdate);
-                              this.RaisePropertyChanged(() => IsWarningPostLimit);
+                              RaisePropertyChanged(() => RemainUpdate);
+                              RaisePropertyChanged(() => MaxUpdate);
+                              RaisePropertyChanged(() => IsWarningPostLimit);
                           }));
-            this.CompositeDisposable.Add(() =>
+            CompositeDisposable.Add(() =>
             {
-                if (this._uvmCache == null) return;
-                var cache = this._uvmCache;
-                this._uvmCache = null;
+                if (_uvmCache == null) return;
+                var cache = _uvmCache;
+                _uvmCache = null;
                 cache.Dispose();
             });
             UpdateUserCache();
@@ -91,40 +85,37 @@ namespace StarryEyes.ViewModels.WindowParts.Backstages
                 _model.User != null
                     ? new UserViewModel(_model.User)
                     : null);
-            if (old != null)
-            {
-                old.Dispose();
-            }
+            old?.Dispose();
         }
 
         private void UserChanged()
         {
-            this.RaisePropertyChanged(() => User);
+            RaisePropertyChanged(() => User);
         }
 
         private void ConnectionStateChanged()
         {
-            this.RaisePropertyChanged(() => ConnectionState);
+            RaisePropertyChanged(() => ConnectionState);
         }
 
         private void FallbackStateUpdated()
         {
-            this.IsFallbacked = _model.IsFallbacked;
-            this.FallbackReleaseTime = _model.FallbackPredictedReleaseTime;
-            this.RaisePropertyChanged(() => IsFallbacked);
-            this.RaisePropertyChanged(() => FallbackReleaseTime);
+            IsFallbacked = _model.IsFallbacked;
+            FallbackReleaseTime = _model.FallbackPredictedReleaseTime;
+            RaisePropertyChanged(() => IsFallbacked);
+            RaisePropertyChanged(() => FallbackReleaseTime);
         }
 
         public void ReconnectUserStreams()
         {
-            this._model.Reconnect();
+            _model.Reconnect();
         }
 
         public void OpenProfile()
         {
-            if (this.User == null) return;
+            if (User == null) return;
             _parent.Close();
-            SearchFlipModel.RequestSearch(this.User.ScreenName, SearchMode.UserScreenName);
+            SearchFlipModel.RequestSearch(User.ScreenName, SearchMode.UserScreenName);
         }
     }
 }

@@ -12,13 +12,8 @@ namespace StarryEyes.ViewModels.Common.FilterEditor
 
     public abstract class FilterNodeViewModelBase : FilterPredicateViewModelBase
     {
-        private readonly ObservableCollection<FilterPredicateViewModelBase> _children =
+        public ObservableCollection<FilterPredicateViewModelBase> Children { get; } =
             new ObservableCollection<FilterPredicateViewModelBase>();
-
-        public ObservableCollection<FilterPredicateViewModelBase> Children
-        {
-            get { return this._children; }
-        }
     }
 
     public abstract class FilterLeafViewModelBase : FilterPredicateViewModelBase

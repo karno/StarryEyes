@@ -11,35 +11,41 @@ namespace StarryEyes.Filters
     public class FilterQueryException : Exception
     {
         private string _innerQuery;
+
         public string InnerQuery
         {
-            get { return this._innerQuery; }
-            set { this._innerQuery = value; }
+            get => _innerQuery;
+            set => _innerQuery = value;
         }
 
         public FilterQueryException(string innerQuery)
         {
-            this._innerQuery = innerQuery;
+            _innerQuery = innerQuery;
         }
 
         public FilterQueryException(string message, string innerQuery)
             : base(message)
         {
-            this._innerQuery = innerQuery;
+            _innerQuery = innerQuery;
         }
+
         public FilterQueryException(string message, string innerQuery, Exception inner)
             : base(message, inner)
         {
-            this._innerQuery = innerQuery;
+            _innerQuery = innerQuery;
         }
+
         protected FilterQueryException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context)
-            : base(info, context) { }
+            System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context)
+            : base(info, context)
+        {
+        }
 
         public override string ToString()
         {
-            return base.ToString() + Environment.NewLine + " " + QueryCompilerResources.FilterQueryExceptionQuery + " " + this._innerQuery;
+            return base.ToString() + Environment.NewLine + " " + QueryCompilerResources.FilterQueryExceptionQuery +
+                   " " + _innerQuery;
         }
 
         public static FilterQueryException CreateException(string msg, string query)
@@ -47,7 +53,8 @@ namespace StarryEyes.Filters
             return new FilterQueryException(msg, query);
         }
 
-        public static FilterQueryException CreateUnsupportedType(string filter, FilterExpressionType transformFailedType, string innerQuery)
+        public static FilterQueryException CreateUnsupportedType(string filter,
+            FilterExpressionType transformFailedType, string innerQuery)
         {
             var msg = QueryCompilerResources
                 .FilterQueryExceptionUnsupportedTypeFormat
@@ -55,7 +62,8 @@ namespace StarryEyes.Filters
             return CreateException(msg, innerQuery);
         }
 
-        public static FilterQueryException CreateUnsupportedType(string filter, IEnumerable<FilterExpressionType> transformFailedTypes, string innerQuery)
+        public static FilterQueryException CreateUnsupportedType(string filter,
+            IEnumerable<FilterExpressionType> transformFailedTypes, string innerQuery)
         {
             var msg = QueryCompilerResources
                 .FilterQueryExceptionUnsupportedTypeManyFormat

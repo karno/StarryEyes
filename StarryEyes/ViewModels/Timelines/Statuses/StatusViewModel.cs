@@ -59,8 +59,6 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         private bool _isInReplyToLoading;
         private bool _isInReplyToLoaded;
 
-        private bool IsSafeMode => App.IsUnlockSafeModeForNewApiPolicy;
-
         public StatusViewModel(TimelineViewModelBase parent, StatusModel status,
             IEnumerable<long> initialBoundAccounts)
         {
@@ -251,7 +249,8 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
         public bool IsRetweeted => RetweetedStatusModel?.IsRetweeted(_bindingAccounts) ??
                                    Model.IsRetweeted(_bindingAccounts);
 
-        public bool CanFavoriteAndRetweet => !IsSafeMode && CanFavoriteImmediate && CanRetweetImmediate;
+        public bool CanFavoriteAndRetweet => App.IsUnlockSafeModeForNewApiPolicy && CanFavoriteImmediate &&
+                                             CanRetweetImmediate;
 
         public bool CanFavorite => !IsDirectMessage && (Setting.AllowFavoriteMyself.Value || !IsMyself);
 

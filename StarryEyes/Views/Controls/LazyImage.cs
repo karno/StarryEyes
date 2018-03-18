@@ -16,8 +16,8 @@ namespace StarryEyes.Views.Controls
 
         public Uri UriSource
         {
-            get { return (Uri)GetValue(UriSourceProperty); }
-            set { SetValue(UriSourceProperty, value); }
+            get => (Uri)GetValue(UriSourceProperty);
+            set => SetValue(UriSourceProperty, value);
         }
 
         public static readonly DependencyProperty DecodePixelWidthProperty =
@@ -26,8 +26,8 @@ namespace StarryEyes.Views.Controls
 
         public int DecodePixelWidth
         {
-            get { return (int)GetValue(DecodePixelWidthProperty); }
-            set { SetValue(DecodePixelWidthProperty, value); }
+            get => (int)GetValue(DecodePixelWidthProperty);
+            set => SetValue(DecodePixelWidthProperty, value);
         }
 
         public static readonly DependencyProperty DecodePixelHeightProperty =
@@ -36,19 +36,18 @@ namespace StarryEyes.Views.Controls
 
         public int DecodePixelHeight
         {
-            get { return (int)GetValue(DecodePixelHeightProperty); }
-            set { SetValue(DecodePixelHeightProperty, value); }
+            get => (int)GetValue(DecodePixelHeightProperty);
+            set => SetValue(DecodePixelHeightProperty, value);
         }
 
-        #endregion
+        #endregion Dependency properties
 
         private static void ImagePropertyChanged(DependencyObject sender,
             DependencyPropertyChangedEventArgs e)
         {
             if (e.NewValue == e.OldValue) return;
             var img = sender as LazyImage;
-            if (img == null) return;
-            img.UpdateImage();
+            img?.UpdateImage();
         }
 
         public Guid Id { get; private set; }
@@ -59,15 +58,15 @@ namespace StarryEyes.Views.Controls
 
         public LazyImage()
         {
-            this.Id = Guid.Empty;
-            this.Loaded += this.OnLoaded;
-            this.Unloaded += this.OnUnloaded;
+            Id = Guid.Empty;
+            Loaded += OnLoaded;
+            Unloaded += OnUnloaded;
         }
 
         void OnLoaded(object sender, RoutedEventArgs e)
         {
             Detach();
-            if (this.UriSource != null)
+            if (UriSource != null)
             {
                 UpdateImage();
             }
@@ -75,12 +74,12 @@ namespace StarryEyes.Views.Controls
 
         private void UpdateImage()
         {
-            if (!this.IsLoaded) return;
+            if (!IsLoaded) return;
 
             // get parameters
-            var uri = this.UriSource;
-            var dpw = this.DecodePixelWidth;
-            var dph = this.DecodePixelHeight;
+            var uri = UriSource;
+            var dpw = DecodePixelWidth;
+            var dph = DecodePixelHeight;
             if (uri == _lastUri &&
                 dpw == _lastDpw &&
                 dph == _lastDph)
@@ -99,7 +98,7 @@ namespace StarryEyes.Views.Controls
             try
             {
                 // clear image
-                this.Source = null;
+                Source = null;
 
                 if (uri == null) return;
 
@@ -109,7 +108,7 @@ namespace StarryEyes.Views.Controls
                     // image is PACK image
                     var bi = new BitmapImage(uri) { CacheOption = BitmapCacheOption.OnLoad };
                     bi.Freeze();
-                    this.ApplyImage(uri, bi);
+                    ApplyImage(uri, bi);
                 }
                 else
                 {
@@ -120,7 +119,7 @@ namespace StarryEyes.Views.Controls
             }
             // ReSharper disable EmptyGeneralCatchClause
             catch
-            // ReSharper restore EmptyGeneralCatchClause
+                // ReSharper restore EmptyGeneralCatchClause
             {
             }
         }
@@ -132,21 +131,23 @@ namespace StarryEyes.Views.Controls
 
         private void Detach()
         {
-            if (this.Id == Guid.Empty) return;
-            var pid = this.Id;
-            this.Id = Guid.Empty;
+            if (Id == Guid.Empty) return;
+            var pid = Id;
+            Id = Guid.Empty;
             ImageLoader.CancelLoading(pid);
         }
 
         public void ApplyImage(Uri sourceUri, BitmapImage image)
         {
-            if (this.UriSource != sourceUri) return;
+            if (UriSource != sourceUri) return;
             try
             {
-                this.Source = image;
+                Source = image;
             }
             // ReSharper disable once EmptyGeneralCatchClause
-            catch { }
+            catch
+            {
+            }
         }
     }
 }

@@ -8,22 +8,13 @@ namespace StarryEyes.Models.Backstages.NotificationEvents
 
         public InternalErrorEvent(string description)
         {
-            this._description = description;
+            _description = description;
         }
 
-        public override string Title
-        {
-            get { return "ERROR"; }
-        }
+        public override string Title => "ERROR";
 
-        public override string Detail
-        {
-            get { return _description; }
-        }
+        public override string Detail => _description;
 
-        public override System.Windows.Media.Color Background
-        {
-            get { return MetroColors.Red; }
-        }
+        public override System.Windows.Media.Color Background => MetroColors.Red;
     }
 }

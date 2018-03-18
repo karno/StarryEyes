@@ -12,26 +12,15 @@ namespace StarryEyes.Models.Backstages.NotificationEvents
 
         public StreamDecodeFailedEvent(string screenName, Exception exception)
         {
-            this._screenName = screenName;
-            this._exception = exception;
+            _screenName = screenName;
+            _exception = exception;
         }
 
-        public override string Title
-        {
-            get { return "DECODE FAILED"; }
-        }
+        public override string Title => "DECODE FAILED";
 
-        public override string Detail
-        {
-            get
-            {
-                return BackstageResources.StreamDecodeFailedFormat.SafeFormat("@" + _screenName, _exception.Message);
-            }
-        }
+        public override string Detail => BackstageResources.StreamDecodeFailedFormat.SafeFormat("@" + _screenName,
+            _exception.Message);
 
-        public override Color Background
-        {
-            get { return MetroColors.Indigo; }
-        }
+        public override Color Background => MetroColors.Indigo;
     }
 }

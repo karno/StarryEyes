@@ -33,7 +33,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         public bool IsLoading
         {
-            get { return _isLoading; }
+            get => _isLoading;
             set
             {
                 _isLoading = value;
@@ -63,7 +63,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
 
         public bool IsScrollInBottom
         {
-            get { return _isScrollInBottom; }
+            get => _isScrollInBottom;
             set
             {
                 if (_isScrollInBottom == value) return;
@@ -97,7 +97,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                             MainInstruction =
                                 SearchFlipResources.MsgUserInfoLoadErrorInstFormat.SafeFormat(_query),
                             Content = SearchFlipResources.MsgUserInfoLoadErrorAccountIsNotExist,
-                            CommonButtons = TaskDialogCommonButtons.Close,
+                            CommonButtons = TaskDialogCommonButtons.Close
                         }));
                     return;
                 }
@@ -129,7 +129,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips.SearchFlips
                             MainInstruction =
                                 SearchFlipResources.MsgUserInfoLoadErrorInstFormat.SafeFormat(_query),
                             Content = ex.Message,
-                            CommonButtons = TaskDialogCommonButtons.Close,
+                            CommonButtons = TaskDialogCommonButtons.Close
                         }));
                 }
                 finally

@@ -135,10 +135,10 @@ namespace StarryEyes.Models.Inputting
             }
         }
 
-        [CanBeNull]
+        [NotNull]
         public string Text
         {
-            get => _text;
+            get => _text ?? String.Empty;
             // ReSharper disable ConstantNullCoalescingCondition
             set => _text = value ?? String.Empty;
             // ReSharper restore ConstantNullCoalescingCondition
@@ -165,12 +165,12 @@ namespace StarryEyes.Models.Inputting
             }
         }
 
-        [CanBeNull]
+        [NotNull]
         public DispatcherCollection<byte[]> AttachedImages => _attachedImages;
 
         #endregion Accessing properties
 
-        [CanBeNull]
+        [NotNull]
         private InputData Clone()
         {
             var newdata = new InputData(_initText)
@@ -186,7 +186,7 @@ namespace StarryEyes.Models.Inputting
             };
             foreach (var image in _attachedImages)
             {
-                newdata.AttachedImages?.Add(image);
+                newdata.AttachedImages.Add(image);
             }
             return newdata;
         }

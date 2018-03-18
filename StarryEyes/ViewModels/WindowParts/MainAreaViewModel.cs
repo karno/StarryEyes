@@ -20,14 +20,14 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             CompositeDisposable.Add(
                 _columns =
-                ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
-                    TabManager.Columns,
-                    cm => new ColumnViewModel(this, cm),
-                    DispatcherHelper.UIDispatcher));
+                    ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+                        TabManager.Columns,
+                        cm => new ColumnViewModel(this, cm),
+                        DispatcherHelper.UIDispatcher));
             CompositeDisposable.Add(
                 Observable.FromEvent(
-                    h => TabManager.CurrentFocusColumnChanged += h,
-                    h => TabManager.CurrentFocusColumnChanged -= h)
+                              h => TabManager.CurrentFocusColumnChanged += h,
+                              h => TabManager.CurrentFocusColumnChanged -= h)
                           .Select(_ => TabManager.CurrentFocusColumnIndex)
                           .Subscribe(UpdateFocusFromModel));
             CompositeDisposable.Add(
@@ -45,14 +45,11 @@ namespace StarryEyes.ViewModels.WindowParts
             Columns.ForEach(c => c.IsDragDropping = false);
         }
 
-        public ReadOnlyDispatcherCollectionRx<ColumnViewModel> Columns
-        {
-            get { return _columns; }
-        }
+        public ReadOnlyDispatcherCollectionRx<ColumnViewModel> Columns => _columns;
 
         public ColumnViewModel FocusedColumn
         {
-            get { return _columns[TabManager.CurrentFocusColumnIndex]; }
+            get => _columns[TabManager.CurrentFocusColumnIndex];
             set
             {
                 var index = _columns.IndexOf(value);
@@ -106,7 +103,7 @@ namespace StarryEyes.ViewModels.WindowParts
         {
             if (_isRegisteredEvents) throw new InvalidOperationException();
             _isRegisteredEvents = true;
-            MainWindowModel.TimelineFocusRequested += this.MainWindowModelTimelineFocusRequested;
+            MainWindowModel.TimelineFocusRequested += MainWindowModelTimelineFocusRequested;
             // Timeline actions
             KeyAssignManager.RegisterActions(
                 KeyAssignAction.Create("CreateTab", () => FocusedColumn.CreateNewTab()),
@@ -125,8 +122,10 @@ namespace StarryEyes.ViewModels.WindowParts
                 KeyAssignAction.Create("CopySTOT", () => ExecuteStatusAction(s => s.CopySTOT())),
                 KeyAssignAction.Create("CopyPermalink", () => ExecuteStatusAction(s => s.CopyPermalink())),
                 KeyAssignAction.Create("ShowUserProfile", () => ExecuteStatusAction(s => s.ShowUserProfile())),
-                KeyAssignAction.Create("ShowRetweeterProfile", () => ExecuteStatusAction(s => s.ShowRetweeterProfile())),
-                KeyAssignAction.Create("ShowRecipientProfile", () => ExecuteStatusAction(s => s.ShowRecipientProfile())),
+                KeyAssignAction.Create("ShowRetweeterProfile",
+                    () => ExecuteStatusAction(s => s.ShowRetweeterProfile())),
+                KeyAssignAction.Create("ShowRecipientProfile",
+                    () => ExecuteStatusAction(s => s.ShowRecipientProfile())),
                 KeyAssignAction.Create("OpenWeb", () => ExecuteStatusAction(s => s.OpenWeb())),
                 KeyAssignAction.Create("OpenFavstar", () => ExecuteStatusAction(s => s.OpenFavstar())),
                 KeyAssignAction.Create("OpenUserDetailOnTwitter",
@@ -134,23 +133,21 @@ namespace StarryEyes.ViewModels.WindowParts
                 KeyAssignAction.Create("OpenUserFavstar", () => ExecuteStatusAction(s => s.OpenUserFavstar())),
                 KeyAssignAction.Create("OpenUserTwilog", () => ExecuteStatusAction(s => s.OpenUserTwilog())),
                 KeyAssignAction.Create("OpenSource", () => ExecuteStatusAction(s => s.OpenSourceLink())),
-
                 KeyAssignAction.Create("ShowConversation", () => ExecuteStatusAction(s => s.ShowConversation())),
                 KeyAssignAction.Create("MuteUser", () => ExecuteStatusAction(s => s.MuteUser())),
                 KeyAssignAction.Create("MuteClient", () => ExecuteStatusAction(s => s.MuteClient())),
                 KeyAssignAction.Create("ReportAsSpam", () => ExecuteStatusAction(s => s.ReportAsSpam())),
                 KeyAssignAction.CreateWithArgumentOptional("Reply",
-                    a => this.ExecuteStatusAction(s => s.SendReplyOrDirectMessage(a))),
+                    a => ExecuteStatusAction(s => s.SendReplyOrDirectMessage(a))),
                 KeyAssignAction.CreateWithArgumentRequired("OpenUrl",
-                    a => this.ExecuteStatusAction(s => s.OpenNthLink(a))),
+                    a => ExecuteStatusAction(s => s.OpenNthLink(a))),
                 KeyAssignAction.CreateWithArgumentOptional("OpenThumbnail",
-                    a => this.ExecuteStatusAction(s => s.OpenNthThumbnail(a)))
-                );
+                    a => ExecuteStatusAction(s => s.OpenNthThumbnail(a)))
+            );
 
             // Timeline argumentable actions
             // reply, favorite, retweet, quote
             // TODO
-
         }
 
         internal void ExecuteTimelineAction(Action<TimelineViewModelBase> action)
@@ -169,17 +166,18 @@ namespace StarryEyes.ViewModels.WindowParts
         }
 
         private static TimelineViewModelBase _timelineActionTargetOverride;
+
         internal static TimelineViewModelBase TimelineActionTargetOverride
         {
-            get { return _timelineActionTargetOverride; }
+            get => _timelineActionTargetOverride;
             set
             {
                 _timelineActionTargetOverride = value;
                 System.Diagnostics.Debug.WriteLine("* set key assign override: " +
-                                                   (value == null ? "null" : value.GetType().ToString()));
+                                                   (value?.GetType().ToString() ?? "null"));
             }
         }
 
-        #endregion
+        #endregion Key assign control
     }
 }

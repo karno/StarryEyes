@@ -16,9 +16,10 @@ namespace StarryEyes.ViewModels.Dialogs
     public class KeyOverrideViewModel : ViewModel
     {
         private string _overrideConsumerKey = String.Empty;
+
         public string OverrideConsumerKey
         {
-            get { return _overrideConsumerKey; }
+            get => _overrideConsumerKey;
             set
             {
                 if (value != _overrideConsumerKey)
@@ -30,9 +31,10 @@ namespace StarryEyes.ViewModels.Dialogs
         }
 
         private string _overrideConsumerSecret = String.Empty;
+
         public string OverrideConsumerSecret
         {
-            get { return _overrideConsumerSecret; }
+            get => _overrideConsumerSecret;
             set
             {
                 if (value != _overrideConsumerSecret)
@@ -44,9 +46,10 @@ namespace StarryEyes.ViewModels.Dialogs
         }
 
         private bool _isKeyChecking;
+
         public bool IsKeyChecking
         {
-            get { return _isKeyChecking; }
+            get => _isKeyChecking;
             set
             {
                 _isKeyChecking = value;
@@ -55,17 +58,14 @@ namespace StarryEyes.ViewModels.Dialogs
             }
         }
 
-        public bool IsCkCsEditEnabled
-        {
-            get { return !_isKeyChecking; }
-        }
+        public bool IsCkCsEditEnabled => !_isKeyChecking;
 
         [UsedImplicitly]
         public void CheckAuthorize()
         {
             if (OverrideConsumerKey == App.ConsumerKey)
             {
-                this.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
+                Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = KeyOverrideWindowResources.MsgKeySettingError,
                     MainIcon = VistaTaskDialogIcon.Error,
@@ -77,7 +77,7 @@ namespace StarryEyes.ViewModels.Dialogs
             }
             if (!(System.Text.RegularExpressions.Regex.Match(OverrideConsumerKey, "^[a-zA-Z0-9]+$")).Success)
             {
-                this.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
+                Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = KeyOverrideWindowResources.MsgKeySettingError,
                     MainIcon = VistaTaskDialogIcon.Error,
@@ -89,7 +89,7 @@ namespace StarryEyes.ViewModels.Dialogs
             }
             if (!(System.Text.RegularExpressions.Regex.Match(OverrideConsumerSecret, "^[a-zA-Z0-9]+$")).Success)
             {
-                this.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
+                Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = KeyOverrideWindowResources.MsgKeySettingError,
                     MainIcon = VistaTaskDialogIcon.Error,
@@ -103,18 +103,18 @@ namespace StarryEyes.ViewModels.Dialogs
             IsKeyChecking = true;
             var authorizer = new OAuthAuthorizer(OverrideConsumerKey, OverrideConsumerSecret);
             Observable.Defer(
-                () => authorizer.GetRequestToken(AuthorizationViewModel.RequestTokenEndpoint).ToObservable())
+                          () => authorizer.GetRequestToken(AuthorizationViewModel.RequestTokenEndpoint).ToObservable())
                       .Retry(3, TimeSpan.FromSeconds(3))
                       .Finally(() => IsKeyChecking = false)
                       .Subscribe(
                           _ =>
                           {
-                              Setting.GlobalConsumerKey.Value = this.OverrideConsumerKey;
-                              Setting.GlobalConsumerSecret.Value = this.OverrideConsumerSecret;
+                              Setting.GlobalConsumerKey.Value = OverrideConsumerKey;
+                              Setting.GlobalConsumerSecret.Value = OverrideConsumerSecret;
                               UpdateEndpointKey();
-                              this.Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
+                              Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
                           },
-                          ex => this.Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
+                          ex => Messenger.RaiseSafe(() => new TaskDialogMessage(new TaskDialogOptions
                           {
                               Title = KeyOverrideWindowResources.MsgAuthErrorTitle,
                               MainIcon = VistaTaskDialogIcon.Error,
@@ -122,7 +122,7 @@ namespace StarryEyes.ViewModels.Dialogs
                               Content = KeyOverrideWindowResources.MsgAuthErrorContent,
                               CommonButtons = TaskDialogCommonButtons.Close,
                               FooterIcon = VistaTaskDialogIcon.Information,
-                              FooterText = KeyOverrideWindowResources.MsgAuthErrorFooter,
+                              FooterText = KeyOverrideWindowResources.MsgAuthErrorFooter
                           })));
         }
 
@@ -132,7 +132,7 @@ namespace StarryEyes.ViewModels.Dialogs
             if (String.IsNullOrEmpty(Setting.GlobalConsumerKey.Value) &&
                 String.IsNullOrEmpty(Setting.GlobalConsumerSecret.Value))
             {
-                var m = this.Messenger.GetResponseSafe(() => new TaskDialogMessage(new TaskDialogOptions
+                var m = Messenger.GetResponseSafe(() => new TaskDialogMessage(new TaskDialogOptions
                 {
                     Title = KeyOverrideWindowResources.MsgSkipTitle,
                     MainIcon = VistaTaskDialogIcon.Warning,
@@ -143,12 +143,12 @@ namespace StarryEyes.ViewModels.Dialogs
                 }));
                 if (m.Response.Result == TaskDialogSimpleResult.Ok)
                 {
-                    this.Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
+                    Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
                 }
             }
             else
             {
-                this.Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
+                Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
             }
         }
 
@@ -161,22 +161,17 @@ namespace StarryEyes.ViewModels.Dialogs
         }
 
         #region OpenApiKeyHelpCommand
+
         private Livet.Commands.ViewModelCommand _openApiKeyHelpCommand;
 
-        public Livet.Commands.ViewModelCommand OpenApiKeyHelpCommand
-        {
-            get
-            {
-                return _openApiKeyHelpCommand ??
-                       (_openApiKeyHelpCommand = new Livet.Commands.ViewModelCommand(OpenApiKeyHelp));
-            }
-        }
+        public Livet.Commands.ViewModelCommand OpenApiKeyHelpCommand =>
+            _openApiKeyHelpCommand ?? (_openApiKeyHelpCommand = new Livet.Commands.ViewModelCommand(OpenApiKeyHelp));
 
         public void OpenApiKeyHelp()
         {
             BrowserHelper.Open("http://krile.starwing.net/apikey.html");
         }
-        #endregion
 
+        #endregion OpenApiKeyHelpCommand
     }
 }

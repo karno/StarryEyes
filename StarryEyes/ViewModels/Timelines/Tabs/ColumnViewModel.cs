@@ -15,39 +15,30 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
         private readonly MainAreaViewModel _parent;
         private readonly ColumnModel _model;
         private readonly ReadOnlyDispatcherCollectionRx<TabViewModel> _tabs;
-        public ReadOnlyDispatcherCollectionRx<TabViewModel> Tabs
-        {
-            get { return this._tabs; }
-        }
+        public ReadOnlyDispatcherCollectionRx<TabViewModel> Tabs => _tabs;
 
-        public MainAreaViewModel Parent
-        {
-            get { return this._parent; }
-        }
+        public MainAreaViewModel Parent => _parent;
 
-        public ColumnModel Model
-        {
-            get { return this._model; }
-        }
+        public ColumnModel Model => _model;
 
         public TabViewModel FocusedTab
         {
             get
             {
-                if (this._tabs == null || this._tabs.Count == 0) return null;
-                if (this._tabs.Count <= this._model.CurrentFocusTabIndex)
+                if (_tabs == null || _tabs.Count == 0) return null;
+                if (_tabs.Count <= _model.CurrentFocusTabIndex)
                 {
-                    this._model.CurrentFocusTabIndex = 0;
+                    _model.CurrentFocusTabIndex = 0;
                 }
-                return this._tabs[this._model.CurrentFocusTabIndex];
+                return _tabs[_model.CurrentFocusTabIndex];
             }
             set
             {
-                var index = this._tabs.IndexOf(value);
-                if (this._model.CurrentFocusTabIndex == index) return;
-                this._model.CurrentFocusTabIndex = this._tabs.IndexOf(value);
-                this._tabs.ForEach(item => item.UpdateFocus());
-                this.RaisePropertyChanged();
+                var index = _tabs.IndexOf(value);
+                if (_model.CurrentFocusTabIndex == index) return;
+                _model.CurrentFocusTabIndex = _tabs.IndexOf(value);
+                _tabs.ForEach(item => item.UpdateFocus());
+                RaisePropertyChanged();
             }
         }
 
@@ -55,44 +46,33 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
 
         private Livet.Commands.ViewModelCommand _dragDropStartCommand;
 
-        public Livet.Commands.ViewModelCommand DragDropStartCommand
-        {
-            get
-            {
-                return this._dragDropStartCommand ??
-                       (this._dragDropStartCommand = new Livet.Commands.ViewModelCommand(this.DragDropStart));
-            }
-        }
+        public Livet.Commands.ViewModelCommand DragDropStartCommand =>
+            _dragDropStartCommand ?? (_dragDropStartCommand = new Livet.Commands.ViewModelCommand(DragDropStart));
 
         public void DragDropStart()
         {
-            this.Parent.StartDragDrop();
+            Parent.StartDragDrop();
         }
 
         private Livet.Commands.ViewModelCommand _dragDropFinishCommand;
 
-        public Livet.Commands.ViewModelCommand DragDropFinishCommand
-        {
-            get
-            {
-                return this._dragDropFinishCommand ??
-                       (this._dragDropFinishCommand = new Livet.Commands.ViewModelCommand(this.DragDropFinish));
-            }
-        }
+        public Livet.Commands.ViewModelCommand DragDropFinishCommand =>
+            _dragDropFinishCommand ?? (_dragDropFinishCommand = new Livet.Commands.ViewModelCommand(DragDropFinish));
 
         public void DragDropFinish()
         {
-            this.Parent.FinishDragDrop();
+            Parent.FinishDragDrop();
         }
 
         private bool _isDragDropping;
+
         public bool IsDragDropping
         {
-            get { return this._isDragDropping; }
+            get => _isDragDropping;
             set
             {
-                this._isDragDropping = value;
-                this.RaisePropertyChanged();
+                _isDragDropping = value;
+                RaisePropertyChanged();
             }
         }
 
@@ -104,13 +84,13 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
         {
             get
             {
-                if (this._leftAccept == null)
+                if (_leftAccept == null)
                 {
-                    this._leftAccept = new DropAcceptDescription();
-                    this._leftAccept.DragOver += this.AcceptTabViewModel;
-                    this._leftAccept.DragDrop += e => this.DropCreateNewColumn(e, false);
+                    _leftAccept = new DropAcceptDescription();
+                    _leftAccept.DragOver += AcceptTabViewModel;
+                    _leftAccept.DragDrop += e => DropCreateNewColumn(e, false);
                 }
-                return this._leftAccept;
+                return _leftAccept;
             }
         }
 
@@ -118,13 +98,13 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
         {
             get
             {
-                if (this._rightAccept == null)
+                if (_rightAccept == null)
                 {
-                    this._rightAccept = new DropAcceptDescription();
-                    this._rightAccept.DragOver += this.AcceptTabViewModel;
-                    this._rightAccept.DragDrop += e => this.DropCreateNewColumn(e, true);
+                    _rightAccept = new DropAcceptDescription();
+                    _rightAccept.DragOver += AcceptTabViewModel;
+                    _rightAccept.DragDrop += e => DropCreateNewColumn(e, true);
                 }
-                return this._rightAccept;
+                return _rightAccept;
             }
         }
 
@@ -140,7 +120,7 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
             if (data == null) return;
             int fromColumnIndex, fromTabIndex;
             // get index
-            var curindex = TabManager.FindColumnIndex(this.Model);
+            var curindex = TabManager.FindColumnIndex(Model);
             if (curindex == -1) return;
             if (!TabManager.FindColumnTabIndex(data.Model, out fromColumnIndex, out fromTabIndex))
             {
@@ -153,28 +133,29 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
             var focusTarget = TabManager.Columns[index];
             TabManager.CleanupColumn();
             var focusTargetIndex = TabManager.FindColumnIndex(focusTarget);
-            if (focusTargetIndex >= 0 && focusTargetIndex < this.Parent.Columns.Count)
+            if (focusTargetIndex >= 0 && focusTargetIndex < Parent.Columns.Count)
             {
-                this.Parent.Columns[focusTargetIndex].Focus();
+                Parent.Columns[focusTargetIndex].Focus();
             }
         }
 
-        #endregion
+        #endregion DragDrop Control
 
         private DropAcceptDescription _description;
+
         public DropAcceptDescription DropAcceptDescription
         {
             get
             {
-                if (this._description == null)
+                if (_description == null)
                 {
-                    this._description = new DropAcceptDescription();
-                    this._description.DragOver += e =>
+                    _description = new DropAcceptDescription();
+                    _description.DragOver += e =>
                     {
                         var data = e.Data.GetData(typeof(TabViewModel)) as TabViewModel;
                         e.Effects = data != null ? DragDropEffects.Move : DragDropEffects.None;
                     };
-                    this._description.DragDrop += e =>
+                    _description.DragDrop += e =>
                     {
                         var data = e.Data.GetData(typeof(TabViewModel)) as TabViewModel;
                         if (data == null) return;
@@ -188,13 +169,13 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
                         if (tvm != null)
                         {
                             if (tvm == data) return;
-                            destColumnIndex = TabManager.FindColumnIndex(this.Model);
+                            destColumnIndex = TabManager.FindColumnIndex(Model);
                             destTabIndex = TabManager.FindTabIndex(tvm.Model, destColumnIndex);
                         }
                         else if (cvm != null)
                         {
-                            destColumnIndex = TabManager.FindColumnIndex(this.Model);
-                            destTabIndex = this.Model.Tabs.Count;
+                            destColumnIndex = TabManager.FindColumnIndex(Model);
+                            destTabIndex = Model.Tabs.Count;
                         }
                         else
                         {
@@ -217,7 +198,7 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
                         // move tab
                         TabManager.MoveTo(fromColumnIndex, fromTabIndex, destColumnIndex, destTabIndex);
                         // update previous column's focus
-                        if (this.Model != dataPreviousParent.Model && dataPreviousParent.Model.Tabs.Count > 0)
+                        if (Model != dataPreviousParent.Model && dataPreviousParent.Model.Tabs.Count > 0)
                         {
                             if (dataPreviousParent.Model.CurrentFocusTabIndex >= dataPreviousParent.Tabs.Count)
                             {
@@ -230,11 +211,11 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
                                     dataPreviousParent.Model.CurrentFocusTabIndex;
                             }
                         }
-                        this.Model.CurrentFocusTabIndex = destTabIndex;
-                        this.Focus();
+                        Model.CurrentFocusTabIndex = destTabIndex;
+                        Focus();
                     };
                 }
-                return this._description;
+                return _description;
             }
         }
 
@@ -242,66 +223,58 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
         {
             DispatcherHelper.UIDispatcher.InvokeAsync(() =>
             {
-                this._tabs.ForEach(item => item.UpdateFocus());
-                this.RaisePropertyChanged(() => this.FocusedTab);
+                _tabs.ForEach(item => item.UpdateFocus());
+                RaisePropertyChanged(() => FocusedTab);
             });
         }
 
         public ColumnViewModel(MainAreaViewModel parent, ColumnModel model)
         {
-            this._parent = parent;
-            this._model = model;
-            this.CompositeDisposable.Add(
-                this._tabs = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
+            _parent = parent;
+            _model = model;
+            CompositeDisposable.Add(
+                _tabs = ViewModelHelperRx.CreateReadOnlyDispatcherCollectionRx(
                     model.Tabs,
                     _ => new TabViewModel(this, _),
                     DispatcherHelper.UIDispatcher));
-            this.CompositeDisposable.Add(
+            CompositeDisposable.Add(
                 Observable.FromEvent(
-                h => this._model.CurrentFocusTabChanged += h,
-                h => this._model.CurrentFocusTabChanged -= h)
-                .Select(_ => this._model.CurrentFocusTabIndex)
-                .Subscribe(this.UpdateFocusFromModel));
-            this.CompositeDisposable.Add(_tabs.ListenCollectionChanged(_ =>
-                this._tabs.ForEach(item => item.UpdateFocus())));
-            if (this._tabs.Count > 0)
+                              h => _model.CurrentFocusTabChanged += h,
+                              h => _model.CurrentFocusTabChanged -= h)
+                          .Select(_ => _model.CurrentFocusTabIndex)
+                          .Subscribe(UpdateFocusFromModel));
+            CompositeDisposable.Add(_tabs.ListenCollectionChanged(_ =>
+                _tabs.ForEach(item => item.UpdateFocus())));
+            if (_tabs.Count > 0)
             {
-                this.FocusedTab = this._tabs[0];
+                FocusedTab = _tabs[0];
             }
         }
 
-        public bool IsFocused
-        {
-            get { return this._parent.FocusedColumn == this; }
-        }
+        public bool IsFocused => _parent.FocusedColumn == this;
 
         internal void UpdateFocus()
         {
-            this.RaisePropertyChanged(() => this.IsFocused);
+            RaisePropertyChanged(() => IsFocused);
         }
 
         public void Focus()
         {
-            this._parent.FocusedColumn = this;
+            _parent.FocusedColumn = this;
         }
 
         internal void CloseTab(TabViewModel tab)
         {
-            this._parent.CloseTab(this, tab);
-            this._parent.Columns.ForEach(cvm => cvm.RestoreLastClosedTabCommand.RaiseCanExecuteChanged());
+            _parent.CloseTab(this, tab);
+            _parent.Columns.ForEach(cvm => cvm.RestoreLastClosedTabCommand.RaiseCanExecuteChanged());
         }
 
         #region CreateNewTabCommand
+
         private Livet.Commands.ViewModelCommand _createNewTabCommand;
 
-        public Livet.Commands.ViewModelCommand CreateNewTabCommand
-        {
-            get
-            {
-                return this._createNewTabCommand ??
-                       (this._createNewTabCommand = new Livet.Commands.ViewModelCommand(this.CreateNewTab));
-            }
-        }
+        public Livet.Commands.ViewModelCommand CreateNewTabCommand =>
+            _createNewTabCommand ?? (_createNewTabCommand = new Livet.Commands.ViewModelCommand(CreateNewTab));
 
         public void CreateNewTab()
         {
@@ -310,24 +283,19 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
                            .Subscribe(_ =>
                            {
                                if (String.IsNullOrEmpty(creating.Name) && creating.FilterQuery == null) return;
-                               this.Model.CreateTab(creating);
+                               Model.CreateTab(creating);
                            });
         }
-        #endregion
+
+        #endregion CreateNewTabCommand
 
         #region RestoreLastClosedTabCommand
+
         private Livet.Commands.ViewModelCommand _restoreLastClosedTabCommand;
 
-        public Livet.Commands.ViewModelCommand RestoreLastClosedTabCommand
-        {
-            get
-            {
-                return this._restoreLastClosedTabCommand ??
-                       (this._restoreLastClosedTabCommand =
-                        new Livet.Commands.ViewModelCommand(this.RestoreLastClosedTab,
-                                                            this.CanRestoreClosedTab));
-            }
-        }
+        public Livet.Commands.ViewModelCommand RestoreLastClosedTabCommand =>
+            _restoreLastClosedTabCommand ?? (_restoreLastClosedTabCommand =
+                new Livet.Commands.ViewModelCommand(RestoreLastClosedTab, CanRestoreClosedTab));
 
         public bool CanRestoreClosedTab()
         {
@@ -336,13 +304,14 @@ namespace StarryEyes.ViewModels.Timelines.Tabs
 
         public void RestoreLastClosedTab()
         {
-            this.Focus();
+            Focus();
             if (TabManager.CanReviveTab)
             {
                 TabManager.ReviveTab();
             }
-            this._parent.Columns.ForEach(cvm => cvm.RestoreLastClosedTabCommand.RaiseCanExecuteChanged());
+            _parent.Columns.ForEach(cvm => cvm.RestoreLastClosedTabCommand.RaiseCanExecuteChanged());
         }
-        #endregion
+
+        #endregion RestoreLastClosedTabCommand
     }
 }

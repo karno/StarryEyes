@@ -22,15 +22,9 @@ namespace StarryEyes.ViewModels.Dialogs
         private readonly int _left;
         private readonly int _top;
 
-        public int Left
-        {
-            get { return _left; }
-        }
+        public int Left => _left;
 
-        public int Top
-        {
-            get { return _top; }
-        }
+        public int Top => _top;
 
         private DisplayMarkerViewModel(int displayIndex)
         {

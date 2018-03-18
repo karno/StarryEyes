@@ -12,11 +12,8 @@ namespace StarryEyes.Views.Messaging.Behaviors
             var m = message as ScrollIntoViewMessage;
             if (m != null)
             {
-                var vsp = this.AssociatedObject.FindVisualChild<VirtualizingStackPanel>();
-                if (vsp != null)
-                {
-                    vsp.BringIndexIntoViewPublic(m.Index);
-                }
+                var vsp = AssociatedObject.FindVisualChild<VirtualizingStackPanel>();
+                vsp?.BringIndexIntoViewPublic(m.Index);
             }
         }
     }

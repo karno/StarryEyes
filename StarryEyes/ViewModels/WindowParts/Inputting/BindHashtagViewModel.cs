@@ -10,23 +10,17 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 
         public BindHashtagViewModel(string hashtag, Action callback)
         {
-            this._hashtag = hashtag;
-            this._callback = callback;
+            _hashtag = hashtag;
+            _callback = callback;
         }
 
-        public string DisplayHashtag
-        {
-            get { return "#" + this._hashtag; }
-        }
+        public string DisplayHashtag => "#" + _hashtag;
 
-        public string Hashtag
-        {
-            get { return this._hashtag; }
-        }
+        public string Hashtag => _hashtag;
 
         public void ToggleBind()
         {
-            this._callback();
+            _callback();
         }
     }
 }

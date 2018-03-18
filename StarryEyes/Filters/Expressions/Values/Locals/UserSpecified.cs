@@ -20,8 +20,8 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             _originalScreenName = screenName;
             _userId = Setting.Accounts
                              .Collection
-                             .Where(u => u.UnreliableScreenName.Equals(
-                                 screenName, StringComparison.CurrentCultureIgnoreCase))
+                             .Where(u => u.UnreliableScreenName?.Equals(
+                                             screenName, StringComparison.CurrentCultureIgnoreCase) ?? false)
                              .Select(u => u.Id)
                              .FirstOrDefault();
             if (_userId == 0)
@@ -31,7 +31,7 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             else
             {
                 var account = Setting.Accounts.Get(_userId);
-                _adata = account != null ? account.RelationData : null;
+                _adata = account?.RelationData;
             }
         }
 
@@ -39,39 +39,30 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
         {
             _userId = id;
             var account = Setting.Accounts.Get(_userId);
-            _adata = account != null ? account.RelationData : null;
+            _adata = account?.RelationData;
         }
 
         public override void BeginLifecycle()
         {
-            AccountRelationData.AccountDataUpdatedStatic += this.AccountRelationDataAccountDataUpdated;
+            AccountRelationData.AccountDataUpdatedStatic += AccountRelationDataAccountDataUpdated;
         }
 
         public override void EndLifecycle()
         {
-            AccountRelationData.AccountDataUpdatedStatic -= this.AccountRelationDataAccountDataUpdated;
+            AccountRelationData.AccountDataUpdatedStatic -= AccountRelationDataAccountDataUpdated;
         }
 
         void AccountRelationDataAccountDataUpdated(RelationDataChangedInfo obj)
         {
             if (obj.AccountUserId == _userId)
             {
-                this.RaiseReapplyFilter(obj);
+                RaiseReapplyFilter(obj);
             }
         }
 
-        public override long UserId
-        {
-            get { return _userId; }
-        }
+        public override long UserId => _userId;
 
-        public override IReadOnlyCollection<long> Users
-        {
-            get
-            {
-                return new List<long>(new[] { _userId });
-            }
-        }
+        public override IReadOnlyCollection<long> Users => new List<long>(new[] { _userId });
 
         public override IReadOnlyCollection<long> Followings
         {
@@ -113,41 +104,23 @@ namespace StarryEyes.Filters.Expressions.Values.Locals
             }
         }
 
-        public override string UserIdSql
-        {
-            get { return _userId.ToString(CultureInfo.InvariantCulture); }
-        }
+        public override string UserIdSql => _userId.ToString(CultureInfo.InvariantCulture);
 
-        public override string UsersSql
-        {
-            get { return "(select Id from Accounts where Id = " + UserId + ")"; }
-        }
+        public override string UsersSql => "(select Id from Accounts where Id = " + UserId + ")";
 
-        public override string FollowingsSql
-        {
-            get { return "(select TargetId from Followings where UserId = " + UserId + ")"; }
-        }
+        public override string FollowingsSql => "(select TargetId from Followings where UserId = " + UserId + ")";
 
-        public override string FollowersSql
-        {
-            get { return "(select TargetId from Followers where UserId = " + UserId + ")"; }
-        }
+        public override string FollowersSql => "(select TargetId from Followers where UserId = " + UserId + ")";
 
-        public override string BlockingsSql
-        {
-            get { return "(select TargetId from Blockings where UserId = " + UserId + ")"; }
-        }
+        public override string BlockingsSql => "(select TargetId from Blockings where UserId = " + UserId + ")";
 
-        public override string MutesSql
-        {
-            get { return "(select TargetId from Mutes where UserId = " + UserId + ")"; }
-        }
+        public override string MutesSql => "(select TargetId from Mutes where UserId = " + UserId + ")";
 
         public override string ToQuery()
         {
-            return String.IsNullOrEmpty(this._originalScreenName)
-                ? "#" + this._userId.ToString(CultureInfo.InvariantCulture)
-                : "@" + this._originalScreenName;
+            return String.IsNullOrEmpty(_originalScreenName)
+                ? "#" + _userId.ToString(CultureInfo.InvariantCulture)
+                : "@" + _originalScreenName;
         }
     }
 }

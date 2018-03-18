@@ -8,21 +8,21 @@ namespace StarryEyes.Views.Controls
     {
         public static readonly DependencyProperty DropDownContextMenuProperty =
             DependencyProperty.Register("DropDownContextMenu", typeof(ContextMenu),
-            typeof(DropDownMenuButton), new UIPropertyMetadata(null));
+                typeof(DropDownMenuButton), new UIPropertyMetadata(null));
 
         public ContextMenu DropDownContextMenu
         {
-            get { return this.GetValue(DropDownContextMenuProperty) as ContextMenu; }
-            set { this.SetValue(DropDownContextMenuProperty, value); }
+            get => GetValue(DropDownContextMenuProperty) as ContextMenu;
+            set => SetValue(DropDownContextMenuProperty, value);
         }
 
         protected override void OnClick()
         {
-            if (this.DropDownContextMenu == null) return;
-            this.DropDownContextMenu.PlacementTarget = this;
-            this.DropDownContextMenu.Placement = PlacementMode.Bottom;
-            this.DropDownContextMenu.IsOpen = !this.DropDownContextMenu.IsOpen;
-            this.DropDownContextMenu.FlowDirection = FlowDirection.LeftToRight;
+            if (DropDownContextMenu == null) return;
+            DropDownContextMenu.PlacementTarget = this;
+            DropDownContextMenu.Placement = PlacementMode.Bottom;
+            DropDownContextMenu.IsOpen = !DropDownContextMenu.IsOpen;
+            DropDownContextMenu.FlowDirection = FlowDirection.LeftToRight;
         }
     }
 }

@@ -8,41 +8,23 @@ namespace StarryEyes.Models.Backstages.NotificationEvents.PostEvents
     public sealed class FallbackedEvent : BackstageEventBase
     {
         private readonly TwitterAccount _account;
-        public TwitterAccount Account
-        {
-            get { return this._account; }
-        }
+        public TwitterAccount Account => _account;
 
         private readonly TwitterAccount _fallbackAccount;
-        public TwitterAccount FallbackAccount
-        {
-            get { return this._fallbackAccount; }
-        }
+        public TwitterAccount FallbackAccount => _fallbackAccount;
 
         public FallbackedEvent(TwitterAccount account, TwitterAccount fallbackTo)
         {
-            this._account = account;
-            this._fallbackAccount = fallbackTo;
+            _account = account;
+            _fallbackAccount = fallbackTo;
         }
 
-        public override string Title
-        {
-            get { return "FALLBACKED"; }
-        }
+        public override string Title => "FALLBACKED";
 
-        public override string Detail
-        {
-            get
-            {
-                return BackstageResources.FallbackFormat.SafeFormat(
-                        "@" + this._account.UnreliableScreenName,
-                        "@" + this._fallbackAccount.UnreliableScreenName);
-            }
-        }
+        public override string Detail => BackstageResources.FallbackFormat.SafeFormat(
+            "@" + _account.UnreliableScreenName,
+            "@" + _fallbackAccount.UnreliableScreenName);
 
-        public override Color Background
-        {
-            get { return MetroColors.Violet; }
-        }
+        public override Color Background => MetroColors.Violet;
     }
 }

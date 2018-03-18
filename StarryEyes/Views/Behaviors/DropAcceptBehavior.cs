@@ -12,26 +12,26 @@ namespace StarryEyes.Views.Behaviors
     {
         public DropAcceptDescription Description
         {
-            get { return (DropAcceptDescription)GetValue(DescriptionProperty); }
-            set { SetValue(DescriptionProperty, value); }
+            get => (DropAcceptDescription)GetValue(DescriptionProperty);
+            set => SetValue(DescriptionProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for Description.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty DescriptionProperty =
             DependencyProperty.Register("Description", typeof(DropAcceptDescription), typeof(DropAcceptBehavior),
-                                        new PropertyMetadata(null));
+                new PropertyMetadata(null));
 
         protected override void OnAttached()
         {
-            this.AssociatedObject.PreviewDragOver += AssociatedObject_DragOver;
-            this.AssociatedObject.PreviewDrop += AssociatedObject_Drop;
+            AssociatedObject.PreviewDragOver += AssociatedObject_DragOver;
+            AssociatedObject.PreviewDrop += AssociatedObject_Drop;
             base.OnAttached();
         }
 
         protected override void OnDetaching()
         {
-            this.AssociatedObject.PreviewDragOver -= AssociatedObject_DragOver;
-            this.AssociatedObject.PreviewDrop -= AssociatedObject_Drop;
+            AssociatedObject.PreviewDragOver -= AssociatedObject_DragOver;
+            AssociatedObject.PreviewDrop -= AssociatedObject_Drop;
             base.OnDetaching();
         }
 
@@ -59,7 +59,6 @@ namespace StarryEyes.Views.Behaviors
             }
             desc.OnDrop(e);
             e.Handled = true;
-
         }
     }
 
@@ -67,32 +66,32 @@ namespace StarryEyes.Views.Behaviors
     {
         public DropAcceptDescription Description
         {
-            get { return (DropAcceptDescription)GetValue(DescriptionProperty); }
-            set { SetValue(DescriptionProperty, value); }
+            get => (DropAcceptDescription)GetValue(DescriptionProperty);
+            set => SetValue(DescriptionProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for Description.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty DescriptionProperty =
             DependencyProperty.Register("Description", typeof(DropAcceptDescription),
-                                        typeof(AdornedDropAcceptBehavior), new PropertyMetadata(null));
+                typeof(AdornedDropAcceptBehavior), new PropertyMetadata(null));
 
         protected override void OnAttached()
         {
-            this.AssociatedObject.PreviewDragOver += AssociatedObject_DragOver;
-            this.AssociatedObject.PreviewDrop += AssociatedObject_Drop;
-            this.AssociatedObject.PreviewDragEnter += AssociatedObject_PreviewDragEnter;
-            this.AssociatedObject.PreviewDragLeave += AssociatedObject_PreviewDragLeave;
-            this.AssociatedObject.PreviewMouseUp += AssociatedObject_PreviewMouseUp;
+            AssociatedObject.PreviewDragOver += AssociatedObject_DragOver;
+            AssociatedObject.PreviewDrop += AssociatedObject_Drop;
+            AssociatedObject.PreviewDragEnter += AssociatedObject_PreviewDragEnter;
+            AssociatedObject.PreviewDragLeave += AssociatedObject_PreviewDragLeave;
+            AssociatedObject.PreviewMouseUp += AssociatedObject_PreviewMouseUp;
             base.OnAttached();
         }
 
         protected override void OnDetaching()
         {
-            this.AssociatedObject.PreviewDragOver -= AssociatedObject_DragOver;
-            this.AssociatedObject.PreviewDrop -= AssociatedObject_Drop;
-            this.AssociatedObject.PreviewDragEnter -= AssociatedObject_PreviewDragEnter;
-            this.AssociatedObject.PreviewDragLeave -= AssociatedObject_PreviewDragLeave;
-            this.AssociatedObject.PreviewMouseUp -= AssociatedObject_PreviewMouseUp;
+            AssociatedObject.PreviewDragOver -= AssociatedObject_DragOver;
+            AssociatedObject.PreviewDrop -= AssociatedObject_Drop;
+            AssociatedObject.PreviewDragEnter -= AssociatedObject_PreviewDragEnter;
+            AssociatedObject.PreviewDragLeave -= AssociatedObject_PreviewDragLeave;
+            AssociatedObject.PreviewMouseUp -= AssociatedObject_PreviewMouseUp;
             base.OnDetaching();
         }
 

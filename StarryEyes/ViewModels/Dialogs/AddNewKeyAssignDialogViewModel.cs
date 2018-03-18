@@ -16,7 +16,6 @@ namespace StarryEyes.ViewModels.Dialogs
 
         public AddNewKeyAssignDialogViewModel()
         {
-
         }
 
         public bool Result { get; private set; }
@@ -25,11 +24,11 @@ namespace StarryEyes.ViewModels.Dialogs
 
         public string FileName
         {
-            get { return this._fileName; }
+            get => _fileName;
             set
             {
-                this._fileName = value;
-                this.CheckPathIsValid();
+                _fileName = value;
+                CheckPathIsValid();
                 RaisePropertyChanged(() => IsAcceptOk);
             }
         }
@@ -67,20 +66,20 @@ namespace StarryEyes.ViewModels.Dialogs
 
         public bool IsAcceptOk
         {
-            get { return this._isAcceptOk; }
+            get => _isAcceptOk;
             set
             {
-                this._isAcceptOk = value;
+                _isAcceptOk = value;
                 RaisePropertyChanged();
             }
         }
 
         public string ErrorMessage
         {
-            get { return this._errorMessage; }
+            get => _errorMessage;
             set
             {
-                this._errorMessage = value;
+                _errorMessage = value;
                 RaisePropertyChanged();
             }
         }
@@ -101,7 +100,7 @@ namespace StarryEyes.ViewModels.Dialogs
 
         private void Close()
         {
-            this.Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
+            Messenger.RaiseSafe(() => new WindowActionMessage(WindowAction.Close));
         }
     }
 }

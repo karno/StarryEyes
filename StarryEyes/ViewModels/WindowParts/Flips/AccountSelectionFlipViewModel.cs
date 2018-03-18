@@ -97,6 +97,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             {
                 if (_isSelected == value) return;
                 _isSelected = value;
+                if (value && !App.IsUnlockSafeModeForNewApiPolicy)
+                {
+                    SelectExcepted();
+                }
                 RaisePropertyChanged(() => IsSelected);
                 _onSelectionChanged();
             }

@@ -8,13 +8,13 @@ namespace StarryEyes.Views.Triggers
     {
         protected override void OnAttached()
         {
-            this.AssociatedObject.KeyDown += this.CheckFireAction;
+            AssociatedObject.KeyDown += CheckFireAction;
             base.OnAttached();
         }
 
         protected override void OnDetaching()
         {
-            this.AssociatedObject.KeyUp -= CheckFireAction;
+            AssociatedObject.KeyUp -= CheckFireAction;
             base.OnDetaching();
         }
 

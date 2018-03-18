@@ -12,13 +12,8 @@ namespace StarryEyes.Models.Subsystems
 {
     internal static class ContributionService
     {
-        private static readonly ObservableSynchronizedCollectionEx<Contributor> _contributors =
+        internal static ObservableSynchronizedCollectionEx<Contributor> Contributors { get; } =
             new ObservableSynchronizedCollectionEx<Contributor>();
-
-        internal static ObservableSynchronizedCollectionEx<Contributor> Contributors
-        {
-            get { return _contributors; }
-        }
 
         static ContributionService()
         {
@@ -37,12 +32,12 @@ namespace StarryEyes.Models.Subsystems
                     using (var sr = new StringReader(str))
                     {
                         var xml = XDocument.Load(sr);
-                        return xml.Root
+                        return xml.Root?
                                   .Descendants("contributor")
                                   .Where(
                                       e =>
-                                      e.Attribute("visible") == null ||
-                                      e.Attribute("visible").Value.ToLower() != "false")
+                                          e.Attribute("visible") == null ||
+                                          e.Attribute("visible")?.Value.ToLower() != "false")
                                   .Select(Contributor.FromXml)
                                   .ToArray();
                     }
@@ -70,18 +65,18 @@ namespace StarryEyes.Models.Subsystems
         {
             var twitter = xElement.Attribute("twitter");
             return twitter != null
-                       ? new Contributor(xElement.Value, twitter.Value)
-                       : new Contributor(xElement.Value, null);
+                ? new Contributor(xElement.Value, twitter.Value)
+                : new Contributor(xElement.Value, null);
         }
 
         public Contributor(string name, string screenName)
         {
-            this.Name = name;
-            this.ScreenName = screenName;
+            Name = name;
+            ScreenName = screenName;
         }
 
-        public string Name { get; set; }
+        public string Name { get; }
 
-        public string ScreenName { get; set; }
+        public string ScreenName { get; }
     }
 }

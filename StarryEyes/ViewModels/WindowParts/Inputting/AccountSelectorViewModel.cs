@@ -15,20 +15,18 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
 {
     public class AccountSelectorViewModel : ViewModel
     {
-        private readonly InputViewModel _parent;
         private readonly ReadOnlyDispatcherCollectionRx<TwitterAccountViewModel> _accounts;
 
         public AccountSelectorViewModel(InputViewModel parent)
         {
-            _parent = parent;
             AccountSelectionFlip = new AccountSelectionFlipViewModel();
             AccountSelectionFlip.Closed += () =>
             {
                 // After selection accounts, return focus to text box
                 // if input area is opened.
-                if (_parent.IsOpening)
+                if (parent.IsOpening)
                 {
-                    _parent.FocusToTextBox();
+                    parent.FocusToTextBox();
                 }
             };
             AccountSelectionFlip.SelectedAccountsChanged += () =>

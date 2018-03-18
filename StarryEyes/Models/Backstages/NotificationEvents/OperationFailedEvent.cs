@@ -10,25 +10,16 @@ namespace StarryEyes.Models.Backstages.NotificationEvents
 
         public OperationFailedEvent(string description, Exception exception)
         {
-            this._description = description;
-            this._exception = exception;
+            _description = description;
+            _exception = exception;
         }
 
-        public override string Title
-        {
-            get { return "FAILED"; }
-        }
+        public override string Title => "FAILED";
 
-        public override string Detail
-        {
-            get
-            {
-                return this._description +
-                       (this._exception == null
-                           ? String.Empty
-                           : " - " + BuildMessage(this.GetCoreException(this._exception)));
-            }
-        }
+        public override string Detail => _description +
+                                         (_exception == null
+                                             ? String.Empty
+                                             : " - " + BuildMessage(GetCoreException(_exception)));
 
         private string BuildMessage(Exception ex)
         {
@@ -45,18 +36,15 @@ namespace StarryEyes.Models.Backstages.NotificationEvents
             var aex = ex as AggregateException;
             if (aex != null)
             {
-                return this.GetCoreException(aex.Flatten().InnerExceptions[0]);
+                return GetCoreException(aex.Flatten().InnerExceptions[0]);
             }
             if (ex.InnerException != null)
             {
-                return this.GetCoreException(ex.InnerException);
+                return GetCoreException(ex.InnerException);
             }
             return ex;
         }
 
-        public override System.Windows.Media.Color Background
-        {
-            get { return MetroColors.Red; }
-        }
+        public override System.Windows.Media.Color Background => MetroColors.Red;
     }
 }

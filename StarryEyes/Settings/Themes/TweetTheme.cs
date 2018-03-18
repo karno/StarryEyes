@@ -16,46 +16,46 @@ namespace StarryEyes.Settings.Themes
         [DataMember(Order = 2)]
         private string ForegroundKeyColor
         {
-            get { return this.KeyText.ToColorString(); }
-            set { this.KeyText = value.ToColor(); }
+            get => KeyText.ToColorString();
+            set => KeyText = value.ToColor();
         }
 
         [DataMember(Order = 3)]
         private string ForegroundSubColor
         {
-            get { return this.SubText.ToColorString(); }
-            set { this.SubText = value.ToColor(); }
+            get => SubText.ToColorString();
+            set => SubText = value.ToColor();
         }
 
         [DataMember(Order = 4)]
         private string ForegroundLinkColor
         {
-            get { return HyperlinkText.ToColorString(); }
-            set { HyperlinkText = value.ToColor(); }
+            get => HyperlinkText.ToColorString();
+            set => HyperlinkText = value.ToColor();
         }
 
         [DataMember(Order = 5)]
         private string FavoriteCounterColor
         {
-            get { return FavoriteCounter.ToColorString(); }
-            set { FavoriteCounter = value.ToColor(); }
+            get => FavoriteCounter.ToColorString();
+            set => FavoriteCounter = value.ToColor();
         }
 
         [DataMember(Order = 6)]
         private string RetweetCounterColor
         {
-            get { return RetweetCounter.ToColorString(); }
-            set { RetweetCounter = value.ToColor(); }
+            get => RetweetCounter.ToColorString();
+            set => RetweetCounter = value.ToColor();
         }
 
         [DataMember(Order = 7)]
         private string RetweetMarkerColor
         {
-            get { return RetweetMarker.ToColorString(); }
-            set { RetweetMarker = value.ToColor(); }
+            get => RetweetMarker.ToColorString();
+            set => RetweetMarker = value.ToColor();
         }
 
-        #endregion
+        #endregion Serialization properties
 
         /// <summary>
         /// Colors for default tweet

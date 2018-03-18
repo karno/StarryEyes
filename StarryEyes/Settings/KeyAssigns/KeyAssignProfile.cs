@@ -8,12 +8,12 @@ namespace StarryEyes.Settings.KeyAssigns
 {
     public class KeyAssignProfile
     {
-        public string Name { get; private set; }
+        public string Name { get; }
 
-        public IDictionary<Key, IList<KeyAssign>> GlobalBindings { get; private set; }
-        public IDictionary<Key, IList<KeyAssign>> TimelineBindings { get; private set; }
-        public IDictionary<Key, IList<KeyAssign>> InputBindings { get; private set; }
-        public IDictionary<Key, IList<KeyAssign>> SearchBindings { get; private set; }
+        public IDictionary<Key, IList<KeyAssign>> GlobalBindings { get; }
+        public IDictionary<Key, IList<KeyAssign>> TimelineBindings { get; }
+        public IDictionary<Key, IList<KeyAssign>> InputBindings { get; }
+        public IDictionary<Key, IList<KeyAssign>> SearchBindings { get; }
 
         public static KeyAssignProfile FromFile(string path)
         {
@@ -37,7 +37,7 @@ namespace StarryEyes.Settings.KeyAssigns
             using (var stream = File.Create(path))
             using (var writer = new StreamWriter(stream))
             {
-                this.DumpText(writer);
+                DumpText(writer);
             }
         }
 
@@ -50,7 +50,7 @@ namespace StarryEyes.Settings.KeyAssigns
         {
             using (var sw = new StringWriter())
             {
-                this.DumpText(sw);
+                DumpText(sw);
                 return sw.ToString();
             }
         }
@@ -98,7 +98,7 @@ namespace StarryEyes.Settings.KeyAssigns
                 else
                 {
                     var binding = KeyAssign.FromString(line);
-                    this.SetAssign(currentGroup, binding);
+                    SetAssign(currentGroup, binding);
                 }
             }
         }
@@ -150,7 +150,7 @@ namespace StarryEyes.Settings.KeyAssigns
                 case KeyAssignGroup.Search:
                     return SearchBindings;
                 default:
-                    throw new ArgumentOutOfRangeException("group");
+                    throw new ArgumentOutOfRangeException(nameof(@group));
             }
         }
 
@@ -170,14 +170,15 @@ namespace StarryEyes.Settings.KeyAssigns
         {
             return EnumerateAssigns(searchFrom)
                 .Where(k => k.Actions.Count() == 1 &&
-                    k.Actions.First().ActionName == actionName);
+                            k.Actions.First().ActionName == actionName);
         }
 
-        public IEnumerable<KeyAssign> FindAssignFromActionName(IEnumerable<string> actionNames, KeyAssignGroup? searchFrom = null)
+        public IEnumerable<KeyAssign> FindAssignFromActionName(IEnumerable<string> actionNames,
+            KeyAssignGroup? searchFrom = null)
         {
             return EnumerateAssigns(searchFrom)
                 .Where(k => k.Actions.Count() == 1 &&
-                    k.Actions.Select(a => a.ActionName).SequenceEqual(actionNames));
+                            k.Actions.Select(a => a.ActionName).SequenceEqual(actionNames));
         }
 
         private IEnumerable<KeyAssign> EnumerateAssigns(KeyAssignGroup? searchFrom = null)
@@ -185,10 +186,10 @@ namespace StarryEyes.Settings.KeyAssigns
             if (searchFrom == null)
             {
                 return EnumerableEx.Concat(
-                    GlobalBindings.Values,
-                    TimelineBindings.Values,
-                    InputBindings.Values,
-                    SearchBindings.Values)
+                                       GlobalBindings.Values,
+                                       TimelineBindings.Values,
+                                       InputBindings.Values,
+                                       SearchBindings.Values)
                                    .SelectMany(items => items);
             }
             switch (searchFrom.Value)

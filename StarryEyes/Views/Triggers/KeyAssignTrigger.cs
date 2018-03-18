@@ -14,23 +14,24 @@ namespace StarryEyes.Views.Triggers
     {
         public KeyAssignGroup Group
         {
-            get { return (KeyAssignGroup)GetValue(GroupProperty); }
-            set { SetValue(GroupProperty, value); }
+            get => (KeyAssignGroup)GetValue(GroupProperty);
+            set => SetValue(GroupProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for Group.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty GroupProperty =
-            DependencyProperty.Register("Group", typeof(KeyAssignGroup), typeof(KeyAssignTrigger), new PropertyMetadata(KeyAssignGroup.Global));
+            DependencyProperty.Register("Group", typeof(KeyAssignGroup), typeof(KeyAssignTrigger),
+                new PropertyMetadata(KeyAssignGroup.Global));
 
         protected override void OnAttached()
         {
-            this.AssociatedObject.PreviewKeyDown += HandleKeyPreview;
+            AssociatedObject.PreviewKeyDown += HandleKeyPreview;
             base.OnAttached();
         }
 
         protected override void OnDetaching()
         {
-            this.AssociatedObject.PreviewKeyDown -= HandleKeyPreview;
+            AssociatedObject.PreviewKeyDown -= HandleKeyPreview;
             base.OnDetaching();
         }
 
@@ -42,7 +43,7 @@ namespace StarryEyes.Views.Triggers
 
         private bool CheckActionKey(Key key)
         {
-            var window = Window.GetWindow(this.AssociatedObject);
+            var window = Window.GetWindow(AssociatedObject);
             if (window == null) return false;
             var modifiers = Keyboard.Modifiers;
             TextBox tbox;

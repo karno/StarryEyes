@@ -107,14 +107,14 @@ namespace StarryEyes.Models.Subsystems.Notifications
             public bool CheckSetPositive(long value1, long value2)
             {
                 if (!CheckAdd(_positive, value1, value2)) return false;
-                this.CheckRemove(this._negative, value1, value2);
+                CheckRemove(_negative, value1, value2);
                 return true;
             }
 
             public bool CheckSetNegative(long value1, long value2)
             {
                 if (!CheckAdd(_negative, value1, value2)) return false;
-                this.CheckRemove(this._positive, value1, value2);
+                CheckRemove(_positive, value1, value2);
                 return true;
             }
 

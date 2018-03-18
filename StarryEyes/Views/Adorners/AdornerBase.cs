@@ -14,18 +14,12 @@ namespace StarryEyes.Views.Adorners
         protected AdornerBase([CanBeNull] UIElement adornedElement)
             : base(adornedElement)
         {
-            this.AdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
-            this.Root = new Grid();
-            if (this.AdornerLayer != null)
-            {
-                this.AdornerLayer.Add(this);
-            }
+            AdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
+            Root = new Grid();
+            AdornerLayer?.Add(this);
         }
 
-        protected override int VisualChildrenCount
-        {
-            get { return 1; }
-        }
+        protected override int VisualChildrenCount => 1;
 
         protected override Size MeasureOverride(Size constraint)
         {
@@ -51,22 +45,23 @@ namespace StarryEyes.Views.Adorners
         public void Dispose()
         {
             GC.SuppressFinalize(this);
-            this.Dispose(true);
+            Dispose(true);
         }
 
         ~AdornerBase()
         {
-            this.Dispose(false);
+            Dispose(false);
         }
 
         private bool _disposed;
+
         protected virtual void Dispose(bool disposing)
         {
-            if (this._disposed)
+            if (_disposed)
             {
                 return;
             }
-            this._disposed = true;
+            _disposed = true;
             AdornerLayer.Remove(this);
         }
     }

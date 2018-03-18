@@ -9,7 +9,7 @@ namespace StarryEyes.Views.WindowParts.Primitives
     {
         public UsersList()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
     }
 }

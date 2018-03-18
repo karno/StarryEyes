@@ -13,10 +13,10 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
     {
         public PostLimitPredictionViewModel()
         {
-            this.CompositeDisposable.Add(
+            CompositeDisposable.Add(
                 InputModel.AccountSelector.Accounts.ListenCollectionChanged(
-                    _ => this.RaisePropertyChanged(() => IsPostLimitPredictionEnabled)));
-            this.CompositeDisposable.Add(
+                    _ => RaisePropertyChanged(() => IsPostLimitPredictionEnabled)));
+            CompositeDisposable.Add(
                 Observable.Interval(TimeSpan.FromSeconds(5))
                           .Where(_ => IsPostLimitPredictionEnabled)
                           .Subscribe(_ =>
@@ -28,35 +28,23 @@ namespace StarryEyes.ViewModels.WindowParts.Inputting
                                   PostLimitPredictionService.GetCurrentWindowCount(account.Id);
                               MaxUpdate = Setting.PostLimitPerWindow.Value;
                               RemainUpdate = MaxUpdate - count;
-                              this.RaisePropertyChanged(() => RemainUpdate);
-                              this.RaisePropertyChanged(() => MaxUpdate);
-                              this.RaisePropertyChanged(() => ControlWidth);
-                              this.RaisePropertyChanged(() => IsWarningPostLimit);
+                              RaisePropertyChanged(() => RemainUpdate);
+                              RaisePropertyChanged(() => MaxUpdate);
+                              RaisePropertyChanged(() => ControlWidth);
+                              RaisePropertyChanged(() => IsWarningPostLimit);
                           }));
         }
 
-        public bool IsPostLimitPredictionEnabled
-        {
-            get { return InputModel.AccountSelector.Accounts.Count == 1; }
-        }
+        public bool IsPostLimitPredictionEnabled => InputModel.AccountSelector.Accounts.Count == 1;
 
         public int RemainUpdate { get; set; }
 
         public int MaxUpdate { get; set; }
 
-        public bool IsWarningPostLimit
-        {
-            get { return RemainUpdate < 5; }
-        }
+        public bool IsWarningPostLimit => RemainUpdate < 5;
 
-        public int MaxControlWidth
-        {
-            get { return 80; }
-        }
+        public int MaxControlWidth => 80;
 
-        public double ControlWidth
-        {
-            get { return (double)MaxControlWidth * RemainUpdate / MaxUpdate; }
-        }
+        public double ControlWidth => (double)MaxControlWidth * RemainUpdate / MaxUpdate;
     }
 }

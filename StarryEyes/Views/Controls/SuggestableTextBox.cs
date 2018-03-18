@@ -21,13 +21,14 @@ namespace StarryEyes.Views.Controls
 
         public DataTemplate ListItemTemplate
         {
-            get { return (DataTemplate)GetValue(ListItemTemplateProperty); }
-            set { SetValue(ListItemTemplateProperty, value); }
+            get => (DataTemplate)GetValue(ListItemTemplateProperty);
+            set => SetValue(ListItemTemplateProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for ListItemTemplate.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ListItemTemplateProperty =
-            DependencyProperty.Register("ListItemTemplate", typeof(DataTemplate), typeof(SuggestableTextBox), new PropertyMetadata(OnTemplateChanged));
+            DependencyProperty.Register("ListItemTemplate", typeof(DataTemplate), typeof(SuggestableTextBox),
+                new PropertyMetadata(OnTemplateChanged));
 
         private static void OnTemplateChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
@@ -37,13 +38,14 @@ namespace StarryEyes.Views.Controls
 
         public SuggestItemProviderBase SuggestItemProvider
         {
-            get { return (SuggestItemProviderBase)GetValue(SuggestItemProviderProperty); }
-            set { SetValue(SuggestItemProviderProperty, value); }
+            get => (SuggestItemProviderBase)GetValue(SuggestItemProviderProperty);
+            set => SetValue(SuggestItemProviderProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for SuggestItemProvider.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SuggestItemProviderProperty =
-            DependencyProperty.Register("SuggestItemProvider", typeof(SuggestItemProviderBase), typeof(SuggestableTextBox), new PropertyMetadata(OnSuggestItemChanged));
+            DependencyProperty.Register("SuggestItemProvider", typeof(SuggestItemProviderBase),
+                typeof(SuggestableTextBox), new PropertyMetadata(OnSuggestItemChanged));
 
         private static void OnSuggestItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -84,15 +86,15 @@ namespace StarryEyes.Views.Controls
         private void OnListMouseDown(object sender, MouseButtonEventArgs e)
         {
             ApplySelected();
-            this.CloseCandidates();
+            CloseCandidates();
         }
 
         protected override void OnTextChanged(TextChangedEventArgs e)
         {
             if (!_suggestListPopup.IsOpen && e.Changes.Any(c => c.AddedLength > 0) &&
-                this.CaretIndex >= 1 && this.Text.Length > this.CaretIndex - 1)
+                CaretIndex >= 1 && Text.Length > CaretIndex - 1)
             {
-                CheckTrigger(this.Text[this.CaretIndex - 1]);
+                CheckTrigger(Text[CaretIndex - 1]);
             }
             if (_suggestListPopup.IsOpen)
             {
@@ -118,16 +120,16 @@ namespace StarryEyes.Views.Controls
                     case Key.Enter:
                     case Key.Tab:
                         ApplySelected();
-                        this.CloseCandidates();
+                        CloseCandidates();
                         if (e.Key == Key.Space)
                         {
-                            this.SelectedText = " "; // insert space
-                            this.SelectionStart++;
-                            this.SelectionLength = 0;
+                            SelectedText = " "; // insert space
+                            SelectionStart++;
+                            SelectionLength = 0;
                         }
                         break;
                     case Key.Escape:
-                        this.CloseCandidates();
+                        CloseCandidates();
                         break;
                     case Key.PageUp:
                         if (_candidateList.SelectedIndex > 8)
@@ -184,8 +186,8 @@ namespace StarryEyes.Views.Controls
                 return;
             }
             int tokenStart, __;
-            var token = _provider.FindNearestToken(this.Text, this.CaretIndex, out tokenStart, out __);
-            var caretIndexInToken = this.CaretIndex - tokenStart;
+            var token = _provider.FindNearestToken(Text, CaretIndex, out tokenStart, out __);
+            var caretIndexInToken = CaretIndex - tokenStart;
             if (String.IsNullOrEmpty(token))
             {
                 CloseCandidates();
@@ -208,7 +210,7 @@ namespace StarryEyes.Views.Controls
             if (_suggestListPopup.Parent == null)
             {
                 // initiate popup
-                var panel = (Panel)this.Parent;
+                var panel = (Panel)Parent;
                 panel.Children.Add(_suggestListPopup);
 
                 _suggestListPopup.Placement = PlacementMode.Custom;
@@ -221,13 +223,13 @@ namespace StarryEyes.Views.Controls
                     };
             }
             int tokenStart, _;
-            var token = _provider.FindNearestToken(this.Text, this.CaretIndex, out tokenStart, out _);
+            var token = _provider.FindNearestToken(Text, CaretIndex, out tokenStart, out _);
             if (token == null) return;
             _suggestListPopup.PlacementTarget = this;
-            _suggestListPopup.PlacementRectangle = this.GetRectFromCharacterIndex(tokenStart);
+            _suggestListPopup.PlacementRectangle = GetRectFromCharacterIndex(tokenStart);
             _suggestListPopup.IsOpen = true;
             UpdateText();
-            this.Focus();
+            Focus();
         }
 
         public void ApplySelected()
@@ -238,20 +240,20 @@ namespace StarryEyes.Views.Controls
                 return;
             }
             int tokenStart, tokenLength;
-            _provider.FindNearestToken(this.Text, this.CaretIndex, out tokenStart, out tokenLength);
+            _provider.FindNearestToken(Text, CaretIndex, out tokenStart, out tokenLength);
             if (tokenStart < 0) return;
-            this.SelectionStart = tokenStart;
-            this.SelectionLength = tokenLength;
+            SelectionStart = tokenStart;
+            SelectionLength = tokenLength;
             var replace = _candidateList.SelectedItem.ToString();
-            this.SelectedText = replace;
-            this.SelectionStart = tokenStart + replace.Length;
-            this.SelectionLength = 0;
+            SelectedText = replace;
+            SelectionStart = tokenStart + replace.Length;
+            SelectionLength = 0;
         }
 
         public void CloseCandidates()
         {
             _suggestListPopup.IsOpen = false;
-            this.Focus();
+            Focus();
         }
     }
 
@@ -275,7 +277,7 @@ namespace StarryEyes.Views.Controls
         protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+            handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

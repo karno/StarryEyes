@@ -16,10 +16,7 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
         private readonly SearchFlipViewModel _parent;
         private readonly SearchResultModel _model;
 
-        public string Query
-        {
-            get { return this._model.Query; }
-        }
+        public string Query => _model.Query;
 
         protected override IEnumerable<long> CurrentAccounts
         {
@@ -35,16 +32,13 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
         {
             _parent = parent;
             _model = model;
-            this.CompositeDisposable.Add(
-                new EventListener<Action>(
-                    h => _model.FocusRequired += h,
-                    h => _model.FocusRequired -= h,
-                    this.SetFocus));
+            CompositeDisposable.Add(new EventListener<Action>(
+                h => _model.FocusRequired += h, h => _model.FocusRequired -= h, SetFocus));
         }
 
         public void SetFocus()
         {
-            this.Messenger.RaiseSafe(() => new InteractionMessage("SetFocus"));
+            Messenger.RaiseSafe(() => new InteractionMessage("SetFocus"));
         }
 
         public override void GotFocus()
@@ -55,7 +49,7 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
         [UsedImplicitly]
         public void Close()
         {
-            this._parent.RewindStack();
+            _parent.RewindStack();
         }
 
         [UsedImplicitly]
@@ -67,7 +61,7 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
                 try
                 {
                     TabManager.CreateTab(TabModel.Create(Query, filterQuery));
-                    this._parent.RewindStack();
+                    _parent.RewindStack();
                 }
                 catch (Exception ex)
                 {
@@ -86,7 +80,7 @@ namespace StarryEyes.ViewModels.Timelines.SearchFlips
         {
             base.Dispose(disposing);
             if (!disposing) return;
-            this._model.Dispose();
+            _model.Dispose();
             MainAreaViewModel.TimelineActionTargetOverride = null;
         }
     }

@@ -129,8 +129,8 @@ namespace StarryEyes.Models.Inputting
         [CanBeNull]
         public IEnumerable<TwitterAccount> Accounts
         {
-            get { return this._accounts; }
-            set { this._accounts = value?.ToArray(); }
+            get => _accounts;
+            set => _accounts = value?.ToArray();
         }
 
         [CanBeNull]
@@ -139,7 +139,7 @@ namespace StarryEyes.Models.Inputting
         [CanBeNull]
         public TwitterUser Recipient
         {
-            get { return _recipient; }
+            get => _recipient;
             set
             {
                 if (value != null && _inReplyTo != null)
@@ -153,7 +153,7 @@ namespace StarryEyes.Models.Inputting
         [CanBeNull]
         public TwitterStatus InReplyTo
         {
-            get { return _inReplyTo; }
+            get => _inReplyTo;
             set
             {
                 if (value != null && _recipient != null)
@@ -167,11 +167,11 @@ namespace StarryEyes.Models.Inputting
         [CanBeNull]
         public CursorPosition CursorPosition { get; set; }
 
-        public bool SetFocusToInputArea { get; set; }
+        public bool SetFocusToInputArea { get; }
 
         private InputSetting()
         {
-            this.SetFocusToInputArea = true;
+            SetFocusToInputArea = true;
             CursorPosition = CursorPosition.End;
         }
     }

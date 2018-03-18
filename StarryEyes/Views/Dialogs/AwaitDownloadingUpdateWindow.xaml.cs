@@ -12,7 +12,7 @@ namespace StarryEyes.Views.Dialogs
         public AwaitDownloadingUpdateWindow()
         {
             InitializeComponent();
-            this.Loaded += AwaitDownloadingUpdateWindow_Loaded;
+            Loaded += AwaitDownloadingUpdateWindow_Loaded;
         }
 
         async void AwaitDownloadingUpdateWindow_Loaded(object sender, RoutedEventArgs e)
@@ -27,11 +27,11 @@ namespace StarryEyes.Views.Dialogs
                     Content = "Update server is down, or patches are not available.",
                     CommonButtons = TaskDialogCommonButtons.Close
                 });
-                this.Close();
+                Close();
                 return;
             }
             AutoUpdateService.StartUpdate(null);
-            this.Close();
+            Close();
         }
     }
 }

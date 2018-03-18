@@ -20,9 +20,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         private ISubject<Unit> _completeCallback;
 
         private bool _isConfigurationActive;
+
         public bool IsConfigurationActive
         {
-            get { return _isConfigurationActive; }
+            get => _isConfigurationActive;
             set
             {
                 if (_isConfigurationActive == value) return;
@@ -39,25 +40,24 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public TabConfigurationFlipViewModel()
         {
-            this.CompositeDisposable.Add(Observable.FromEvent<Tuple<TabModel, ISubject<Unit>>>(
-                h => MainWindowModel.TabConfigureRequested += h,
-                h => MainWindowModel.TabConfigureRequested -= h)
-                .Subscribe(this.StartTabConfigure));
-
+            CompositeDisposable.Add(Observable.FromEvent<Tuple<TabModel, ISubject<Unit>>>(
+                                                  h => MainWindowModel.TabConfigureRequested += h,
+                                                  h => MainWindowModel.TabConfigureRequested -= h)
+                                              .Subscribe(StartTabConfigure));
         }
 
         private void StartTabConfigure(Tuple<TabModel, ISubject<Unit>> args)
         {
             // ensure close before starting configuration
-            this.IsConfigurationActive = false;
+            IsConfigurationActive = false;
 
             var model = args.Item1;
             var callback = args.Item2;
-            this._completeCallback = callback;
-            this._currentConfigurationTarget = model;
-            this.IsConfigurationActive = true;
-            this._lastValidFilterQuery = model.FilterQuery;
-            this._initialNormalizedQuery =
+            _completeCallback = callback;
+            _currentConfigurationTarget = model;
+            IsConfigurationActive = true;
+            _lastValidFilterQuery = model.FilterQuery;
+            _initialNormalizedQuery =
                 _lastValidFilterQuery == null
                     ? String.Empty
                     : _lastValidFilterQuery.ToQuery();
@@ -73,7 +73,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public string TabName
         {
-            get { return _currentConfigurationTarget != null ? _currentConfigurationTarget.Name : String.Empty; }
+            get => _currentConfigurationTarget != null ? _currentConfigurationTarget.Name : String.Empty;
             set
             {
                 _currentConfigurationTarget.Name = value;
@@ -84,7 +84,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool IsShowUnreadCounts
         {
-            get { return _currentConfigurationTarget != null && _currentConfigurationTarget.ShowUnreadCounts; }
+            get => _currentConfigurationTarget != null && _currentConfigurationTarget.ShowUnreadCounts;
             set
             {
                 _currentConfigurationTarget.ShowUnreadCounts = value;
@@ -95,7 +95,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public bool IsNotifyNewArrivals
         {
-            get { return _currentConfigurationTarget != null && _currentConfigurationTarget.NotifyNewArrivals; }
+            get => _currentConfigurationTarget != null && _currentConfigurationTarget.NotifyNewArrivals;
             set
             {
                 _currentConfigurationTarget.NotifyNewArrivals = value;
@@ -106,7 +106,7 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
 
         public string NotifySoundSourcePath
         {
-            get { return _currentConfigurationTarget != null ? _currentConfigurationTarget.NotifySoundSource : String.Empty; }
+            get => _currentConfigurationTarget != null ? _currentConfigurationTarget.NotifySoundSource : String.Empty;
             set
             {
                 if (_currentConfigurationTarget == null) return;
@@ -118,12 +118,12 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         [UsedImplicitly]
         public void SelectSoundSource()
         {
-            var msg = this.Messenger.GetResponseSafe(() =>
+            var msg = Messenger.GetResponseSafe(() =>
                 new OpeningFileSelectionMessage
                 {
                     Title = GeneralFlipResources.TabConfigOpenSoundTitle,
                     Filter = GeneralFlipResources.TabConfigOpenSoundFilter + "|*.wav",
-                    FileName = NotifySoundSourcePath,
+                    FileName = NotifySoundSourcePath
                 });
             if (msg.Response != null && msg.Response.Length > 0)
             {
@@ -134,9 +134,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         private string _initialNormalizedQuery;
 
         private string _currentQueryString;
+
         public string QueryString
         {
-            get { return _currentQueryString; }
+            get => _currentQueryString;
             set
             {
                 _currentQueryString = value;
@@ -148,9 +149,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         private bool _foundError;
+
         public bool FoundError
         {
-            get { return _foundError; }
+            get => _foundError;
             set
             {
                 _foundError = value;
@@ -159,9 +161,10 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         private string _exceptionMessage;
+
         public string ExceptionMessage
         {
-            get { return _exceptionMessage; }
+            get => _exceptionMessage;
             set
             {
                 _exceptionMessage = value;
@@ -192,34 +195,28 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
         }
 
         #region OpenQueryReferenceCommand
+
         private Livet.Commands.ViewModelCommand _openQueryReferenceCommand;
 
-        public Livet.Commands.ViewModelCommand OpenQueryReferenceCommand
-        {
-            get
-            {
-                if (this._openQueryReferenceCommand == null)
-                {
-                    this._openQueryReferenceCommand = new Livet.Commands.ViewModelCommand(OpenQueryReference);
-                }
-                return this._openQueryReferenceCommand;
-            }
-        }
+        public Livet.Commands.ViewModelCommand OpenQueryReferenceCommand =>
+            _openQueryReferenceCommand ?? (_openQueryReferenceCommand =
+                new Livet.Commands.ViewModelCommand(OpenQueryReference));
 
         public void OpenQueryReference()
         {
             BrowserHelper.Open(App.QueryReferenceUrl);
         }
-        #endregion
+
+        #endregion OpenQueryReferenceCommand
 
         public void Close()
         {
             if (!IsConfigurationActive) return;
-            this.IsConfigurationActive = false;
+            IsConfigurationActive = false;
             if (_currentConfigurationTarget != null)
             {
-                if (this._lastValidFilterQuery != null &&
-                    this._lastValidFilterQuery.ToQuery() != this._initialNormalizedQuery)
+                if (_lastValidFilterQuery != null &&
+                    _lastValidFilterQuery.ToQuery() != _initialNormalizedQuery)
                 {
                     _currentConfigurationTarget.RawQueryString = _lastValidFilterQueryString;
                     _currentConfigurationTarget.FilterQuery = _lastValidFilterQuery;

@@ -7,27 +7,22 @@ namespace StarryEyes.ViewModels.Common
     public class FilterEditControlViewModel : ViewModel
     {
         private FilterQuery _filter;
+
         public FilterQuery Filter
         {
-            get { return this._filter; }
+            get => _filter;
             set
             {
-                this._filter = value;
-                this.RaisePropertyChanged();
+                _filter = value;
+                RaisePropertyChanged();
             }
         }
 
-        private readonly DispatcherCollection<FilterSourceViewModel> _sources
-            = new DispatcherCollection<FilterSourceViewModel>(DispatcherHelper.UIDispatcher);
-
-        public DispatcherCollection<FilterSourceViewModel> Sources
-        {
-            get { return this._sources; }
-        }
+        public DispatcherCollection<FilterSourceViewModel> Sources { get; } =
+            new DispatcherCollection<FilterSourceViewModel>(DispatcherHelper.UIDispatcher);
 
         public FilterEditControlViewModel()
         {
         }
-
     }
 }
