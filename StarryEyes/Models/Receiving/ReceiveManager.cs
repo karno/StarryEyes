@@ -18,7 +18,7 @@ namespace StarryEyes.Models.Receiving
 
         public static event Action<long> UserStreamsConnectionStateChanged;
 
-        public static event Action<ListInfo> ListMemberChanged;
+        public static event Action<Tuple<ListInfo, IEnumerable<long>>> ListMemberChanged;
 
         public static void Initialize()
         {

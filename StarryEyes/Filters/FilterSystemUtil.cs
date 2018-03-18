@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Cadena.Data;
 using Cadena.Data.Entities;
-using JetBrains.Annotations;
-using StarryEyes.Albireo.Collections;
 using StarryEyes.Filters.Expressions.Operators;
 using StarryEyes.Models.Databases;
 using StarryEyes.Models.Receiving;
@@ -69,19 +67,18 @@ namespace StarryEyes.Filters
         public ListWatcher(ListInfo info)
         {
             _info = info;
-            ReceiveManager.ListMemberChanged += OnListMemberChanged;
         }
 
-        [CanBeNull]
-        public AVLTree<long> Ids { get; } = new AVLTree<long>();
+        public HashSet<long> Ids { get; } = new HashSet<long>();
 
         public long ListId => _listId;
 
-        private void OnListMemberChanged(ListInfo info)
+        private void OnListMemberChanged(Tuple<ListInfo, IEnumerable<long>> tuple)
         {
-            if (info.Equals(_info))
+            var info = tuple.Item1;
+            if (info.Equals(_info) && Ids.SyncSet(tuple.Item2))
             {
-                RefreshMembers();
+                OnListMemberUpdated?.Invoke();
             }
         }
 

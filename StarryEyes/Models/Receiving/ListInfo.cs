@@ -15,6 +15,12 @@ namespace StarryEyes.Models.Receiving
             Slug = slug;
         }
 
+        public ListInfo(ListParameter parameter)
+        {
+            OwnerScreenName = parameter.OwnerScreenName;
+            Slug = parameter.Slug;
+        }
+
         public string Slug { get; set; }
 
         public string OwnerScreenName { get; set; }

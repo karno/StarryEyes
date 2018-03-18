@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Cadena;
+using Cadena.Api.Rest;
 using Cadena.Data;
 using StarryEyes.Casket;
 using StarryEyes.Casket.DatabaseModels;
@@ -19,6 +22,19 @@ namespace StarryEyes.Models.Databases
             }).ConfigureAwait(false);
         }
 
+        public static async Task<DatabaseList> GetOrReceiveListDescription(IApiAccessor accessor, ListInfo listInfo)
+        {
+            return await Task.Run(async () =>
+            {
+                var userId = UserProxy.GetId(listInfo.OwnerScreenName);
+                var dbl = await Database.ListCrud.GetAsync(userId, listInfo.Slug).ConfigureAwait(false);
+                if (dbl != null) return dbl;
+                var twl = await accessor.ShowListAsync(listInfo.ToParameter(), CancellationToken.None);
+                return await SetListDescription(twl.Result).ConfigureAwait(false);
+            }).ConfigureAwait(false);
+        }
+
+
         public static async Task<IEnumerable<long>> GetListMembers(ListInfo listInfo)
         {
             var user = await Database.UserCrud.GetAsync(listInfo.OwnerScreenName).ConfigureAwait(false);
@@ -33,16 +49,18 @@ namespace StarryEyes.Models.Databases
             return await Database.ListUserCrud.GetUsersAsync(listId).ConfigureAwait(false);
         }
 
-        public static async Task SetListDescription(TwitterList list)
+        public static async Task<DatabaseList> SetListDescription(TwitterList list)
         {
-            await Database.ListCrud.InsertAsync(new DatabaseList
+            var dbl = new DatabaseList
             {
                 Id = list.Id,
                 UserId = list.User.Id,
                 Name = list.Name,
                 FullName = list.FullName,
                 Slug = list.Slug
-            }).ConfigureAwait(false);
+            };
+            await Database.ListCrud.InsertAsync(dbl).ConfigureAwait(false);
+            return dbl;
         }
 
         public static async Task SetListMembers(TwitterList list, IEnumerable<long> users)

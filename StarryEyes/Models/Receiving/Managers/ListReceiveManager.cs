@@ -128,7 +128,7 @@ namespace StarryEyes.Models.Receiving.Managers
 
     internal class ListMemberReceiveManager
     {
-        public event Action<ListInfo> ListMemberChanged;
+        public event Action<Tuple<ListInfo, IEnumerable<long>>> ListMemberChanged;
 
         private readonly object _listReceiverLocker = new object();
 
@@ -190,10 +190,9 @@ namespace StarryEyes.Models.Receiving.Managers
                 else
                 {
                     _listReceiverReferenceCount.Add(info, 1);
-                    var lparam = info.ToParameter();
-                    var listener = new ListMemberListener(account.CreateAccessor(), lparam);
+                    var listener = new ListMemberListener(account.CreateAccessor(), info);
                     _receiverDictionary.Add(info, listener);
-                    listener.ListMemberChanged += (o, e) => ListMemberChanged?.Invoke(info);
+                    listener.ListMemberChanged += (o, e) => ListMemberChanged?.Invoke(e);
                 }
             }
         }
@@ -218,40 +217,29 @@ namespace StarryEyes.Models.Receiving.Managers
 
         private sealed class ListMemberListener : IDisposable
         {
-            private readonly ListParameter _listParam;
+            private readonly ListInfo _listParam;
             private readonly ListMemberReceiver _receiver;
 
             private readonly HashSet<long> _members = new HashSet<long>();
 
-            public event EventHandler<ListParameter> ListMemberChanged;
+            public event EventHandler<Tuple<ListInfo, IEnumerable<long>>> ListMemberChanged;
 
-            public ListMemberListener(IApiAccessor accessor, ListParameter listParam)
+            public ListMemberListener(IApiAccessor accessor, ListInfo listParam)
             {
                 _listParam = listParam;
-                _receiver = new ListMemberReceiver(accessor, listParam, UserProxy.StoreUsers, UsersChanged,
-                    BackstageModel.NotifyException);
+                _receiver = new ListMemberReceiver(accessor, listParam, UserProxy.StoreUsers,
+                    UsersChanged, BackstageModel.NotifyException);
                 ReceiveManager.ReceiveEngine.RegisterReceiver(_receiver, RequestPriority.Low);
             }
 
-            private void UsersChanged(IEnumerable<long> userIds)
+            private async void UsersChanged(IEnumerable<long> userIds)
             {
-                var newset = new HashSet<long>(userIds);
-                bool changed = false;
-                foreach (var id in newset)
+                if (!_members.SyncSet(userIds)) return;
+                if (_receiver.ListId != null)
                 {
-                    if (_members.Add(id))
-                        changed = true;
+                    await ListProxy.SetListMembers(_receiver.ListId.Value, _members);
                 }
-                foreach (var id in _members.ToArray())
-                {
-                    if (newset.Remove(id)) continue;
-                    _members.Remove(id);
-                    changed = true;
-                }
-                if (changed)
-                {
-                    ListMemberChanged?.Invoke(this, _listParam);
-                }
+                ListMemberChanged?.Invoke(this, Tuple.Create(_listParam, _members.AsEnumerable()));
             }
 
             public void Dispose()
