@@ -1016,6 +1016,15 @@ namespace StarryEyes.Globalization.WindowParts {
         }
         
         /// <summary>
+        ///   Notify tweets are favorited that is retweeted by me に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string NotifyFavoriteRetweeted {
+            get {
+                return ResourceManager.GetString("NotifyFavoriteRetweeted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Notify my tweets are favorited に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string NotifyFavorites {
@@ -1075,6 +1084,15 @@ namespace StarryEyes.Globalization.WindowParts {
         public static string NotifyQuotes {
             get {
                 return ResourceManager.GetString("NotifyQuotes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Notify tweets are retweeted that is retweeted by me に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string NotifyRetweetRetweeted {
+            get {
+                return ResourceManager.GetString("NotifyRetweetRetweeted", resourceCulture);
             }
         }
         

@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using Cadena.Api;
 using Cadena.Api.Parameters;
 using Cadena.Data;
 using Cadena.Data.Entities;
@@ -608,9 +609,21 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                     expected(account);
                     try
                     {
-                        var request = new FavoriteRequest(account.CreateAccessor(), Status.Id, add);
-
-                        await RequestManager.Enqueue(request).ConfigureAwait(false);
+                        try
+                        {
+                            var request = new FavoriteRequest(account.CreateAccessor(), Status.Id, add);
+                            await RequestManager.Enqueue(request).ConfigureAwait(false);
+                        }
+                        catch (TwitterApiException tex)
+                        {
+                            if (tex.Message == "You have already favorited this status.")
+                            {
+                                // favorite is already succeeded.
+                                return;
+                            }
+                            // not handled. rethrow it.
+                            throw;
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -655,13 +668,25 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 }
 
                 // define working task
-                Func<TwitterAccount, Task> workTask = account => Task.Run(async () =>
+                Task WorkTask(TwitterAccount account) => Task.Run(async () =>
                 {
                     expected(account);
                     try
                     {
-                        var request = new RetweetRequest(account.CreateAccessor(), Status.Id);
-                        await RequestManager.Enqueue(request).ConfigureAwait(false);
+                        try
+                        {
+                            var request = new RetweetRequest(account.CreateAccessor(), Status.Id);
+                            await RequestManager.Enqueue(request).ConfigureAwait(false);
+                        }
+                        catch (TwitterApiException tex)
+                        {
+                            if (tex.Message == "You have already retweeted this Tweet.")
+                            {
+                                // operation is already succeeded.
+                                return;
+                            }
+                            throw;
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -669,14 +694,14 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                         var desc = add
                             ? MainAreaTimelineResources.MsgRetweetFailed
                             : MainAreaTimelineResources.MsgUnretweetFailed;
-                        BackstageModel.RegisterEvent(new OperationFailedEvent(
-                            desc + "(" + account.UnreliableScreenName + " -> " +
-                            Status.User.ScreenName + ")", ex));
+                        BackstageModel.RegisterEvent(
+                            new OperationFailedEvent(
+                                desc + "(" + account.UnreliableScreenName + " -> " + Status.User.ScreenName + ")", ex));
                     }
                 });
 
                 // dispatch actions
-                Task.WaitAll(infos.Select(workTask).ToArray());
+                Task.WaitAll(infos.Select(WorkTask).ToArray());
 
                 // notify changed
                 RaisePropertyChanged(() => IsRetweeted);

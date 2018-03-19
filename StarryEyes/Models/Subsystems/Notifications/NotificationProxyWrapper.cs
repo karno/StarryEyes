@@ -97,11 +97,12 @@ namespace StarryEyes.Models.Subsystems.Notifications
             }
         }
 
-        public void NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet)
+        public void NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet,
+            bool retweetedRetweet)
         {
-            if (!_proxy.NotifyRetweeted(source, original, retweet))
+            if (!_proxy.NotifyRetweeted(source, original, retweet, retweetedRetweet))
             {
-                Next?.NotifyRetweeted(source, original, retweet);
+                Next?.NotifyRetweeted(source, original, retweet, retweetedRetweet);
             }
         }
 

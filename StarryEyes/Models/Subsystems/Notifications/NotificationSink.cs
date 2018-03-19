@@ -60,11 +60,14 @@ namespace StarryEyes.Models.Subsystems.Notifications
             BackstageModel.RegisterEvent(new UnfavoritedEvent(source, status));
         }
 
-        public void NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet)
+        public void NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet,
+            bool retweetedRetweet)
         {
-            if (retweet.RetweetedStatus != null && (
-                    Setting.Accounts.Contains(source.Id) ||
-                    Setting.Accounts.Contains(original.User.Id)))
+            if (retweetedRetweet ||
+                (retweet.RetweetedStatus != null && (
+                     Setting.Accounts.Contains(source.Id) ||
+                     Setting.Accounts.Contains(original.User.Id) ||
+                     Setting.Accounts.Contains(retweet.User.Id))))
             {
                 BackstageModel.RegisterEvent(new RetweetedEvent(source, original));
             }

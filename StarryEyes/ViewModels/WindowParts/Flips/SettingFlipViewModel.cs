@@ -674,6 +674,18 @@ namespace StarryEyes.ViewModels.WindowParts.Flips
             set => Setting.NotifyRetweet.Value = value;
         }
 
+        public bool IsNotifyFavoriteRetweeted
+        {
+            get => Setting.NotifyFavoriteRetweeted.Value;
+            set => Setting.NotifyFavoriteRetweeted.Value = value;
+        }
+
+        public bool IsNotifyRetweetRetweeted
+        {
+            get => Setting.NotifyRetweetRetweeted.Value;
+            set => Setting.NotifyRetweetRetweeted.Value = value;
+        }
+
         public bool IsNotifyQuotes
         {
             get => Setting.NotifyQuote.Value;

@@ -239,14 +239,18 @@ namespace StarryEyes.Models.Receiving.Managers
                                     BackstageModel.RegisterEvent(new UnknownEvent(se.Source, se.RawEvent));
                                     break;
                                 case StatusEvents.Favorite:
+                                case StatusEvents.FavoriteRetweet:
                                     NotificationService.NotifyFavorited(se.Source, se.TargetObject);
                                     break;
                                 case StatusEvents.Unfavorite:
-                                case StatusEvents.FavoriteRetweet:
                                     NotificationService.NotifyUnfavorited(se.Source, se.TargetObject);
                                     break;
                                 case StatusEvents.RetweetRetweet:
-                                    // maybe do nothing. (it will deliver as normal status.)
+                                    if (se.TargetObject.RetweetedStatus != null)
+                                    {
+                                        NotificationService.NotifyRetweeted(se.Source,
+                                            se.TargetObject.RetweetedStatus, se.TargetObject, true);
+                                    }
                                     break;
                                 case StatusEvents.Quote:
                                     if (se.TargetObject.QuotedStatus != null)

@@ -117,8 +117,9 @@ namespace StarryEyes.Feather.Proxies
         /// <param name="source">source user</param>
         /// <param name="original">original tweet</param>
         /// <param name="retweet">retweeted tweet</param>
+        /// <param name="retweetedRetweet">notificaion is raised by retweeted_retweet</param>
         /// <returns>return true to trap notification</returns>
-        bool NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet);
+        bool NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet, bool retweetedRetweet);
 
         /// <summary>
         /// The user quoted the tweet.

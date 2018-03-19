@@ -29,7 +29,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
         void NotifyUnfavorited([NotNull] TwitterUser source, [NotNull] TwitterStatus status);
 
         void NotifyRetweeted([NotNull] TwitterUser source, [NotNull] TwitterStatus original,
-            [NotNull] TwitterStatus retweet);
+            [NotNull] TwitterStatus retweet, bool retweetedRetweet);
 
         void NotifyQuoted([NotNull] TwitterUser source, [NotNull] TwitterStatus original,
             [NotNull] TwitterStatus quote);

@@ -60,7 +60,7 @@ namespace StarryEyes.Models.Subsystems
         {
             if (status.RetweetedStatus != null)
             {
-                NotifyRetweeted(status.User, status.RetweetedStatus, status);
+                NotifyRetweeted(status.User, status.RetweetedStatus, status, false);
             }
             if (status.QuotedStatus != null)
             {
@@ -242,7 +242,8 @@ namespace StarryEyes.Models.Subsystems
             Head.NotifyUnfavorited(source, status);
         }
 
-        internal static void NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet)
+        internal static void NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet,
+            bool retweetedRetweet)
         {
             if (MuteBlockManager.IsBlocked(source) || MuteBlockManager.IsOfficialMuted(source)) return;
             if (!Setting.NotifyBackfilledTweets.Value &&
@@ -259,7 +260,7 @@ namespace StarryEyes.Models.Subsystems
                     StatusProxy.AddRetweeter(original.Id, source.Id);
                     StatusBroadcaster.Republish(original);
                 }));
-            Head.NotifyRetweeted(source, original, retweet);
+            Head.NotifyRetweeted(source, original, retweet, retweetedRetweet);
         }
 
         internal static void NotifyQuoted(TwitterUser source, TwitterStatus original, TwitterStatus quote)

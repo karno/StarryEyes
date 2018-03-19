@@ -22,11 +22,7 @@ namespace StarryEyes.Settings
 
         internal AccountManager(Setting.SettingItem<List<TwitterAccount>> settingItem)
         {
-            if (settingItem == null)
-            {
-                throw new ArgumentNullException("settingItem");
-            }
-            _settingItem = settingItem;
+            _settingItem = settingItem ?? throw new ArgumentNullException(nameof(settingItem));
             _accountObservableCollection = new ObservableSynchronizedCollectionEx<TwitterAccount>(_settingItem.Value);
             _accountCache = new ConcurrentDictionary<long, TwitterAccount>(
                 _accountObservableCollection.Distinct(a => a.Id).ToDictionary(a => a.Id));
@@ -48,15 +44,9 @@ namespace StarryEyes.Settings
                     .ToArray())).ConfigureAwait(false);
         }
 
-        public IEnumerable<long> Ids
-        {
-            get { return _accountCache.Keys; }
-        }
+        public IEnumerable<long> Ids => _accountCache.Keys;
 
-        public ObservableSynchronizedCollectionEx<TwitterAccount> Collection
-        {
-            get { return _accountObservableCollection; }
-        }
+        public ObservableSynchronizedCollectionEx<TwitterAccount> Collection => _accountObservableCollection;
 
         public bool Contains(long id)
         {
@@ -73,8 +63,8 @@ namespace StarryEyes.Settings
         {
             var accounts = _accountObservableCollection.ToArray();
             return accounts.Length == 0
-                       ? null
-                       : accounts[_random.Next(accounts.Length)];
+                ? null
+                : accounts[_random.Next(accounts.Length)];
         }
 
         public TwitterAccount GetRelatedOne(long id)
@@ -87,8 +77,8 @@ namespace StarryEyes.Settings
                                     .Where(a => a.RelationData.Followings.Contains(id))
                                     .ToArray();
             return followings.Length == 0
-                       ? GetRandomOne()
-                       : followings[_random.Next(followings.Length)];
+                ? GetRandomOne()
+                : followings[_random.Next(followings.Length)];
         }
 
         public void RemoveAccountFromId(long id)
@@ -99,8 +89,8 @@ namespace StarryEyes.Settings
 
         private void CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var added = e.NewItems != null ? e.NewItems[0] as TwitterAccount : null;
-            var removed = e.OldItems != null ? e.OldItems[0] as TwitterAccount : null;
+            var added = e.NewItems?[0] as TwitterAccount;
+            var removed = e.OldItems?[0] as TwitterAccount;
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -126,7 +116,7 @@ namespace StarryEyes.Settings
                 case NotifyCollectionChangedAction.Reset:
                     _accountCache.Clear();
                     _accountObservableCollection.ForEach(a => _accountCache[a.Id] = a);
-                    Task.Run(() => AccountProxy.RemoveAllAccountsAsync());
+                    Task.Run(AccountProxy.RemoveAllAccountsAsync);
                     break;
             }
             _settingItem.Value = _accountObservableCollection.ToList();

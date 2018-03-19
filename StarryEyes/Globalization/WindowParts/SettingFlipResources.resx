@@ -358,6 +358,12 @@ Blocked users or no-retweet users are applied immediately as before.</value>
   <data name="NotifyRetweets" xml:space="preserve">
     <value>Notify my tweets are retweeted</value>
   </data>
+  <data name="NotifyRetweetRetweeted" xml:space="preserve">
+    <value>Notify tweets are retweeted that is retweeted by me</value>
+  </data>
+  <data name="NotifyFavoriteRetweeted" xml:space="preserve">
+    <value>Notify tweets are favorited that is retweeted by me</value>
+  </data>
   <data name="NotifyQuotes" xml:space="preserve">
     <value>Notify my tweets are quoted</value>
   </data>
