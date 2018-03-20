@@ -22,6 +22,7 @@ namespace StarryEyes.Models.Accounting
             UnreliableScreenName = String.Empty;
             OAuthAccessToken = String.Empty;
             OAuthAccessTokenSecret = String.Empty;
+            UnreliableInformationLastUpdated = DateTime.MinValue;
         }
 
         public TwitterAccount(long id, string screenName, [CanBeNull] AccessToken token)
@@ -33,6 +34,7 @@ namespace StarryEyes.Models.Accounting
             OAuthAccessTokenSecret = token.Secret;
             // default settings
             IsUserStreamsEnabled = true;
+            UnreliableInformationLastUpdated = DateTime.MinValue;
         }
 
         /// <summary>
@@ -105,6 +107,8 @@ namespace StarryEyes.Models.Accounting
         {
             return new TwitterUser(Id, UnreliableScreenName, UnreliableProfileImage);
         }
+
+        public DateTime UnreliableInformationLastUpdated { get; set; }
 
         #endregion Cache property
 

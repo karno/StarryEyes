@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Cadena.Data;
 using StarryEyes.Casket;
@@ -31,13 +32,14 @@ namespace StarryEyes.Models.Databases
             await Database.RelationCrud.DropAllAsync().ConfigureAwait(false);
         }
 
-        public static void UpdateUserInfoAsync(TwitterUser user)
+        public static void UpdateUserInfoAsync(TwitterUser user, DateTime timestamp)
         {
             var account = Setting.Accounts.Get(user.Id);
-            if (account != null)
+            if (account != null && account.UnreliableInformationLastUpdated < timestamp)
             {
                 account.UnreliableScreenName = user.ScreenName;
                 account.UnreliableProfileImage = user.ProfileImageUri;
+                account.UnreliableInformationLastUpdated = timestamp;
             }
         }
     }

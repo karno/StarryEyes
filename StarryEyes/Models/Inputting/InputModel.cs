@@ -39,20 +39,18 @@ namespace StarryEyes.Models.Inputting
             StatusBroadcaster.BroadcastPoint.Subscribe(s =>
             {
                 var status = s.StatusModel?.Status;
-                if (status != null)
-                {
-                    UpdateForUser(status.User);
-                    UpdateForUser(status.Recipient);
-                    UpdateForUser(status.RetweetedStatus?.User);
-                    UpdateForUser(status.QuotedStatus?.User);
-                }
+                if (status == null) return;
+                UpdateForUser(status.User, status.CreatedAt);
+                UpdateForUser(status.Recipient, status.CreatedAt);
+                UpdateForUser(status.RetweetedStatus?.User, status.RetweetedStatus?.CreatedAt);
+                UpdateForUser(status.QuotedStatus?.User, status.QuotedStatus?.CreatedAt);
             }, _ => { }, () => { });
         }
 
-        private static void UpdateForUser([CanBeNull] TwitterUser user)
+        private static void UpdateForUser([CanBeNull] TwitterUser user, DateTime? timestamp)
         {
-            if (user == null) return;
-            AccountProxy.UpdateUserInfoAsync(user);
+            if (user == null || timestamp == null) return;
+            AccountProxy.UpdateUserInfoAsync(user, timestamp.Value);
         }
 
         #region composite events
