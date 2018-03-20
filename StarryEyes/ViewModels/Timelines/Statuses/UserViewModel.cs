@@ -125,9 +125,9 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void OpenUserWeb()
         {
-            if (!String.IsNullOrWhiteSpace(Web))
+            if (!String.IsNullOrWhiteSpace(User.Url))
             {
-                BrowserHelper.Open(Web);
+                BrowserHelper.Open(User.Url);
             }
         }
 

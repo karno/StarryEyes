@@ -71,9 +71,7 @@ namespace StarryEyes.Models.Subsystems.Notifications
 
         public void NotifyQuoted(TwitterUser source, TwitterStatus original, TwitterStatus quote)
         {
-            if (quote.QuotedStatus != null && (
-                    Setting.Accounts.Contains(source.Id) ||
-                    Setting.Accounts.Contains(original.User.Id)))
+            if (quote.QuotedStatus != null && Setting.Accounts.Contains(original.User.Id))
             {
                 BackstageModel.RegisterEvent(new QuotedEvent(source, quote));
             }
