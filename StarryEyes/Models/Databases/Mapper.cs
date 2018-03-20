@@ -141,7 +141,7 @@ namespace StarryEyes.Models.Databases
                 BaseSource = orig.Source,
                 Source = status.Source,
                 StatusType = status.StatusType,
-                EntityAidedText = orig.GetEntityAidedText(EntityDisplayMode.LinkUri),
+                EntityAidedText = orig.GetEntityAidedText(),
                 Text = status.Text,
                 UserId = status.User.Id,
                 BaseUserId = orig.User.Id,

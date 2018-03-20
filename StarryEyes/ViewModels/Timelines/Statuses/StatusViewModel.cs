@@ -549,7 +549,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void CopyBody()
         {
-            SetClipboard(Status.GetEntityAidedText(EntityDisplayMode.LinkUri));
+            SetClipboard(Status.GetEntityAidedText());
         }
 
         public void CopyPermalink()
@@ -946,7 +946,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
                 return;
             }
             var setting = InputSetting.CreateReply(Status,
-                " RT @" + User.ScreenName + ": " + Status.GetEntityAidedText(EntityDisplayMode.LinkUri),
+                " RT @" + User.ScreenName + ": " + Status.GetEntityAidedText(),
                 false);
             setting.CursorPosition = CursorPosition.Begin;
             InputModel.InputCore.SetText(setting);
