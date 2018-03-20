@@ -115,11 +115,27 @@ namespace StarryEyes.Feather.Proxies
         /// The user retweeted the tweet.
         /// </summary>
         /// <param name="source">source user</param>
-        /// <param name="original">original tweet</param>
-        /// <param name="retweet">retweeted tweet</param>
-        /// <param name="retweetedRetweet">notificaion is raised by retweeted_retweet</param>
+        /// <param name="status">retweeted tweet</param>
         /// <returns>return true to trap notification</returns>
-        bool NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet, bool retweetedRetweet);
+        bool NotifyRetweeted(TwitterUser source, TwitterStatus status);
+
+        /// <summary>
+        /// Someone favorited retweeted status.
+        /// </summary>
+        /// <param name="source">source user</param>
+        /// <param name="target">target user</param>
+        /// <param name="status">target status</param>
+        /// <returns></returns>
+        bool NotifyRetweetFavorited(TwitterUser source, TwitterUser target, TwitterStatus status);
+
+        /// <summary>
+        /// Someone retweeted retweeted status.
+        /// </summary>
+        /// <param name="source">source user</param>
+        /// <param name="target">target user</param>
+        /// <param name="status">target status</param>
+        /// <returns></returns>
+        bool NotifyRetweetRetweeted(TwitterUser source, TwitterUser target, TwitterStatus status);
 
         /// <summary>
         /// The user quoted the tweet.

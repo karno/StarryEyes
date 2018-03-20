@@ -99,11 +99,12 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
             OnNewNotificationDataQueued?.Invoke();
         }
 
-        public void Retweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet)
+        public void Retweeted(TwitterUser source, TwitterStatus target)
         {
             lock (_middlePriorityQueue)
             {
-                _middlePriorityQueue.AddLast(new NotificationData(SlimNotificationKind.Retweet, source, original));
+                _middlePriorityQueue.AddLast(new NotificationData(SlimNotificationKind.Retweet, source,
+                    target.RetweetedStatus ?? target));
             }
             OnNewNotificationDataQueued?.Invoke();
         }
@@ -113,6 +114,26 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
             lock (_middlePriorityQueue)
             {
                 _middlePriorityQueue.AddLast(new NotificationData(SlimNotificationKind.Quote, source, quote));
+            }
+            OnNewNotificationDataQueued?.Invoke();
+        }
+
+        public void RetweetFavorited(TwitterUser source, TwitterUser target, TwitterStatus status)
+        {
+            lock (_middlePriorityQueue)
+            {
+                _middlePriorityQueue.AddLast(new NotificationData(SlimNotificationKind.Favorite, source,
+                    target, status.RetweetedStatus ?? status));
+            }
+            OnNewNotificationDataQueued?.Invoke();
+        }
+
+        public void RetweetRetweeted(TwitterUser source, TwitterUser target, TwitterStatus status)
+        {
+            lock (_middlePriorityQueue)
+            {
+                _middlePriorityQueue.AddLast(new NotificationData(SlimNotificationKind.Retweet, source,
+                    target, status.RetweetedStatus ?? status));
             }
             OnNewNotificationDataQueued?.Invoke();
         }
@@ -149,6 +170,15 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
             Kind = kind;
             SourceUser = source;
             TargetUser = targetUser;
+        }
+
+        public NotificationData(SlimNotificationKind kind, TwitterUser source, TwitterUser targetUser,
+            TwitterStatus targetStatus)
+        {
+            Kind = kind;
+            SourceUser = source;
+            TargetUser = targetUser;
+            TargetStatus = targetStatus;
         }
 
         public SlimNotificationKind Kind { get; }

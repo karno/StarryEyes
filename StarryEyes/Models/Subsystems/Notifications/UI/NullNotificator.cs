@@ -4,9 +4,7 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
 {
     public sealed class NullNotificator : IUINotificator
     {
-        private static readonly NullNotificator _nullNotificator = new NullNotificator();
-
-        public static NullNotificator Instance => _nullNotificator;
+        public static NullNotificator Instance { get; } = new NullNotificator();
 
         private NullNotificator()
         {
@@ -32,11 +30,19 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
         {
         }
 
-        public void Retweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet)
+        public void Retweeted(TwitterUser source, TwitterStatus target)
         {
         }
 
         public void Quoted(TwitterUser source, TwitterStatus original, TwitterStatus quote)
+        {
+        }
+
+        public void RetweetFavorited(TwitterUser source, TwitterUser target, TwitterStatus status)
+        {
+        }
+
+        public void RetweetRetweeted(TwitterUser source, TwitterUser target, TwitterStatus status)
         {
         }
     }

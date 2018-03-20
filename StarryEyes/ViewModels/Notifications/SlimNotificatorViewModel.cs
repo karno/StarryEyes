@@ -86,20 +86,11 @@ namespace StarryEyes.ViewModels.Notifications
             _top = (int)(bound.Bottom - 24);
         }
 
-        public int Left
-        {
-            get { return _left; }
-        }
+        public int Left => _left;
 
-        public int Top
-        {
-            get { return _top; }
-        }
+        public int Top => _top;
 
-        public int Width
-        {
-            get { return _width; }
-        }
+        public int Width => _width;
 
         public Color BackgroundColor
         {
@@ -127,25 +118,13 @@ namespace StarryEyes.ViewModels.Notifications
             }
         }
 
-        public Brush BackgroundBrush
-        {
-            get { return new SolidColorBrush(BackgroundColor); }
-        }
+        public Brush BackgroundBrush => new SolidColorBrush(BackgroundColor);
 
-        public SlimNotificationKind NotificationKind
-        {
-            get { return _data.Kind; }
-        }
+        public SlimNotificationKind NotificationKind => _data.Kind;
 
-        public Uri UserImage
-        {
-            get
-            {
-                return _data.SourceUser != null
-                    ? _data.SourceUser.ProfileImageUri
-                    : _data.TargetStatus.User.ProfileImageUri;
-            }
-        }
+        public Uri UserImage => _data.SourceUser != null
+            ? _data.SourceUser.ProfileImageUri
+            : _data.TargetStatus.User.ProfileImageUri;
 
         public string Description
         {
@@ -158,12 +137,28 @@ namespace StarryEyes.ViewModels.Notifications
                     case SlimNotificationKind.Message:
                         return RemoveLines(_data.TargetStatus.ToString());
                     case SlimNotificationKind.Follow:
-                        return RemoveLines("@" + _data.SourceUser.ScreenName + " follows @" +
-                                           _data.TargetUser.ScreenName);
+                        return RemoveLines("@" + _data.SourceUser.ScreenName + " follows " +
+                                           "@" + _data.TargetUser.ScreenName);
                     case SlimNotificationKind.Favorite:
-                        return RemoveLines("@" + _data.SourceUser.ScreenName + " favorites " + _data.TargetStatus);
+                        if (_data.TargetUser != null)
+                        {
+                            return RemoveLines("@" + _data.SourceUser.ScreenName + " favorites " +
+                                               "@" + _data.TargetUser.ScreenName + " retweeted " + _data.TargetStatus);
+                        }
+                        else
+                        {
+                            return RemoveLines("@" + _data.SourceUser.ScreenName + " favorites " + _data.TargetStatus);
+                        }
                     case SlimNotificationKind.Retweet:
-                        return RemoveLines("@" + _data.SourceUser.ScreenName + " retweets " + _data.TargetStatus);
+                        if (_data.TargetUser != null)
+                        {
+                            return RemoveLines("@" + _data.SourceUser.ScreenName + " retweets " +
+                                               "@" + _data.TargetUser.ScreenName + " retweeted " + _data.TargetStatus);
+                        }
+                        else
+                        {
+                            return RemoveLines("@" + _data.SourceUser.ScreenName + " retweets " + _data.TargetStatus);
+                        }
                     case SlimNotificationKind.Quote:
                         return RemoveLines("@" + _data.SourceUser.ScreenName + " quotes " + _data.TargetStatus);
                     default:

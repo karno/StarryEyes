@@ -7,10 +7,10 @@ namespace StarryEyes.Models.Backstages.TwitterEvents
 {
     public sealed class QuotedEvent : TwitterEventBase
     {
-        public QuotedEvent(TwitterUser source, TwitterStatus target)
-            : base(source, target.QuotedStatus?.User, target)
+        public QuotedEvent(TwitterUser source, TwitterStatus status)
+            : base(source, status.QuotedStatus?.User, status)
         {
-            if (target.QuotedStatus == null)
+            if (status.QuotedStatus == null)
             {
                 throw new ArgumentException("specified status has not quote information.");
             }

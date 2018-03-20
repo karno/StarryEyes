@@ -15,6 +15,8 @@ namespace StarryEyes.Models.Backstages.TwitterEvents
 
         public TwitterUser TargetUser { get; }
 
+        public TwitterStatus OriginalStatus { get; }
+
         public TwitterStatus TargetStatus { get; }
 
         public bool IsLocalUserInvolved => Setting.Accounts.Ids.Contains(Source.Id) ||
@@ -27,10 +29,11 @@ namespace StarryEyes.Models.Backstages.TwitterEvents
             TargetUser = target;
         }
 
-        public TwitterEventBase(TwitterUser source, TwitterUser target, TwitterStatus targetStatus)
+        public TwitterEventBase(TwitterUser source, TwitterUser target, TwitterStatus status)
             : this(source, target)
         {
-            TargetStatus = targetStatus;
+            OriginalStatus = status;
+            TargetStatus = status.RetweetedStatus ?? status;
         }
 
         public override Color Background => MetroColors.Cyan;

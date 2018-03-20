@@ -27,6 +27,8 @@ namespace StarryEyes.ViewModels.Notifications
             NormalNotificator.Instance.OnRetweeted += Instance_OnRetweeted;
             NormalNotificator.Instance.OnQuoted += Instance_OnQuoted;
             NormalNotificator.Instance.OnUserFollowed += Instance_OnUserFollowed;
+            NormalNotificator.Instance.OnRetweetFavorited += Instance_OnRetweetFavorited;
+            NormalNotificator.Instance.OnRetweetRetweeted += Instance_OnRetweetRetweeted;
         }
 
         static void Instance_OnUserFollowed(TwitterUser arg1, TwitterUser arg2)
@@ -51,6 +53,18 @@ namespace StarryEyes.ViewModels.Notifications
         {
             Show(new NormalNotificatorViewModel(MetroColors.Olive,
                 arg1, "quoted", arg2.ToString()));
+        }
+
+        static void Instance_OnRetweetFavorited(TwitterUser arg1, TwitterUser arg2, TwitterStatus arg3)
+        {
+            Show(new NormalNotificatorViewModel(MetroColors.Amber,
+                arg1, "favorited", arg2.ScreenName + " retweeted " + arg3));
+        }
+
+        static void Instance_OnRetweetRetweeted(TwitterUser arg1, TwitterUser arg2, TwitterStatus arg3)
+        {
+            Show(new NormalNotificatorViewModel(MetroColors.Emerald,
+                arg1, "retweeted", arg2.ScreenName + " retweeted " + arg3));
         }
 
 

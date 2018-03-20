@@ -97,12 +97,11 @@ namespace StarryEyes.Models.Subsystems.Notifications
             }
         }
 
-        public void NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet,
-            bool retweetedRetweet)
+        public void NotifyRetweeted(TwitterUser source, TwitterStatus status)
         {
-            if (!_proxy.NotifyRetweeted(source, original, retweet, retweetedRetweet))
+            if (!_proxy.NotifyRetweeted(source, status))
             {
-                Next?.NotifyRetweeted(source, original, retweet, retweetedRetweet);
+                Next?.NotifyRetweeted(source, status);
             }
         }
 
@@ -114,12 +113,28 @@ namespace StarryEyes.Models.Subsystems.Notifications
             }
         }
 
-
-        public void NotifyDeleted(long statusId, TwitterStatus deleted)
+        public void NotifyRetweetFavorited(TwitterUser source, TwitterUser target, TwitterStatus status)
         {
-            if (!_proxy.NotifyDeleted(statusId, deleted))
+            if (!_proxy.NotifyRetweetFavorited(source, target, status))
             {
-                Next?.NotifyDeleted(statusId, deleted);
+                Next?.NotifyRetweetFavorited(source, target, status);
+            }
+        }
+
+        public void NotifyRetweetRetweeted(TwitterUser source, TwitterUser target, TwitterStatus status)
+        {
+            if (!_proxy.NotifyRetweetRetweeted(source, target, status))
+            {
+                Next?.NotifyRetweetRetweeted(source, target, status);
+            }
+        }
+
+
+        public void NotifyDeleted(long statusId, TwitterStatus status)
+        {
+            if (!_proxy.NotifyDeleted(statusId, status))
+            {
+                Next?.NotifyDeleted(statusId, status);
             }
         }
 

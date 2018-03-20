@@ -229,83 +229,12 @@ namespace StarryEyes.Models.Receiving.Managers
 
                     if (value)
                     {
-                        var handler = StreamHandler.Create(StatusInbox.Enqueue, BackstageModel.NotifyException,
-                            _ => StateChanged?.Invoke(_account));
-                        handler.RegisterHandler<StreamStatusEvent>(se =>
+                        var handler = CreateHandler();
+                        _userStreamsReceiver = new UserStreamReceiver(_streamAccessor, handler)
                         {
-                            switch (se.Event)
-                            {
-                                case StatusEvents.Unknown:
-                                    BackstageModel.RegisterEvent(new UnknownEvent(se.Source, se.RawEvent));
-                                    break;
-                                case StatusEvents.Favorite:
-                                case StatusEvents.FavoriteRetweet:
-                                    NotificationService.NotifyFavorited(se.Source, se.TargetObject);
-                                    break;
-                                case StatusEvents.Unfavorite:
-                                    NotificationService.NotifyUnfavorited(se.Source, se.TargetObject);
-                                    break;
-                                case StatusEvents.RetweetRetweet:
-                                    if (se.TargetObject.RetweetedStatus != null)
-                                    {
-                                        NotificationService.NotifyRetweeted(se.Source,
-                                            se.TargetObject.RetweetedStatus, se.TargetObject, true);
-                                    }
-                                    break;
-                                case StatusEvents.Quote:
-                                    if (se.TargetObject.QuotedStatus != null)
-                                    {
-                                        NotificationService.NotifyQuoted(se.Source,
-                                            se.TargetObject.QuotedStatus, se.TargetObject);
-                                    }
-                                    break;
-                                default:
-                                    throw new ArgumentOutOfRangeException();
-                            }
-                        });
-                        handler.RegisterHandler<StreamUserEvent>(ue =>
-                        {
-                            switch (ue.Event)
-                            {
-                                case UserEvents.Unknown:
-                                    BackstageModel.RegisterEvent(new UnknownEvent(ue.Source, ue.RawEvent));
-                                    break;
-                                case UserEvents.Follow:
-                                    NotificationService.NotifyFollowed(ue.Source, ue.Target);
-                                    break;
-                                case UserEvents.Unfollow:
-                                    NotificationService.NotifyUnfollowed(ue.Source, ue.Target);
-                                    break;
-                                case UserEvents.Block:
-                                    NotificationService.NotifyBlocked(ue.Source, ue.Target);
-                                    break;
-                                case UserEvents.Unblock:
-                                    NotificationService.NotifyUnblocked(ue.Source, ue.Target);
-                                    break;
-                                case UserEvents.Mute:
-                                    NotificationService.NotifyMuted(ue.Source, ue.Target);
-                                    break;
-                                case UserEvents.UnMute:
-                                    NotificationService.NotifyUnmuted(ue.Source, ue.Target);
-                                    break;
-                                case UserEvents.UserUpdate:
-                                    NotificationService.NotifyUserUpdated(ue.Source);
-                                    break;
-                                case UserEvents.UserDelete:
-                                case UserEvents.UserSuspend:
-                                    // do nothing
-                                    break;
-                                default:
-                                    throw new ArgumentOutOfRangeException();
-                            }
-                        });
-                        handler.RegisterHandler<StreamDelete>(de => NotificationService.NotifyDeleted(de.Id, null));
-                        handler.RegisterHandler<StreamLimit>(
-                            le => NotificationService.NotifyLimitationInfoGot(_account, (int)le.UndeliveredCount));
-
-                        // list handler is not used.
-
-                        _userStreamsReceiver = new UserStreamReceiver(_streamAccessor, handler);
+                            RepliesAll = _account.ReceiveRepliesAll,
+                            IncludeFollowingsActivities = _account.ReceiveFollowingsActivity
+                        };
                         ReceiveManager.ReceiveEngine.RegisterReceiver(_userStreamsReceiver);
                     }
                     else
@@ -315,6 +244,92 @@ namespace StarryEyes.Models.Receiving.Managers
                         old.Dispose();
                     }
                 }
+            }
+
+            private StreamHandler CreateHandler()
+            {
+                var handler = StreamHandler.Create(StatusInbox.Enqueue, BackstageModel.NotifyException,
+                    _ => StateChanged?.Invoke(_account));
+                handler.RegisterHandler<StreamStatusEvent>(se =>
+                {
+                    switch (se.Event)
+                    {
+                        case StatusEvents.Unknown:
+                            BackstageModel.RegisterEvent(new UnknownEvent(se.Source, se.RawEvent));
+                            break;
+                        case StatusEvents.Favorite:
+                            NotificationService.NotifyFavorited(se.Source, se.TargetObject);
+                            break;
+                        case StatusEvents.FavoriteRetweet:
+                            if (se.TargetObject.RetweetedStatus != null)
+                            {
+                                NotificationService.NotifyRetweetFavorited(se.Source, se.Target,
+                                    se.TargetObject);
+                            }
+                            break;
+                        case StatusEvents.Unfavorite:
+                            NotificationService.NotifyUnfavorited(se.Source, se.TargetObject);
+                            break;
+                        case StatusEvents.RetweetRetweet:
+                            if (se.TargetObject.RetweetedStatus != null)
+                            {
+                                NotificationService.NotifyRetweetRetweeted(se.Source, se.Target,
+                                    se.TargetObject);
+                            }
+                            break;
+                        case StatusEvents.Quote:
+                            if (se.TargetObject.QuotedStatus != null)
+                            {
+                                NotificationService.NotifyQuoted(se.Source,
+                                    se.TargetObject.QuotedStatus, se.TargetObject);
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                });
+                handler.RegisterHandler<StreamUserEvent>(ue =>
+                {
+                    switch (ue.Event)
+                    {
+                        case UserEvents.Unknown:
+                            BackstageModel.RegisterEvent(new UnknownEvent(ue.Source, ue.RawEvent));
+                            break;
+                        case UserEvents.Follow:
+                            NotificationService.NotifyFollowed(ue.Source, ue.Target);
+                            break;
+                        case UserEvents.Unfollow:
+                            NotificationService.NotifyUnfollowed(ue.Source, ue.Target);
+                            break;
+                        case UserEvents.Block:
+                            NotificationService.NotifyBlocked(ue.Source, ue.Target);
+                            break;
+                        case UserEvents.Unblock:
+                            NotificationService.NotifyUnblocked(ue.Source, ue.Target);
+                            break;
+                        case UserEvents.Mute:
+                            NotificationService.NotifyMuted(ue.Source, ue.Target);
+                            break;
+                        case UserEvents.UnMute:
+                            NotificationService.NotifyUnmuted(ue.Source, ue.Target);
+                            break;
+                        case UserEvents.UserUpdate:
+                            NotificationService.NotifyUserUpdated(ue.Source);
+                            break;
+                        case UserEvents.UserDelete:
+                        case UserEvents.UserSuspend:
+                            // do nothing
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                });
+                handler.RegisterHandler<StreamDelete>(de => NotificationService.NotifyDeleted(de.Id, null));
+                handler.RegisterHandler<StreamLimit>(
+                    le => NotificationService.NotifyLimitationInfoGot(_account, (int)le.UndeliveredCount));
+
+                // list handler is not used.
+                return handler;
             }
 
             public UserStreamsConnectionState ConnectionState => _userStreamsReceiver == null

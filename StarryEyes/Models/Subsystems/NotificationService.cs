@@ -60,7 +60,7 @@ namespace StarryEyes.Models.Subsystems
         {
             if (status.RetweetedStatus != null)
             {
-                NotifyRetweeted(status.User, status.RetweetedStatus, status, false);
+                NotifyRetweeted(status.User, status.RetweetedStatus);
             }
             if (status.QuotedStatus != null)
             {
@@ -242,16 +242,16 @@ namespace StarryEyes.Models.Subsystems
             Head.NotifyUnfavorited(source, status);
         }
 
-        internal static void NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet,
-            bool retweetedRetweet)
+        internal static void NotifyRetweeted(TwitterUser source, TwitterStatus status)
         {
             if (MuteBlockManager.IsBlocked(source) || MuteBlockManager.IsOfficialMuted(source)) return;
-            if (!Setting.NotifyBackfilledTweets.Value &&
-                retweet.CreatedAt < App.StartupDateTime)
+            if (!Setting.NotifyBackfilledTweets.Value && status.CreatedAt < App.StartupDateTime)
             {
                 // backfilled tweets
                 return;
             }
+            var original = status.RetweetedStatus;
+            if (original == null) return;
             Task.Run(() => UserProxy.StoreUser(source));
             Task.Run(() => StatusModel.UpdateStatusInfo(
                 original.Id,
@@ -260,7 +260,48 @@ namespace StarryEyes.Models.Subsystems
                     StatusProxy.AddRetweeter(original.Id, source.Id);
                     StatusBroadcaster.Republish(original);
                 }));
-            Head.NotifyRetweeted(source, original, retweet, retweetedRetweet);
+            Head.NotifyRetweeted(source, status);
+        }
+
+        internal static void NotifyRetweetFavorited(TwitterUser source, TwitterUser target, TwitterStatus status)
+        {
+            if (MuteBlockManager.IsBlocked(source) || MuteBlockManager.IsOfficialMuted(source)) return;
+            if (!NotificationLatch.CheckSetPositive(NotificationLatchTarget.Favorite, source.Id, status.Id))
+            {
+                return;
+            }
+            var original = status.RetweetedStatus;
+            if (original == null) return;
+            Task.Run(() => UserProxy.StoreUser(source));
+            Task.Run(() => StatusModel.UpdateStatusInfo(
+                original.Id,
+                model => model.AddFavoritedUser(source), _ =>
+                {
+                    StatusProxy.AddFavoritor(original.Id, source.Id);
+                    StatusBroadcaster.Republish(original);
+                }));
+            Head.NotifyRetweetFavorited(source, target, status);
+        }
+
+        internal static void NotifyRetweetRetweeted(TwitterUser source, TwitterUser target, TwitterStatus status)
+        {
+            if (MuteBlockManager.IsBlocked(source) || MuteBlockManager.IsOfficialMuted(source)) return;
+            if (!Setting.NotifyBackfilledTweets.Value && status.CreatedAt < App.StartupDateTime)
+            {
+                // backfilled tweets
+                return;
+            }
+            var original = status.RetweetedStatus;
+            if (original == null) return;
+            Task.Run(() => UserProxy.StoreUser(source));
+            Task.Run(() => StatusModel.UpdateStatusInfo(
+                original.Id,
+                model => model.AddRetweetedUser(source), _ =>
+                {
+                    StatusProxy.AddRetweeter(original.Id, source.Id);
+                    StatusBroadcaster.Republish(original);
+                }));
+            Head.NotifyRetweetRetweeted(source, target, status);
         }
 
         internal static void NotifyQuoted(TwitterUser source, TwitterStatus original, TwitterStatus quote)

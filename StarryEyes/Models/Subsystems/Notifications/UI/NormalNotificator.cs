@@ -25,6 +25,10 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
 
         public event Action<TwitterUser, TwitterStatus> OnRetweeted;
 
+        public event Action<TwitterUser, TwitterUser, TwitterStatus> OnRetweetFavorited;
+
+        public event Action<TwitterUser, TwitterUser, TwitterStatus> OnRetweetRetweeted;
+
         public event Action<TwitterUser, TwitterStatus> OnQuoted;
 
         public void StatusReceived(TwitterStatus status)
@@ -52,14 +56,24 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
             OnFavorited?.Invoke(source, target);
         }
 
-        public void Retweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet)
+        public void Retweeted(TwitterUser source, TwitterStatus target)
         {
-            OnRetweeted?.Invoke(source, original);
+            OnRetweeted?.Invoke(source, target);
         }
 
         public void Quoted(TwitterUser source, TwitterStatus original, TwitterStatus quote)
         {
             OnQuoted?.Invoke(source, quote);
+        }
+
+        public void RetweetFavorited(TwitterUser source, TwitterUser target, TwitterStatus status)
+        {
+            OnRetweetFavorited?.Invoke(source, target, status);
+        }
+
+        public void RetweetRetweeted(TwitterUser source, TwitterUser target, TwitterStatus status)
+        {
+            OnRetweetRetweeted?.Invoke(source, target, status);
         }
     }
 }

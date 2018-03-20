@@ -183,24 +183,7 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
 
             public bool NotifyFavorited(TwitterUser source, TwitterStatus status)
             {
-                var notify = false;
-                var isRetweet = status.RetweetedStatus != null;
-                if (isRetweet && status.RetweetedStatus != null)
-                {
-                    if (Setting.NotifyFavoriteRetweeted.Value && !CheckMyself(source) && CheckMyself(status))
-                    {
-                        notify = true;
-                    }
-                    else
-                    {
-                        status = status.RetweetedStatus;
-                    }
-                }
-                else if (Setting.NotifyFavorite.Value && !CheckMyself(source) && CheckMyself(status))
-                {
-                    notify = true;
-                }
-                if (notify)
+                if (Setting.NotifyFavorite.Value && !CheckMyself(source) && CheckMyself(status))
                 {
                     PlaySoundCore(GetSoundFilePath(NotifySoundType.Event));
                     GetNotificator().Favorited(source, status);
@@ -213,14 +196,36 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
                 return false;
             }
 
-            public bool NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet,
-                bool retweetedRetweet)
+            public bool NotifyRetweeted(TwitterUser source, TwitterStatus status)
             {
-                if ((retweetedRetweet && Setting.NotifyRetweetRetweeted.Value) ||
-                    (Setting.NotifyRetweet.Value && !CheckMyself(source) && CheckMyself(original)))
+                if (Setting.NotifyRetweet.Value && !CheckMyself(source) && CheckMyself(status.User))
                 {
                     PlaySoundCore(GetSoundFilePath(NotifySoundType.Event));
-                    GetNotificator().Retweeted(source, original, retweet);
+                    GetNotificator().Retweeted(source, status.RetweetedStatus ?? status);
+                }
+                return false;
+            }
+
+            public bool NotifyRetweetFavorited(TwitterUser source, TwitterUser target, TwitterStatus status)
+            {
+                var original = status.RetweetedStatus ?? status;
+                if (Setting.NotifyFavoriteRetweeted.Value && !CheckMyself(source) &&
+                    CheckMyself(target) && !CheckMyself(original.User))
+                {
+                    PlaySoundCore(GetSoundFilePath(NotifySoundType.Event));
+                    GetNotificator().RetweetFavorited(source, target, original);
+                }
+                return false;
+            }
+
+            public bool NotifyRetweetRetweeted(TwitterUser source, TwitterUser target, TwitterStatus status)
+            {
+                var original = status.RetweetedStatus ?? status;
+                if (Setting.NotifyRetweetRetweeted.Value && !CheckMyself(source) &&
+                    CheckMyself(target) && !CheckMyself(original.User))
+                {
+                    PlaySoundCore(GetSoundFilePath(NotifySoundType.Event));
+                    GetNotificator().RetweetRetweeted(source, target, original);
                 }
                 return false;
             }

@@ -5,8 +5,8 @@ namespace StarryEyes.Models.Backstages.TwitterEvents
 {
     public sealed class UnfavoritedEvent : TwitterEventBase
     {
-        public UnfavoritedEvent(TwitterUser user, TwitterStatus target)
-            : base(user, target.User, target)
+        public UnfavoritedEvent(TwitterUser user, TwitterStatus status)
+            : base(user, status.User, status)
         {
         }
 

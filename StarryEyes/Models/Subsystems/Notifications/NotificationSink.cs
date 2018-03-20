@@ -60,16 +60,12 @@ namespace StarryEyes.Models.Subsystems.Notifications
             BackstageModel.RegisterEvent(new UnfavoritedEvent(source, status));
         }
 
-        public void NotifyRetweeted(TwitterUser source, TwitterStatus original, TwitterStatus retweet,
-            bool retweetedRetweet)
+        public void NotifyRetweeted(TwitterUser source, TwitterStatus status)
         {
-            if (retweetedRetweet ||
-                (retweet.RetweetedStatus != null && (
-                     Setting.Accounts.Contains(source.Id) ||
-                     Setting.Accounts.Contains(original.User.Id) ||
-                     Setting.Accounts.Contains(retweet.User.Id))))
+            if (Setting.Accounts.Contains(source.Id) ||
+                Setting.Accounts.Contains(status.User.Id))
             {
-                BackstageModel.RegisterEvent(new RetweetedEvent(source, original));
+                BackstageModel.RegisterEvent(new RetweetedEvent(source, status));
             }
         }
 
@@ -83,7 +79,23 @@ namespace StarryEyes.Models.Subsystems.Notifications
             }
         }
 
-        public void NotifyDeleted(long statusId, TwitterStatus deleted)
+        public void NotifyRetweetFavorited(TwitterUser source, TwitterUser target, TwitterStatus status)
+        {
+            if (Setting.Accounts.Contains(target.Id))
+            {
+                BackstageModel.RegisterEvent(new FavoritedEvent(source, target, status));
+            }
+        }
+
+        public void NotifyRetweetRetweeted(TwitterUser source, TwitterUser target, TwitterStatus status)
+        {
+            if (Setting.Accounts.Contains(target.Id))
+            {
+                BackstageModel.RegisterEvent(new RetweetedEvent(source, target, status));
+            }
+        }
+
+        public void NotifyDeleted(long statusId, TwitterStatus status)
         {
             // do nothing, currently.
         }
