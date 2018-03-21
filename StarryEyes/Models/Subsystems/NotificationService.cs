@@ -60,7 +60,7 @@ namespace StarryEyes.Models.Subsystems
         {
             if (status.RetweetedStatus != null)
             {
-                NotifyRetweeted(status.User, status.RetweetedStatus);
+                NotifyRetweeted(status.User, status);
             }
             if (status.QuotedStatus != null)
             {

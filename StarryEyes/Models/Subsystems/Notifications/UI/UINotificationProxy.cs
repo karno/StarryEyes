@@ -198,6 +198,8 @@ namespace StarryEyes.Models.Subsystems.Notifications.UI
 
             public bool NotifyRetweeted(TwitterUser source, TwitterStatus status)
             {
+                // reference to original status.
+                status = status.RetweetedStatus ?? status;
                 if (Setting.NotifyRetweet.Value && !CheckMyself(source) && CheckMyself(status.User))
                 {
                     PlaySoundCore(GetSoundFilePath(NotifySoundType.Event));
