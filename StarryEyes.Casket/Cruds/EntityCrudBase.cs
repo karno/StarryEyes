@@ -32,9 +32,12 @@ namespace StarryEyes.Casket.Cruds
 
         public async Task<Dictionary<long, IEnumerable<T>>> GetEntitiesDictionaryAsync(IEnumerable<long> parentIds)
         {
-            return (await Descriptor.QueryAsync<T>(
-                CreateSql("ParentId in @Ids"),
-                new { Ids = parentIds.ToArray() }).ConfigureAwait(false))
+            return (await parentIds
+                    .Chunk(Database.MAX_PARAM_LENGTH)
+                    .Select(chunk => Descriptor.QueryAsync<T>(
+                        CreateSql("ParentId IN @Ids"),
+                        new { Ids = chunk.ToArray() }))
+                    .GatherSelectMany().ConfigureAwait(false))
                 .GroupBy(d => d.ParentId)
                 .ToDictionary(d => d.Key, d => d.AsEnumerable());
         }
@@ -49,7 +52,7 @@ namespace StarryEyes.Casket.Cruds
         internal Tuple<string, object> CreateDeleter(long parentId)
         {
             return Tuple.Create("delete from " + TableName + " where ParentId = @Id;",
-                         (object)new { Id = parentId });
+                (object)new { Id = parentId });
         }
     }
 }

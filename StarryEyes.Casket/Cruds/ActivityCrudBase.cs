@@ -35,8 +35,11 @@ namespace StarryEyes.Casket.Cruds
         public async Task<Dictionary<long, IEnumerable<long>>> GetUsersDictionaryAsync(
             IEnumerable<long> statusIds)
         {
-            return (await Descriptor.QueryAsync<DatabaseActivity>(
-                CreateSql("StatusId IN @Ids"), new { Ids = statusIds.ToArray() }).ConfigureAwait(false))
+            return (await statusIds
+                    .Chunk(Database.MAX_PARAM_LENGTH)
+                    .Select(chunk => Descriptor.QueryAsync<DatabaseActivity>(
+                        CreateSql("StatusId IN @Ids"), new { Ids = chunk.ToArray() }))
+                    .GatherSelectMany().ConfigureAwait(false))
                 .GroupBy(e => e.StatusId)
                 .ToDictionary(e => e.Key, e => e.Select(d => d.UserId));
         }

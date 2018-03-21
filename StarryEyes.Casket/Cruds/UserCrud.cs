@@ -25,8 +25,8 @@ namespace StarryEyes.Casket.Cruds
         public async Task<DatabaseUser> GetAsync(string screenName)
         {
             return (await Descriptor.QueryAsync<DatabaseUser>(
-                CreateSql("LOWER(ScreenName) = @ScreenName limit 1"),
-                new { ScreenName = screenName.ToLower() }).ConfigureAwait(false))
+                    CreateSql("LOWER(ScreenName) = @ScreenName limit 1"),
+                    new { ScreenName = screenName.ToLower() }).ConfigureAwait(false))
                 .SingleOrDefault();
         }
 
@@ -51,9 +51,11 @@ namespace StarryEyes.Casket.Cruds
 
         public Task<IEnumerable<DatabaseUser>> GetUsersAsync(IEnumerable<long> ids)
         {
-            return Descriptor.QueryAsync<DatabaseUser>(
-                CreateSql("Id IN @Ids"),
-                new { Ids = ids.ToArray() });
+            return ids.Chunk(Database.MAX_PARAM_LENGTH)
+                      .Select(chunk => Descriptor.QueryAsync<DatabaseUser>(
+                          CreateSql("Id IN @Ids"),
+                          new { Ids = chunk.ToArray() }))
+                      .GatherSelectMany();
         }
 
         public Task<IEnumerable<DatabaseUser>> GetUsersAsync(string partOfScreenName)

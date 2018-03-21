@@ -31,15 +31,17 @@ namespace StarryEyes.Casket.Cruds
         public async Task<bool> CheckExistsAsync(long id)
         {
             return (await Descriptor.QueryAsync<long>(
-                "select Id from " + TableName + " where Id = @Id;",
-                new { Id = id }).ConfigureAwait(false)).SingleOrDefault() != 0;
+                       "select Id from " + TableName + " where Id = @Id;",
+                       new { Id = id }).ConfigureAwait(false)).SingleOrDefault() != 0;
         }
 
         public Task<IEnumerable<DatabaseStatus>> GetStatusesAsync(IEnumerable<long> ids)
         {
-            return Descriptor.QueryAsync<DatabaseStatus>(
-                CreateSql("Id IN @Ids"),
-                new { Ids = ids });
+            return ids.Chunk(Database.MAX_PARAM_LENGTH)
+                      .Select(chunk => Descriptor.QueryAsync<DatabaseStatus>(
+                          CreateSql("Id IN @Ids"),
+                          new { Ids = chunk.ToArray() }))
+                      .GatherSelectMany();
         }
 
         public Task<IEnumerable<DatabaseStatus>> GetRetweetedStatusesAsync(long originalId)
@@ -74,9 +76,9 @@ namespace StarryEyes.Casket.Cruds
         public async Task<long?> GetInReplyToAsync(long id)
         {
             return (await Descriptor.QueryAsync<long?>(
-                "select InReplyToStatusId " +
-                "from " + TableName + " " +
-                "where Id = @Id limit 1;", new { Id = id }).ConfigureAwait(false))
+                    "select InReplyToStatusId " +
+                    "from " + TableName + " " +
+                    "where Id = @Id limit 1;", new { Id = id }).ConfigureAwait(false))
                 .FirstOrDefault();
         }
 

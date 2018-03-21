@@ -14,6 +14,8 @@ namespace StarryEyes.Casket
 {
     public static class Database
     {
+        internal const int MAX_PARAM_LENGTH = 999;
+
         private static readonly AccountInfoCrud _accountInfoCrud = new AccountInfoCrud();
         private static readonly StatusCrud _statusCrud = new StatusCrud();
         private static readonly StatusEntityCrud _statusEntityCrud = new StatusEntityCrud();

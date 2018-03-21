@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 // ReSharper disable CheckNamespace
@@ -85,6 +86,29 @@ namespace System.Linq
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             return take == null ? source : source.Take(take.Value);
+        }
+
+        public static IEnumerable<IEnumerable<T>> Chunk<T>(this IEnumerable<T> source, int chunkSize)
+        {
+            var tempList = new List<T>(chunkSize);
+            foreach (var item in source)
+            {
+                tempList.Add(item);
+                if (tempList.Count < chunkSize) continue;
+                yield return tempList.ToArray();
+                tempList.Clear();
+            }
+            yield return tempList.ToArray();
+        }
+
+        public static async Task<IEnumerable<T>> GatherAsyncResult<T>(this IEnumerable<Task<T>> source)
+        {
+            return await Task.WhenAll(source).ConfigureAwait(false);
+        }
+
+        public static async Task<IEnumerable<T>> GatherSelectMany<T>(this IEnumerable<Task<IEnumerable<T>>> source)
+        {
+            return (await source.GatherAsyncResult().ConfigureAwait(false)).SelectMany(c => c);
         }
     }
 }
