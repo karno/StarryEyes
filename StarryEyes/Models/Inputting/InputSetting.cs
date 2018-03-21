@@ -47,8 +47,7 @@ namespace StarryEyes.Models.Inputting
                                    .Where(e => !except.Contains(e.Id))
                                    .Select(e => e.DisplayText)
                                    .Distinct()
-                                   .Select(s => "@" + s + " ")
-                                   .JoinString("");
+                                   .JoinString(" ");
             }
             return new InputSetting
             {
