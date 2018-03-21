@@ -549,7 +549,7 @@ namespace StarryEyes.ViewModels.Timelines.Statuses
 
         public void CopyBody()
         {
-            SetClipboard(Status.GetEntityAidedText());
+            SetClipboard(Status.GetEntityAidedText(EntityDisplayMode.FullText));
         }
 
         public void CopyPermalink()

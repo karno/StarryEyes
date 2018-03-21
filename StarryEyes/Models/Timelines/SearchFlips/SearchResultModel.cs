@@ -76,9 +76,9 @@ namespace StarryEyes.Models.Timelines.SearchFlips
                     var negative = splitted.Where(s => s.StartsWith("-")).Select(s => s.Substring(1)).ToArray();
                     var filter = new Func<TwitterStatus, bool>(
                         status =>
-                            positive.Any(s => status.GetEntityAidedText()
+                            positive.Any(s => status.GetEntityAidedText(EntityDisplayMode.FullText)
                                                     .IndexOf(s, StringComparison.CurrentCultureIgnoreCase) >= 0) &&
-                            !negative.Any(s => status.GetEntityAidedText()
+                            !negative.Any(s => status.GetEntityAidedText(EntityDisplayMode.FullText)
                                                      .IndexOf(s, StringComparison.CurrentCultureIgnoreCase) >= 0));
                     var psql = positive.Select(s => "LOWER(EntityAidedText) like LOWER('%" + s + "%')")
                                        .JoinString(" OR ");

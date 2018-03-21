@@ -122,7 +122,7 @@ namespace StarryEyes.Helpers
                   .ForEach(e => result.Add(Tuple.Create(e.Url, e.MediaUrl)));
 
             // resolve url in status text
-            var matches = UrlRegex.Matches(status.GetEntityAidedText(EntityDisplayMode.LinkUri)).Cast<Match>();
+            var matches = UrlRegex.Matches(status.GetEntityAidedText(EntityDisplayMode.FullText)).Cast<Match>();
             matches.Select(m => m.Value).ForEach(s =>
             {
                 if (SupportedExtents.Any(ext => s.EndsWith("." + ext)))
