@@ -250,6 +250,7 @@ namespace StarryEyes.Models.Receiving.Managers
             {
                 var handler = StreamHandler.Create(StatusInbox.Enqueue, BackstageModel.NotifyException,
                     _ => StateChanged?.Invoke(_account));
+                handler.RegisterHandler<StreamDelete>(d => StatusInbox.EnqueueRemoval(d.Id));
                 handler.RegisterHandler<StreamStatusEvent>(se =>
                 {
                     switch (se.Event)
@@ -324,7 +325,6 @@ namespace StarryEyes.Models.Receiving.Managers
                             throw new ArgumentOutOfRangeException();
                     }
                 });
-                handler.RegisterHandler<StreamDelete>(de => NotificationService.NotifyDeleted(de.Id, null));
                 handler.RegisterHandler<StreamLimit>(
                     le => NotificationService.NotifyLimitationInfoGot(_account, (int)le.UndeliveredCount));
 
